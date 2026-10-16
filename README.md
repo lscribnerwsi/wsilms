@@ -58,3 +58,15 @@ If IT would rather not use an app password, the same functions can send through 
 - Saves are "last one wins". If two admins edit the same module at the same moment, the later save overwrites the earlier one.
 - Week-by-week unlocking is a display rule. A learner who changes the date on their computer could open a locked week early. Real enforcement comes with Google sign-in.
 - Learner progress is matched to people in the People list by full name. Associates without a WSI account are saved by the name they type.
+
+## New in this version
+
+- **Reports** tab combines Insights and Progress & scores, plus Recertification and Surveys & touchpoints.
+- **Ninjio** tab: upload the monthly Advanced Training Report (.xlsx). It reads the "User Performance" sheet, groups people by branch from the department column, and lets you review and send one email per branch manager.
+- **Emails** tab: edit all seven email templates.
+- **Branch manager accounts** in "Continue as": each sees only their branch. People must have their branch set in their profile.
+- **Recertification**: in a module's settings, set "Recertify every N months" and optionally auto-reassign.
+- **Recurring trainings** (Assignments tab): assign a module to a group every month, quarter, 6 months or year.
+- **Survey form** and **Outside training link** lesson types. The New Hire Survey and 45-Day Touchpoint modules show a sample survey until you paste the Google Form link in the module editor.
+- **Upload auto-check**: set an example screenshot on an upload question. `netlify/functions/check-upload.mjs` uses the same ANTHROPIC_API_KEY. Unclear uploads are emailed to Katelyn.
+- Email now also allows @cjsearchgroup.com addresses.

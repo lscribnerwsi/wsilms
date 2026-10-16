@@ -321,13 +321,46 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
       </div>
     </sc-if>
 
-    <!-- INSIGHTS -->
-    <sc-if value="{{ isInsights }}" hint-placeholder-val="{{ false }}">
-      <div style="display: flex; flex-direction: column; gap: 22px;">
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-          <h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Learning insights</h1>
-          <p style="margin: 0; font-size: 15px; color: #3F4040;">How training is going across WSI, by branch, role and module.</p>
-        </div>
+    <!-- DASHBOARD -->
+    <sc-if value="{{ isDash }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; gap: 26px; align-items: flex-start; flex-wrap: wrap;">
+        <nav style="flex: 0 0 210px; position: sticky; top: 12px; display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <span style="padding: 6px 10px 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #C62B1C;">Dashboard</span>
+          <sc-for list="{{ dashNav }}" as="n" hint-placeholder-count="4">
+            <button onClick="{{ n.onClick }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 0; background: {{ n.bg }}; color: {{ n.color }}; font: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer;" style-hover="background: #F5F5F4;"><span>{{ n.label }}</span><sc-if value="{{ n.hasCount }}" hint-placeholder-val="{{ false }}"><span style="min-width: 22px; padding: 1px 7px; border-radius: 999px; background: #EE3826; color: #FFFFFF; font-size: 11px; font-weight: 800; text-align: center;">{{ n.count }}</span></sc-if></button>
+          </sc-for>
+        </nav>
+        <div style="flex: 1 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 22px;">
+          <sc-if value="{{ isDashOverview }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 4px;"><h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Dashboard</h1><p style="margin: 0; font-size: 15px; color: #3F4040;">Training in progress and anything that needs your attention.</p></div>
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;"><span style="font-weight: 800; font-size: 17px;">Needs your review</span><span style="font-size: 13px; color: #5C5D5D;">{{ reviewTotal }}</span></div>
+              <sc-if value="{{ reviewNone }}" hint-placeholder-val="{{ false }}"><span style="font-size: 14px; color: #3F4040;">You're all caught up.</span></sc-if>
+              <sc-for list="{{ reviewItems }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.onClick }}" style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border: 0; border-top: 1px solid #F0F0EF; background: none; font: inherit; text-align: left; cursor: pointer; color: #262626;">
+                  <span style="flex: none; min-width: 40px; height: 40px; padding: 0 8px; box-sizing: border-box; border-radius: 10px; background: {{ r.bg }}; color: {{ r.color }}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">{{ r.count }}</span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 15px;">{{ r.label }}</span><span style="font-size: 13px; color: #5C5D5D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.sub }}</span></span>
+                  <span style="flex: none; font-size: 13px; font-weight: 700; color: #C62B1C;">{{ r.cta }} →</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;"><h2 style="font-weight: 800; font-size: 17px; margin: 0;">Training in Progress</h2><span style="font-size: 13px; color: #5C5D5D;">New hires and promotions</span></div>
+              <sc-if value="{{ insNoNewHires }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">{{ insEmptyText }}</span></sc-if>
+              <div style="display: flex; flex-direction: column;">
+                <sc-for list="{{ insNewHires }}" as="n" hint-placeholder-count="5">
+                  <button onClick="{{ n.onOpen }}" style="display: grid; grid-template-columns: 30px minmax(0, 1fr) 90px 80px; align-items: center; gap: 12px; padding: 9px 0; border: 0; border-top: 1px solid #F0F0EF; background: none; font: inherit; text-align: left; cursor: pointer; color: #262626;">
+                    <span style="width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">{{ n.initials }}</span>
+                    <span style="min-width: 0; display: flex; flex-direction: column;"><span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><span style="font-size: 14px; font-weight: 700;">{{ n.name }}</span><span style="padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: {{ n.tBg }}; color: {{ n.tColor }};">{{ n.type }}</span></span><span style="font-size: 12px; color: #5C5D5D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ n.meta }} · {{ n.days }}</span></span>
+                    <span style="display: flex; align-items: center; gap: 6px;"><span style="flex: 1; height: 6px; border-radius: 999px; background: #EBEBEA;"><span style="display: block; height: 100%; border-radius: 999px; background: #EE3826; width: {{ n.width }};"></span></span><span style="font-size: 12px; font-weight: 700; width: 32px; text-align: right;">{{ n.pctLabel }}</span></span>
+                    <span style="justify-self: end; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; background: {{ n.stBg }}; color: {{ n.stColor }}; border: {{ n.stBorder }};">{{ n.status }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isDashReporting }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 4px;"><h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Reporting</h1><p style="margin: 0; font-size: 15px; color: #3F4040;">Completion, scores and recertification across WSI. Filter by group, department or branch.</p></div>
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: 10px; background: {{ scopeBg }}; border: 1.5px solid {{ scopeBorder }};">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg>
           <span style="font-size: 13px; font-weight: 700;">Showing</span>
@@ -349,21 +382,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
             </div>
           </sc-for>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px;">
-          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;"><h2 style="font-weight: 800; font-size: 17px; margin: 0;">Training in Progress</h2><span style="font-size: 13px; color: #5C5D5D;">New hires and promotions</span></div>
-            <sc-if value="{{ insNoNewHires }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">{{ insEmptyText }}</span></sc-if>
-            <div style="display: flex; flex-direction: column;">
-              <sc-for list="{{ insNewHires }}" as="n" hint-placeholder-count="5">
-                <button onClick="{{ n.onOpen }}" style="display: grid; grid-template-columns: 30px minmax(0, 1fr) 90px 80px; align-items: center; gap: 12px; padding: 9px 0; border: 0; border-top: 1px solid #F0F0EF; background: none; font: inherit; text-align: left; cursor: pointer; color: #262626;">
-                  <span style="width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">{{ n.initials }}</span>
-                  <span style="min-width: 0; display: flex; flex-direction: column;"><span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><span style="font-size: 14px; font-weight: 700;">{{ n.name }}</span><span style="padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: {{ n.tBg }}; color: {{ n.tColor }};">{{ n.type }}</span></span><span style="font-size: 12px; color: #5C5D5D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ n.meta }} · {{ n.days }}</span></span>
-                  <span style="display: flex; align-items: center; gap: 6px;"><span style="flex: 1; height: 6px; border-radius: 999px; background: #EBEBEA;"><span style="display: block; height: 100%; border-radius: 999px; background: #EE3826; width: {{ n.width }};"></span></span><span style="font-size: 12px; font-weight: 700; width: 32px; text-align: right;">{{ n.pctLabel }}</span></span>
-                  <span style="justify-self: end; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; background: {{ n.stBg }}; color: {{ n.stColor }}; border: {{ n.stBorder }};">{{ n.status }}</span>
-                </button>
-              </sc-for>
-            </div>
-          </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 16px;">
           <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
             <h2 style="font-weight: 800; font-size: 17px; margin: 0;">Completion by branch</h2>
             <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -376,7 +395,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
               </sc-for>
             </div>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0; grid-column: 1 / -1;">
+          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
             <h2 style="font-weight: 800; font-size: 17px; margin: 0;">Completion by role</h2>
             <div style="display: flex; flex-direction: column; gap: 12px;">
               <sc-for list="{{ insRoles }}" as="b" hint-placeholder-count="5">
@@ -388,13 +407,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
               </sc-for>
             </div>
           </div>
-        </div>
-      </div>
-    </sc-if>
-
-    <!-- REPORTS: RECERT + SURVEYS -->
-    <sc-if value="{{ isInsights }}" hint-placeholder-val="{{ false }}">
-      <div style="display: flex; flex-direction: column; gap: 22px; padding-top: 22px;">
+            </div>
         <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
           <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
             <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Recertification</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Trainings that have expired or expire in the next 60 days. Modules set to recertify: {{ recertModules }}</span></div>
@@ -410,6 +423,154 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
               <td><div style="display: flex; gap: 8px; justify-content: flex-end;"><button onClick="{{ r.onEmail }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626; padding: 5px 10px; font-size: 12px;">Email</button><button onClick="{{ r.onReassign }}" style="padding: 8px 16px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px 12px; font-size: 12px;">Reassign</button></div></td>
             </tr></sc-for></tbody></table></div></sc-if>
         </div>
+          </sc-if>
+          <sc-if value="{{ isDashChecks }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Knowledge checks by module</h1>
+            <p style="margin: 0; font-size: 15px; color: #3F4040;">Where each module stands and how people score on its knowledge check. Passing score is {{ passScore }}%; the latest attempt counts.</p>
+          </div>
+          <button onClick="{{ exportScores }}" style="display: flex; gap: 8px; align-items: center; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: #262626;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+            Export scores
+          </button>
+        </div>
+        
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; max-width: 1100px;">
+          <sc-for list="{{ scoreStats }}" as="st" hint-placeholder-count="4">
+            <div style="display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; border-radius: 12px; border: 1px solid #E3E3E1; border-top: 4px solid {{ st.edge }}; background: #FFFFFF;">
+              <span style="font-size: 32px; font-weight: 800; line-height: 1; color: {{ st.color }};">{{ st.value }}</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3F4040;">{{ st.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;">
+            <h2 style="font-weight: 800; font-size: 17px; margin: 0;">Module progress</h2>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; font-weight: 600;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #262626;"></span>Complete</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #7D7E7D;"></span>In progress</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #E3E3E1;"></span>Not started</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #EE3826;"></span>Overdue</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <sc-for list="{{ modProgress }}" as="m" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: minmax(160px, 320px) minmax(0, 1fr); gap: 16px; align-items: center;">
+                <span style="display: flex; flex-direction: column; min-width: 0;"><span style="font-size: 13px; font-weight: 700; line-height: 1.35;">{{ m.title }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ m.total }} assigned</span></span>
+                <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+                  <sc-if value="{{ m.someAssigned }}" hint-placeholder-val="{{ true }}">
+                    <div style="display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: #E3E3E1;">
+                      <span style="width: {{ m.wDone }}; background: #262626;"></span><span style="width: {{ m.wProg }}; background: #7D7E7D;"></span><span style="width: {{ m.wNot }}; background: #E3E3E1;"></span><span style="width: {{ m.wOver }}; background: #EE3826;"></span>
+                    </div>
+                    <span style="font-size: 12px; color: #5C5D5D;">{{ m.legend }}</span>
+                  </sc-if>
+                  <sc-if value="{{ m.noneAssigned }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #A9AAA8;">Not assigned to anyone yet</span></sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;">
+            <h2 style="font-weight: 800; font-size: 18px; margin: 0;">Knowledge checks by module</h2>
+            <span style="font-size: 13px; color: #5C5D5D;">Click a module to see its results.</span>
+          </div>
+          <div style="overflow-x: auto; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <table style="width: 100%; min-width: 760px; border-collapse: collapse;">
+              <thead><tr><th style="padding-left: 20px;">Module</th><th>Taken</th><th>Average score</th><th>Passed 1st try</th><th>Avg attempts</th><th>Lowest</th></tr></thead>
+              <tbody>
+                <sc-for list="{{ scoreModuleRows }}" as="m" hint-placeholder-count="8">
+                  <tr onClick="{{ m.onPick }}" style="cursor: pointer; background: {{ m.rowBg }};">
+                    <td style="padding-left: 20px; max-width: 340px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 700; line-height: 1.35;">{{ m.title }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ m.cat }}</span></div></td>
+                    <td>{{ m.taken }}</td>
+                    <td><div style="display: flex; align-items: center; gap: 10px; min-width: 160px;"><div style="flex: 1; height: 6px; border-radius: 999px; background: #EBEBEA;"><div style="height: 100%; border-radius: 999px; background: {{ m.barColor }}; width: {{ m.avgWidth }};"></div></div><span style="font-size: 14px; font-weight: 800; width: 42px; color: {{ m.avgColor }};">{{ m.avg }}</span></div></td>
+                    <td style="font-weight: 600;">{{ m.firstPass }}</td>
+                    <td>{{ m.attempts }}</td>
+                    <td>{{ m.low }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <h2 style="font-weight: 800; font-size: 18px; margin: 0;">{{ resultsTitle }}</h2>
+            <sc-if value="{{ resultsFiltered }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearScoreFilter }}" style="padding: 4px 12px; border-radius: 999px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;">Show all</button></sc-if>
+          </div>
+          <div style="overflow-x: auto; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <table style="width: 100%; min-width: 820px; border-collapse: collapse;">
+              <thead><tr><th style="padding-left: 20px;">Person</th><th>Module</th><th>Latest score</th><th>First attempt</th><th>Attempts</th><th>Result</th><th>Date</th></tr></thead>
+              <tbody>
+                <sc-for list="{{ scoreRows }}" as="r" hint-placeholder-count="6">
+                  <tr>
+                    <td style="padding-left: 20px;">
+                      <button onClick="{{ r.onOpen }}" style="display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; font: inherit; text-align: left; cursor: pointer; color: #262626;">
+                        <span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ r.initials }}</span>
+                        <span style="font-weight: 700; text-decoration: underline; text-decoration-color: #C9CAC8; text-underline-offset: 3px;">{{ r.name }}</span>
+                        <sc-if value="{{ r.isLive }}" hint-placeholder-val="{{ false }}"><span style="padding: 1px 8px; border-radius: 999px; background: #262626; color: #FFFFFF; font-size: 10px; font-weight: 700;">Live</span></sc-if>
+                      </button>
+                    </td>
+                    <td style="max-width: 300px; line-height: 1.35;">{{ r.module }}</td>
+                    <td style="font-size: 15px; font-weight: 800; color: {{ r.scoreColor }};">{{ r.score }}</td>
+                    <td>{{ r.first }}</td>
+                    <td>{{ r.attempts }}</td>
+                    <td><span style="padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: {{ r.stBg }}; color: {{ r.stColor }}; border: {{ r.stBorder }};">{{ r.result }}</span></td>
+                    <td style="white-space: nowrap;">{{ r.date }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <sc-if value="{{ noScoreRows }}" hint-placeholder-val="{{ false }}"><div style="padding: 28px; text-align: center; font-size: 14px; color: #5C5D5D;">No one has taken this knowledge check yet.</div></sc-if>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Uploaded answers</span><span style="font-size: 13px; color: #5C5D5D;">Files and screenshots learners sent for upload questions in knowledge checks.</span></div><span style="font-size: 13px; font-weight: 700;">{{ uploadsPendingLabel }}</span></div>
+          <sc-if value="{{ noUploads }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">No uploads yet. In the module editor, set a knowledge check question's answer type to "File or screenshot upload".</span></sc-if>
+          <sc-for list="{{ uploadRows }}" as="f" hint-placeholder-count="0">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid #EBEBEA;">
+              <span style="flex: none; width: 32px; height: 32px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ f.initials }}</span>
+              <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 700; font-size: 14px;">{{ f.who }} · {{ f.module }}</span><span style="font-size: 13px; color: #3F4040;">{{ f.question }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ f.file }} · {{ f.date }}</span><sc-if value="{{ f.hasAi }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 700; color: {{ f.aiColor }};">{{ f.aiLabel }}</span></sc-if></div>
+              <sc-if value="{{ f.hasHref }}" hint-placeholder-val="{{ false }}"><a href="{{ f.href }}" target="_blank" rel="noopener" style="padding: 6px 12px; border-radius: 8px; border: 1.5px solid #262626; font-size: 12px; font-weight: 700; color: #262626; text-decoration: none;">Open file</a></sc-if>
+              <sc-if value="{{ f.notReviewed }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.onReview }}" style="padding: 6px 12px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;">Mark reviewed</button></sc-if>
+              <sc-if value="{{ f.reviewed }}" hint-placeholder-val="{{ false }}"><span style="padding: 3px 10px; border-radius: 999px; background: #262626; color: #FFFFFF; font-size: 12px; font-weight: 700;">Reviewed</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+          </sc-if>
+          <sc-if value="{{ isDashSurveys }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 4px;"><h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Surveys</h1><p style="margin: 0; font-size: 15px; color: #3F4040;">Onboarding survey and 45-day touchpoint responses, overall and by person.</p></div>
+            <div style="display: flex; gap: 6px; padding: 4px; border-radius: 999px; background: #EBEBEA; align-self: flex-start;"><sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="padding: 8px 16px; border-radius: 999px; border: 0; background: {{ t.bg }}; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">{{ t.label }}</button></sc-for></div>
+            <sc-if value="{{ svSample }}" hint-placeholder-val="{{ false }}"><div style="padding: 10px 14px; border-radius: 10px; background: #F5F5F4; font-size: 13px; line-height: 1.5;">Sample responses are shown until real ones come in.</div></sc-if>
+            <sc-if value="{{ svGoogle }}" hint-placeholder-val="{{ false }}"><div style="padding: 10px 14px; border-radius: 10px; background: #FDECE9; color: #7E1B11; font-size: 13px; line-height: 1.5;">This survey uses a Google Form, so answers are saved in the form's Google Sheet. Only who submitted and when is shown here.</div></sc-if>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+              <sc-for list="{{ svKpis }}" as="k" hint-placeholder-count="3"><div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; border-top: 4px solid #262626;"><span style="font-weight: 800; font-size: 28px;">{{ k.value }}</span><span style="font-size: 13px; font-weight: 600; color: #3F4040;">{{ k.label }}</span></div></sc-for>
+            </div>
+            <sc-for list="{{ svQuestions }}" as="q" hint-placeholder-count="3">
+              <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;"><span style="font-weight: 800; font-size: 15px; line-height: 1.4;">{{ q.num }}. {{ q.q }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ q.n }}</span></div>
+                <sc-if value="{{ q.isScale }}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;"><div style="display: flex; flex-direction: column;"><span style="font-weight: 800; font-size: 34px; line-height: 1;">{{ q.avg }}</span><span style="font-size: 12px; color: #5C5D5D;">average of 5</span></div><div style="flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 5px;"><sc-for list="{{ q.bars }}" as="b" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 54px minmax(0, 1fr) 28px; align-items: center; gap: 8px;"><span style="font-size: 12px; font-weight: 700;">{{ b.label }}</span><div style="height: 8px; border-radius: 999px; background: #EBEBEA;"><div style="height: 100%; border-radius: 999px; background: #EE3826; width: {{ b.w }};"></div></div><span style="font-size: 12px; font-weight: 700; text-align: right;">{{ b.n }}</span></div></sc-for></div></div></sc-if>
+                <sc-if value="{{ q.isChoice }}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 6px;"><sc-for list="{{ q.bars }}" as="b" hint-placeholder-count="3"><div style="display: grid; grid-template-columns: minmax(80px, 160px) minmax(0, 1fr) 60px; align-items: center; gap: 10px;"><span style="font-size: 13px; font-weight: 700;">{{ b.label }}</span><div style="height: 10px; border-radius: 999px; background: #EBEBEA;"><div style="height: 100%; border-radius: 999px; background: #262626; width: {{ b.w }};"></div></div><span style="font-size: 12px; font-weight: 700; text-align: right;">{{ b.n }} · {{ b.pct }}</span></div></sc-for></div></sc-if>
+                <sc-if value="{{ q.isText }}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 8px;"><sc-for list="{{ q.texts }}" as="t" hint-placeholder-count="2"><div style="padding: 10px 14px; border-radius: 10px; background: #F5F5F4; font-size: 14px; line-height: 1.5;">“{{ t.text }}”<span style="display: block; font-size: 12px; color: #5C5D5D; margin-top: 4px;">{{ t.who }}</span></div></sc-for><sc-if value="{{ q.noText }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">No written answers yet.</span></sc-if></div></sc-if>
+              </div>
+            </sc-for>
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+              <span style="font-weight: 800; font-size: 17px;">Responses by person</span>
+              <sc-if value="{{ svNoResp }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">No responses yet.</span></sc-if>
+              <sc-for list="{{ svPeople }}" as="p" hint-placeholder-count="2">
+                <div style="display: flex; flex-direction: column; border-top: 1px solid #F0F0EF;">
+                  <button onClick="{{ p.onToggle }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; color: #262626;"><span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ p.initials }}</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ p.name }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ p.meta }}</span></span><span style="font-size: 13px; font-weight: 700; color: #C62B1C;">{{ p.cta }}</span></button>
+                  <sc-if value="{{ p.open }}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 8px; padding: 0 0 14px 42px;"><sc-for list="{{ p.answers }}" as="x" hint-placeholder-count="3"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; font-weight: 700; color: #5C5D5D;">{{ x.q }}</span><span style="font-size: 14px; line-height: 1.5;">{{ x.a }}</span></div></sc-for></div></sc-if>
+                </div>
+              </sc-for>
+            </div>
         <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
           <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Surveys and touchpoints</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">New hires’ onboarding survey and 45-day touchpoint. Set or change each due date here.</span></div>
           <sc-if value="{{ noSurveyRows }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">No new hires right now.</span></sc-if>
@@ -424,6 +585,8 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
                 <sc-if value="{{ c.canAssign }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.onAssign }}" style="padding: 0; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Assign</button></sc-if>
               </div></td></sc-for>
             </tr></sc-for></tbody></table></div>
+        </div>
+          </sc-if>
         </div>
       </div>
     </sc-if>
@@ -726,129 +889,6 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
       </div>
     </sc-if>
 
-    <!-- SCORES -->
-    <sc-if value="{{ isScores }}" hint-placeholder-val="{{ false }}">
-      <div style="display: flex; flex-direction: column; gap: 22px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Progress &amp; scores</h1>
-            <p style="margin: 0; font-size: 15px; color: #3F4040;">Where each module stands and how people score on its knowledge check. Passing score is {{ passScore }}%; the latest attempt counts.</p>
-          </div>
-          <button onClick="{{ exportScores }}" style="display: flex; gap: 8px; align-items: center; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: #262626;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
-            Export scores
-          </button>
-        </div>
-        
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; max-width: 1100px;">
-          <sc-for list="{{ scoreStats }}" as="st" hint-placeholder-count="4">
-            <div style="display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; border-radius: 12px; border: 1px solid #E3E3E1; border-top: 4px solid {{ st.edge }}; background: #FFFFFF;">
-              <span style="font-size: 32px; font-weight: 800; line-height: 1; color: {{ st.color }};">{{ st.value }}</span>
-              <span style="font-size: 13px; font-weight: 600; color: #3F4040;">{{ st.label }}</span>
-            </div>
-          </sc-for>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;">
-            <h2 style="font-weight: 800; font-size: 17px; margin: 0;">Module progress</h2>
-            <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; font-weight: 600;">
-              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #262626;"></span>Complete</span>
-              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #7D7E7D;"></span>In progress</span>
-              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #E3E3E1;"></span>Not started</span>
-              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #EE3826;"></span>Overdue</span>
-            </div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 14px;">
-            <sc-for list="{{ modProgress }}" as="m" hint-placeholder-count="6">
-              <div style="display: grid; grid-template-columns: minmax(160px, 320px) minmax(0, 1fr); gap: 16px; align-items: center;">
-                <span style="display: flex; flex-direction: column; min-width: 0;"><span style="font-size: 13px; font-weight: 700; line-height: 1.35;">{{ m.title }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ m.total }} assigned</span></span>
-                <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
-                  <sc-if value="{{ m.someAssigned }}" hint-placeholder-val="{{ true }}">
-                    <div style="display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: #E3E3E1;">
-                      <span style="width: {{ m.wDone }}; background: #262626;"></span><span style="width: {{ m.wProg }}; background: #7D7E7D;"></span><span style="width: {{ m.wNot }}; background: #E3E3E1;"></span><span style="width: {{ m.wOver }}; background: #EE3826;"></span>
-                    </div>
-                    <span style="font-size: 12px; color: #5C5D5D;">{{ m.legend }}</span>
-                  </sc-if>
-                  <sc-if value="{{ m.noneAssigned }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #A9AAA8;">Not assigned to anyone yet</span></sc-if>
-                </div>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;">
-            <h2 style="font-weight: 800; font-size: 18px; margin: 0;">Knowledge checks by module</h2>
-            <span style="font-size: 13px; color: #5C5D5D;">Click a module to see its results.</span>
-          </div>
-          <div style="overflow-x: auto; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
-            <table style="width: 100%; min-width: 760px; border-collapse: collapse;">
-              <thead><tr><th style="padding-left: 20px;">Module</th><th>Taken</th><th>Average score</th><th>Passed 1st try</th><th>Avg attempts</th><th>Lowest</th></tr></thead>
-              <tbody>
-                <sc-for list="{{ scoreModuleRows }}" as="m" hint-placeholder-count="8">
-                  <tr onClick="{{ m.onPick }}" style="cursor: pointer; background: {{ m.rowBg }};">
-                    <td style="padding-left: 20px; max-width: 340px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 700; line-height: 1.35;">{{ m.title }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ m.cat }}</span></div></td>
-                    <td>{{ m.taken }}</td>
-                    <td><div style="display: flex; align-items: center; gap: 10px; min-width: 160px;"><div style="flex: 1; height: 6px; border-radius: 999px; background: #EBEBEA;"><div style="height: 100%; border-radius: 999px; background: {{ m.barColor }}; width: {{ m.avgWidth }};"></div></div><span style="font-size: 14px; font-weight: 800; width: 42px; color: {{ m.avgColor }};">{{ m.avg }}</span></div></td>
-                    <td style="font-weight: 600;">{{ m.firstPass }}</td>
-                    <td>{{ m.attempts }}</td>
-                    <td>{{ m.low }}</td>
-                  </tr>
-                </sc-for>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <h2 style="font-weight: 800; font-size: 18px; margin: 0;">{{ resultsTitle }}</h2>
-            <sc-if value="{{ resultsFiltered }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearScoreFilter }}" style="padding: 4px 12px; border-radius: 999px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;">Show all</button></sc-if>
-          </div>
-          <div style="overflow-x: auto; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
-            <table style="width: 100%; min-width: 820px; border-collapse: collapse;">
-              <thead><tr><th style="padding-left: 20px;">Person</th><th>Module</th><th>Latest score</th><th>First attempt</th><th>Attempts</th><th>Result</th><th>Date</th></tr></thead>
-              <tbody>
-                <sc-for list="{{ scoreRows }}" as="r" hint-placeholder-count="6">
-                  <tr>
-                    <td style="padding-left: 20px;">
-                      <button onClick="{{ r.onOpen }}" style="display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; font: inherit; text-align: left; cursor: pointer; color: #262626;">
-                        <span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ r.initials }}</span>
-                        <span style="font-weight: 700; text-decoration: underline; text-decoration-color: #C9CAC8; text-underline-offset: 3px;">{{ r.name }}</span>
-                        <sc-if value="{{ r.isLive }}" hint-placeholder-val="{{ false }}"><span style="padding: 1px 8px; border-radius: 999px; background: #262626; color: #FFFFFF; font-size: 10px; font-weight: 700;">Live</span></sc-if>
-                      </button>
-                    </td>
-                    <td style="max-width: 300px; line-height: 1.35;">{{ r.module }}</td>
-                    <td style="font-size: 15px; font-weight: 800; color: {{ r.scoreColor }};">{{ r.score }}</td>
-                    <td>{{ r.first }}</td>
-                    <td>{{ r.attempts }}</td>
-                    <td><span style="padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: {{ r.stBg }}; color: {{ r.stColor }}; border: {{ r.stBorder }};">{{ r.result }}</span></td>
-                    <td style="white-space: nowrap;">{{ r.date }}</td>
-                  </tr>
-                </sc-for>
-              </tbody>
-            </table>
-            <sc-if value="{{ noScoreRows }}" hint-placeholder-val="{{ false }}"><div style="padding: 28px; text-align: center; font-size: 14px; color: #5C5D5D;">No one has taken this knowledge check yet.</div></sc-if>
-          </div>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Uploaded answers</span><span style="font-size: 13px; color: #5C5D5D;">Files and screenshots learners sent for upload questions in knowledge checks.</span></div><span style="font-size: 13px; font-weight: 700;">{{ uploadsPendingLabel }}</span></div>
-          <sc-if value="{{ noUploads }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">No uploads yet. In the module editor, set a knowledge check question's answer type to "File or screenshot upload".</span></sc-if>
-          <sc-for list="{{ uploadRows }}" as="f" hint-placeholder-count="0">
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid #EBEBEA;">
-              <span style="flex: none; width: 32px; height: 32px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ f.initials }}</span>
-              <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 700; font-size: 14px;">{{ f.who }} · {{ f.module }}</span><span style="font-size: 13px; color: #3F4040;">{{ f.question }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ f.file }} · {{ f.date }}</span><sc-if value="{{ f.hasAi }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 700; color: {{ f.aiColor }};">{{ f.aiLabel }}</span></sc-if></div>
-              <sc-if value="{{ f.hasHref }}" hint-placeholder-val="{{ false }}"><a href="{{ f.href }}" target="_blank" rel="noopener" style="padding: 6px 12px; border-radius: 8px; border: 1.5px solid #262626; font-size: 12px; font-weight: 700; color: #262626; text-decoration: none;">Open file</a></sc-if>
-              <sc-if value="{{ f.notReviewed }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.onReview }}" style="padding: 6px 12px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;">Mark reviewed</button></sc-if>
-              <sc-if value="{{ f.reviewed }}" hint-placeholder-val="{{ false }}"><span style="padding: 3px 10px; border-radius: 999px; background: #262626; color: #FFFFFF; font-size: 12px; font-weight: 700;">Reviewed</span></sc-if>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-    </sc-if>
-
     <!-- NINJIO -->
     <sc-if value="{{ isNinjio }}" hint-placeholder-val="{{ false }}">
       <div style="display: flex; flex-direction: column; gap: 22px;">
@@ -924,15 +964,27 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
         <div style="display: flex; flex-direction: column; gap: 4px;"><h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Email templates</h1><p style="margin: 0; font-size: 15px; color: #3F4040; max-width: 640px;">Every email comes from Katelyn with Katelyn cc’d. Words in {braces} are filled in for each person.</p></div>
         <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
           <div style="flex: 1 1 260px; max-width: 340px; display: flex; flex-direction: column; gap: 8px;">
+            <button onClick="{{ addCustomTpl }}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; border-radius: 10px; border: 1.5px dashed #C9CAC8; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: #C62B1C;" style-hover="border-color: #EE3826; background: #FDECE9;">+ Add template</button>
             <sc-for list="{{ tplRows }}" as="t" hint-placeholder-count="7"><button onClick="{{ t.onClick }}" style="display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid {{ t.border }}; background: {{ t.bg }}; font: inherit; text-align: left; cursor: pointer; color: #262626;"><span style="font-weight: 800; font-size: 14px;">{{ t.label }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ t.use }}</span></button></sc-for>
           </div>
-          <div style="flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; gap: 14px;">
+          <div data-sch-editor="1" style="flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; gap: 14px;">
             <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">{{ tplLabel }}</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">{{ tplUse }}</span></div>
+            <sc-if value="{{ tplIsCustom }}" hint-placeholder-val="{{ false }}"><label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Template name</span><input value="{{ tplName }}" onChange="{{ onTplName }}" placeholder="e.g. Welcome to WSI" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626; font-weight: 700;"></label></sc-if>
             <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Subject</span><input value="{{ tplSubject }}" onChange="{{ onTplSubject }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
             <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Message</span><textarea value="{{ tplBody }}" onChange="{{ onTplBody }}" rows="10" style="padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; resize: vertical;"></textarea></label>
-            <span style="font-size: 12px; color: #5C5D5D;">Available: {{ tplVars }}</span>
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"><span style="font-size: 12px; font-weight: 800; color: #3F4040; margin-right: 4px;">Add variable</span><sc-for list="{{ tplVarBtns }}" as="v" hint-placeholder-count="5"><button onMouseDown="{{ v.onDown }}" onClick="{{ v.onClick }}" title="{{ v.tok }}" style="padding: 5px 10px; border-radius: 999px; border: 1.5px solid #E3E3E1; background: #F5F5F4; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;" style-hover="border-color: #EE3826; background: #FDECE9;">{{ v.label }}</button></sc-for><span style="flex-basis: 100%; font-size: 11px; color: #5C5D5D;">Click in the subject or message, then pick one. It fills in for each person.</span></div>
             <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 10px; background: #F5F5F4;"><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #C62B1C;">Preview</span><span style="font-weight: 800; font-size: 14px;">{{ tplPrevSubject }}</span><span style="font-size: 14px; line-height: 1.55; white-space: pre-wrap;">{{ tplPrevBody }}</span></div>
-            <button onClick="{{ resetTpl }}" style="align-self: flex-start; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Reset to original wording</button>
+            <sc-if value="{{ tplNotCustom }}" hint-placeholder-val="{{ true }}"><button onClick="{{ resetTpl }}" style="align-self: flex-start; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Reset to original wording</button></sc-if>
+            <sc-if value="{{ tplIsCustom }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid #EBEBEA;">
+                <span style="font-weight: 800; font-size: 15px;">Send this email</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; align-items: end;">
+                  <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">To</span><select value="{{ ctTo }}" onChange="{{ onCtTo }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"><option value="">Choose a person or group…</option><optgroup label="Groups"><sc-for list="{{ ctGroups }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></optgroup><optgroup label="People"><sc-for list="{{ ctPeople }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></optgroup></select></label>
+                  <button onClick="{{ sendCustom }}" disabled="{{ ctNoTo }}" style="min-height: 38px; padding: 0 18px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; opacity: {{ ctOpacity }};">{{ ctSendLabel }}</button>
+                </div>
+                <button onClick="{{ deleteCustomTpl }}" style="align-self: flex-start; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Delete this template</button>
+              </div>
+            </sc-if>
           </div>
         </div>
       </div>
@@ -1015,7 +1067,12 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
           </div>
           <span style="font-size: 12px; line-height: 1.5; color: #5C5D5D;">{{ schEd.help }} Links use [link text](https://…). Lines starting with “- ” show as sub-bullets. In lists, put one item per line.</span>
           <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start;">
-            <div style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+            <div data-sch-editor="1" style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+              <div style="position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 10px 12px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; box-shadow: 0 4px 14px rgba(38,38,38,0.06);">
+                <span style="font-size: 12px; font-weight: 800; color: #3F4040; margin-right: 4px;">Add variable</span>
+                <sc-for list="{{ schVars }}" as="v" hint-placeholder-count="8"><button onMouseDown="{{ v.onDown }}" onClick="{{ v.onClick }}" title="{{ v.tip }}" style="padding: 5px 10px; border-radius: 999px; border: 1.5px solid #E3E3E1; background: #F5F5F4; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;" style-hover="border-color: #EE3826; background: #FDECE9;">{{ v.label }}</button></sc-for>
+                <span style="flex-basis: 100%; font-size: 11px; color: #5C5D5D;">Click in any text box, then pick a variable. It fills in for each person, for example {first} becomes their first name.</span>
+              </div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button onClick="{{ schExpandAll }}" style="padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Expand all</button><button onClick="{{ schCollapseAll }}" style="padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Collapse all</button></div>
               <sc-for list="{{ schBlocks }}" as="b" hint-placeholder-count="6">
                 <sc-if value="{{ b.weekStart }}" hint-placeholder-val="{{ false }}"><span style="padding-top: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #C62B1C;">Week {{ b.week }}</span></sc-if>
@@ -1797,7 +1854,7 @@ const TPL_META = [
   ['ninjioIndividual', 'Ninjio reminder to individuals', 'Ninjio tab, people who haven’t finished', '{first} {training}'],
   ['uploadReview', 'Upload needs review', 'Sent to Katelyn when an upload doesn’t match the example', '{name} {training} {question} {reason}'],
 ];
-const TPL_SAMPLE = { first: 'Jordan', name: 'Jordan Ellis', list: '• Posting Jobs in Avionte (due Oct 30, 2026)', trainings: 'Posting Jobs in Avionte', training: 'E-Verify Training', link: 'https://your-site.netlify.app/WSI%20Training.dc.html', expires: 'Nov 15, 2026', due: 'Nov 30, 2026', managers: 'Dani Johnston', branch: 'Kalamazoo', month: 'October 2026', completed: '14', total: '16', rate: '88%', question: 'Upload your E-Verify confirmation', reason: 'The screenshot shows a different page.' };
+const TPL_SAMPLE = { first: 'Jordan', name: 'Jordan Ellis', list: '• Posting Jobs in Avionte (due Oct 30, 2026)', trainings: 'Posting Jobs in Avionte', training: 'E-Verify Training', link: 'https://your-site.netlify.app/WSI%20Training.dc.html', expires: 'Nov 15, 2026', due: 'Nov 30, 2026', managers: 'Dani', branch: 'Kalamazoo', month: 'October 2026', completed: '14', total: '16', rate: '88%', question: 'Upload your E-Verify confirmation', reason: 'The screenshot shows a different page.' };
 const SURVEY_IDS = ['new-hire-survey', 'touchpoint-45'];
 const toD = (x) => x == null || x === '' ? new Date(NaN) : typeof x === 'number' ? new Date(x) : new Date(String(x).length === 10 ? x + 'T12:00:00' : x);
 const fmtD = (x) => { const d = toD(x); return isNaN(d) ? '—' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); };
@@ -1899,6 +1956,8 @@ class Component extends DCLogic {
     }, saved, { templates: { ...TPL_DEFAULT, ...(saved.templates || {}) } }, saved.tab === 'insights' || saved.tab === 'progress' ? { tab: 'reports' } : {}, saved.foaV !== 1 ? (() => { const fix = (x) => typeof x === 'string' ? x.replace(/Front Office Assistant/g, 'Front Office Administrator') : x; const ue = {}; Object.entries(saved.userEdits || {}).forEach(([k, v]) => { ue[k] = { ...v, title: fix(v.title), promotions: (v.promotions || []).map(p => ({ ...p, from: fix(p.from), to: fix(p.to) })) }; if (!v.promotions) delete ue[k].promotions; if (v.title == null) delete ue[k].title; }); return { foaV: 1, ...(saved.userEdits ? { userEdits: ue } : {}) }; })() : {}, saved.branchV !== 1 ? (() => { const ue = { ...(saved.userEdits || {}) }; const setB = (id, b) => { ue[id] = { ...(ue[id] || {}), dept: b }; }; setB('w46', 'Kalamazoo'); setB('w33', 'Battle Creek'); const xu = (saved.extraUsers || []).map(u => /^kalen wells$/i.test(u.name.trim()) ? { ...u, dept: 'Battle Creek' } : u); xu.filter(u => /^kalen wells$/i.test(u.name.trim())).forEach(u => { if (ue[u.id]) setB(u.id, 'Battle Creek'); }); return { branchV: 1, userEdits: ue, extraUsers: xu }; })() : {}, { scope: '' }, saved.seedV !== 4 ? (() => { const pv = saved.paths || PATHS_SEED, as = (saved.assignments || []).filter(x => !(x.userId === 'w46' && x.pathId && x.pathId !== 'p5' && (pv.find(p => p.id === x.pathId) || {}).kind === 'Promotion' && !(x.progress >= 100))); const seed = SEED_V3(), moved = as.map(x => { const sd = seed.find(y => y.userId === 'w46' && y.userId === x.userId && y.moduleId === x.moduleId); return sd && x.pathId !== 'p5' && !(x.progress >= 100) ? { ...x, pathId: 'p5', week: sd.week, opens: sd.opens, due: sd.due } : x; }); as.length = 0; as.push(...moved); const add = seed.filter(a => !as.some(x => x.userId === a.userId && x.moduleId === a.moduleId)); return { seedV: 4, paths: pv.some(p => p.id === 'p5') ? pv : [...pv, PATHS_SEED.find(p => p.id === 'p5')], assignments: [...as, ...add], userEdits: { ...(saved.userEdits || {}), w33: { ...((saved.userEdits || {}).w33 || {}), start: ((saved.userEdits || {}).w33 || {}).start || '2026-10-05' } } }; })() : {}, saved.promoV !== 1 ? (() => { const ue = { ...(saved.userEdits || {}) }; if (saved.seedV !== 4) ue.w33 = { ...(ue.w33 || {}), start: (ue.w33 || {}).start || '2026-10-05' }; const m = { ...(ue.w46 || {}) }; if (!m.promotions) m.promotions = [{ id: 'pr-maddie', date: '2026-10-12', from: 'Front Office Administrator', to: 'Staffing Coordinator' }]; if (saved.branchV !== 1) { m.dept = 'Kalamazoo'; ue.w33 = { ...(ue.w33 || {}), dept: 'Battle Creek' }; } ue.w46 = m; return { promoV: 1, userEdits: ue }; })() : {}, saved.rolesV !== 2 ? { roles: (saved.roles || ROLES_SEED).filter(r => ROLE_KEEP.includes(r.title)).concat(ROLES_SEED.filter(r => !(saved.roles || []).some(x => x.title === r.title))).filter((r, i, arr) => arr.findIndex(x => x.title === r.title) === i), groups: (saved.groups || GROUPS_SEED).map(g => ({ ...g, roles: (g.roles || []).filter(t => ROLE_KEEP.includes(t)) })), rolesV: 2 } : {}, saved.tab === 'scores' ? { tab: 'reports' } : saved.tab === 'roles' ? { tab: 'groups' } : {}, { pathDlg: null, mail: null, aiBusy: false, mailSending: false, customModules: (() => { try { return JSON.parse(localStorage.getItem('wsi-custom-modules') || '[]'); } catch (e) { return []; } })(), dialog: null, emp: {}, nm: {}, editing: null, delId: null, newLessonType: 'text', hidden: (() => { try { return JSON.parse(localStorage.getItem('wsi-hidden-modules') || '[]'); } catch (e) { return []; } })(), overrides: (() => { try { return JSON.parse(localStorage.getItem(OVR) || '{}'); } catch (e) { return {}; } })(), toast: null, assignTarget: null, detailId: null, draft: { mods: {}, due: plus(14), notify: true } });
   }
   componentDidMount() {
+    this._onFocusIn = (e) => { const t = e.target; if (t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && (!t.type || t.type === 'text'))) && t.closest('[data-sch-editor]')) this._schField = t; };
+    document.addEventListener('focusin', this._onFocusIn);
     const sched = () => window.WSI_MODULES && this._ctx ? (this.fixSamples(), this.runSchedules()) : setTimeout(sched, 400);
     setTimeout(sched, 800);
     setTimeout(() => { this.swapLogo(); this.syncMedia(); }, 0);
@@ -1909,8 +1968,8 @@ class Component extends DCLogic {
   syncMedia() { document.querySelectorAll('[data-src]').forEach(el => { const v = el.getAttribute('data-src'); if (v && v.indexOf('{{') === -1 && el.getAttribute('src') !== v) el.setAttribute('src', v); }); }
   componentDidUpdate() {
     this.swapLogo(); this.syncMedia();
-    const { role, tab, filter, assignments, auto, extraUsers, customModules, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits } = this.state;
-    try { localStorage.setItem(KEY, JSON.stringify({ role, tab, filter, assignments, auto, extraUsers, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits })); localStorage.setItem('wsi-custom-modules', JSON.stringify(customModules)); localStorage.setItem(OVR, JSON.stringify(this.state.overrides)); localStorage.setItem('wsi-hidden-modules', JSON.stringify(this.state.hidden)); if (this._schedule && this._schedule !== this._lastSched) { this._lastSched = this._schedule; localStorage.setItem('wsi-schedule', this._schedule); } } catch (e) {}
+    const { role, tab, filter, assignments, auto, extraUsers, customModules, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, customTpls, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits } = this.state;
+    try { localStorage.setItem(KEY, JSON.stringify({ role, tab, filter, assignments, auto, extraUsers, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, customTpls, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits })); localStorage.setItem('wsi-custom-modules', JSON.stringify(customModules)); localStorage.setItem(OVR, JSON.stringify(this.state.overrides)); localStorage.setItem('wsi-hidden-modules', JSON.stringify(this.state.hidden)); if (this._schedule && this._schedule !== this._lastSched) { this._lastSched = this._schedule; localStorage.setItem('wsi-schedule', this._schedule); } } catch (e) {}
   }
   edit(fn) {
     this.setState(s => { const d = clone(s.editing.draft); fn(d, s.editing.li); return { editing: { ...s.editing, draft: d, dirty: true } }; });
@@ -2196,13 +2255,64 @@ class Component extends DCLogic {
     Object.values(sheets).forEach(rs => rs.forEach(r => { if (!training && /training selected/i.test(String(r[0]))) training = String(r[1] || ''); }));
     return { id: 'n' + Date.now(), file: fileName, training: training || 'Ninjio training', uploadedAt: Date.now(), month: TODAY.toLocaleString('en-US', { month: 'long', year: 'numeric' }), rows };
   }
+  dashExtra(c, ex) {
+    const s = this.state, { USERS, ASG, modById, MODULES, canAssign } = c;
+    const sec = s.dashSec || 'overview', go = (k) => () => { this.setState({ dashSec: k }); window.scrollTo(0, 0); }, goTab = (t, extra) => () => { this.setState({ tab: t, ...(extra || {}) }); window.scrollTo(0, 0); };
+    const ups = (this._uploadsAll || []).filter(f => !(s.reviewed || {})[f.key] && !(f.ai && f.ai.verdict === 'match'));
+    const od = ASG.filter(a => modById[a.moduleId] && aStatus(a) === 'Overdue');
+    const exp = (ex.recertRows || []).filter(r => r.status === 'Expired');
+    const drafts = MODULES.filter(m => m.draft);
+    const schD = (s.schedDocs || []).filter(d => d.status !== 'assigned');
+    const recentForms = (this._formsAll || []).filter(f => Date.now() - f.at < 14 * 864e5);
+    const nm = (l) => Array.from(new Set(l)).slice(0, 3).join(', ') + (new Set(l).size > 3 ? '…' : '');
+    const items = [
+      ups.length && { count: ups.length, label: 'Uploaded answers to review', sub: nm(ups.map(f => f.who)), cta: 'Review', onClick: go('checks'), bg: TINT, color: DEEP },
+      od.length && { count: od.length, label: 'Overdue trainings', sub: nm(od.map(a => (USERS.find(u => u.id === a.userId) || {}).name || '')), cta: 'View', onClick: goTab('assignments', { asgFilter: 'Overdue' }), bg: TINT, color: DEEP },
+      exp.length && { count: exp.length, label: 'Expired recertifications', sub: nm(exp.map(r => r.name)), cta: 'View', onClick: go('reporting'), bg: TINT, color: DEEP },
+      drafts.length && { count: drafts.length, label: 'Modules marked "needs review"', sub: nm(drafts.map(m => m.title)), cta: 'Open modules', onClick: goTab('modules'), bg: '#F5F5F4', color: INK },
+      schD.length && { count: schD.length, label: 'Training schedules not yet assigned', sub: nm(schD.map(d => d.personName || '')), cta: 'Open', onClick: goTab('schedules'), bg: '#F5F5F4', color: INK },
+      recentForms.length && { count: recentForms.length, label: 'New survey responses', sub: nm(recentForms.map(f => f.who)) + ' · last 14 days', cta: 'Read', onClick: go('surveys'), bg: '#F5F5F4', color: INK },
+    ].filter(Boolean);
+    const urgent = (ups.length ? ups.length : 0) + od.length + exp.length;
+    const out = {
+      isDashOverview: sec === 'overview', isDashReporting: sec === 'reporting', isDashChecks: sec === 'checks', isDashSurveys: sec === 'surveys',
+      reviewItems: items, reviewNone: !items.length, reviewTotal: items.length ? items.reduce((t, x) => t + x.count, 0) + ' items' : '',
+      dashNav: [['overview', 'Overview', urgent], ['reporting', 'Reporting', exp.length], ['checks', 'Knowledge checks', ups.length], ['surveys', 'Surveys', recentForms.length]].map(([k, l, n]) => ({ label: l, count: n, hasCount: n > 0, bg: sec === k ? '#262626' : 'transparent', color: sec === k ? '#FFFFFF' : '#262626', onClick: go(k) })),
+    };
+    // Surveys
+    const sid = SURVEY_IDS.includes(s.svSel) ? s.svSel : SURVEY_IDS[0], m = modById[sid];
+    out.svTabs = SURVEY_IDS.filter(id => modById[id]).map(id => ({ label: modById[id].title, bg: id === sid ? '#FFFFFF' : 'transparent', onClick: () => this.setState({ svSel: id, svOpen: null }) }));
+    const li = m ? m.lessons.findIndex(l => l.type === 'form') : -1, L = li >= 0 ? m.lessons[li] : null, qs = (L && L.questions) || [];
+    let resp = (this._formsAll || []).filter(f => f.mid === sid && f.li === li);
+    const sample = !resp.length && SAMPLE() && qs.length;
+    if (sample) {
+      const pick = (q, i, k) => q.kind === 'scale' ? String([4, 5, 3, 4][(i + k) % 4]) : q.kind === 'choice' ? (q.o || [])[(i + k) % (q.o || [1]).length] : ['The team made me feel welcome right away.', 'More time shadowing before taking calls on my own.', 'A checklist of logins for day one would help.'][(i + k) % 3];
+      resp = ['Austin McKendrick', 'Kalen Wells', 'Maddie Bonnewell'].map((who, k) => ({ who, at: TODAY.getTime() - (k + 2) * 864e5, via: 'demo', answers: Object.fromEntries(qs.map((q, i) => [i, pick(q, i, k)])) }));
+    }
+    const withAns = resp.filter(r => r.answers && Object.keys(r.answers).length);
+    const assigned = ASG.filter(a => a.moduleId === sid).length;
+    out.svSample = !!sample; out.svGoogle = !!(L && L.url) && !withAns.length && resp.length > 0;
+    const scaleQs = qs.map((q, i) => [q, i]).filter(([q]) => q.kind === 'scale');
+    const allScale = withAns.flatMap(r => scaleQs.map(([q, i]) => +r.answers[i]).filter(x => x > 0));
+    out.svKpis = [{ value: resp.length, label: 'Responses' }, { value: assigned ? Math.round(Math.min(100, resp.length / assigned * 100)) + '%' : '—', label: 'Response rate (' + assigned + ' assigned)' }, { value: allScale.length ? (allScale.reduce((t, x) => t + x, 0) / allScale.length).toFixed(1) : '—', label: 'Average rating (of 5)' }];
+    out.svQuestions = withAns.length ? qs.map((q, i) => {
+      const vals = withAns.map(r => ({ v: r.answers[i], who: r.who })).filter(x => x.v !== undefined && x.v !== '');
+      const kind = q.kind || 'text', n = vals.length + ' answer' + (vals.length === 1 ? '' : 's');
+      if (kind === 'scale') { const nums = vals.map(x => +x.v).filter(x => x > 0), cnt = [1, 2, 3, 4, 5].map(k => nums.filter(x => x === k).length), mx = Math.max(1, ...cnt); return { num: i + 1, q: q.q, n, isScale: true, avg: nums.length ? (nums.reduce((t, x) => t + x, 0) / nums.length).toFixed(1) : '—', bars: [5, 4, 3, 2, 1].map(k => ({ label: k + (k === 5 ? ' Great' : k === 1 ? ' Poor' : ''), n: cnt[k - 1], w: Math.round(cnt[k - 1] / mx * 100) + '%' })) }; }
+      if (kind === 'choice') { const opts = q.o || Array.from(new Set(vals.map(x => x.v))); const cnt = opts.map(o => vals.filter(x => x.v === o).length), mx = Math.max(1, ...cnt); return { num: i + 1, q: q.q, n, isChoice: true, bars: opts.map((o, j) => ({ label: o, n: cnt[j], pct: vals.length ? Math.round(cnt[j] / vals.length * 100) + '%' : '0%', w: Math.round(cnt[j] / mx * 100) + '%' })) }; }
+      return { num: i + 1, q: q.q, n, isText: true, texts: vals.slice(0, 8).map(x => ({ text: x.v, who: x.who })), noText: !vals.length };
+    }) : [];
+    out.svNoResp = !resp.length;
+    out.svPeople = resp.slice().sort((x, y) => y.at - x.at).map((r, k) => { const id = r.who + '|' + r.at, open = s.svOpen === id; return { name: r.who, initials: ini(r.who), meta: 'Submitted ' + fmtTs(r.at) + (r.via === 'google' ? ' · Google Form' : ''), open, cta: r.answers ? (open ? 'Hide' : 'View answers') : '', onToggle: () => r.answers && this.setState({ svOpen: open ? null : id }), answers: qs.map((q, i) => ({ q: q.q, a: r.answers && r.answers[i] != null && r.answers[i] !== '' ? (q.kind === 'scale' ? r.answers[i] + ' of 5' : String(r.answers[i])) : '—' })) }; });
+    return out;
+  }
   schedVals(c) {
     const s = this.state, { USERS, canAssign } = c;
     const TPLS = s.schedTemplates || window.WSI_SCHEDULE_TEMPLATES || [], DOCS = s.schedDocs || [];
     const logo = window.WSI_LOGO || 'wsi-logo.png';
     const fl = (x) => x ? fmt(x, true) : '—';
     const locOf = (branch) => { const m = (s.managers || []).find(x => x.branch === branch); return (m && m.location) || BRANCH_LOC[branch] || ''; };
-    const ctxFor = (d) => { const u = USERS.find(x => x.id === d.userId) || {}; const mg = (s.managers || []).find(m => m.branch === u.dept); return { name: u.name || d.personName || '', role: d.role || u.title || '', branch: u.dept && u.dept !== 'Not set' ? u.dept : '', manager: mg ? mg.names : '', start: d.start }; };
+    const ctxFor = (d) => { const u = USERS.find(x => x.id === d.userId) || {}; const mg = (s.managers || []).find(m => m.branch === u.dept); return { name: u.name || d.personName || '', role: d.role || u.title || '', branch: u.dept && u.dept !== 'Not set' ? u.dept : '', location: locOf(u.dept), manager: mg ? mg.names : '', start: d.start }; };
     const nextMon = () => { const d = new Date(TODAY); d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7)); return d.toISOString().slice(0, 10); };
     const setT = (fn) => this.setState(st => ({ schedTemplates: fn((st.schedTemplates || window.WSI_SCHEDULE_TEMPLATES || []).map(t => t)) }));
     const setD = (fn) => this.setState(st => ({ schedDocs: fn((st.schedDocs || []).slice()) }));
@@ -2273,6 +2383,9 @@ class Component extends DCLogic {
       schOpenPrint: () => window.WSISchedule && WSISchedule.open(T0, cx, { logo }),
       schToggleAssign: () => { const on = T0.status !== 'assigned'; upd(x => { x.status = on ? 'assigned' : 'draft'; x.assignedAt = on ? Date.now() : null; }); this.toastMsg(on ? 'Assigned. ' + (cx.name || '').split(' ')[0] + ' can open it from their dashboard.' : 'Unassigned'); },
       schDelete: () => { if (!confirm(isDoc ? 'Delete this schedule?' : 'Delete this template? Schedules already created from it are kept.')) return; if (isDoc) setD(ds => ds.filter(d => d.id !== E.id)); else setT(ts => ts.filter(t => t.id !== E.id)); this.setState({ schEdit: null }); },
+      schVars: [['First name', '{first}', 'Their first name'], ['Last name', '{last}', 'Their last name'], ['Full name', '{name}', 'First and last name'], ['Role', '{role}', 'Role from the schedule'], ['Branch', '{branch}', 'Their branch'], ['Office location', '{location}', 'Branch city, e.g. Kalamazoo, MI'], ['Branch manager', '{manager}', 'Their branch manager'], ['Start date', '{start}', 'Start or promotion date']].map(([l, tok, tip]) => ({ label: l, tip: tip + ' · ' + tok,
+        onDown: (e) => e.preventDefault(),
+        onClick: () => { const el = this._schField; if (!el || !document.body.contains(el)) return this.toastMsg('Click in a text box first, then pick a variable'); const st = el.selectionStart ?? el.value.length, en = el.selectionEnd ?? st; const nv = el.value.slice(0, st) + tok + el.value.slice(en); const setter = Object.getOwnPropertyDescriptor(el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype, 'value').set; setter.call(el, nv); el.dispatchEvent(new Event('input', { bubbles: true })); el.focus(); const p = st + tok.length; try { el.setSelectionRange(p, p); } catch (e) {} } })),
       schExpandAll: () => this.setState({ schOpen: Object.fromEntries(T0.blocks.map(b => [b.id, true])) }), schCollapseAll: () => this.setState({ schOpen: {} }),
       schPreview: window.WSISchedule ? WSISchedule.html(T0, cx, { logo }) : '',
       schBlocks: T0.blocks.map((b, i) => {
@@ -2392,13 +2505,30 @@ class Component extends DCLogic {
     const sv = survPeople(USERS, canAssign);
     Object.assign(out, { surveyRows: sv, noSurveyRows: !sv.length, surveyHeads: SURVEY_IDS.filter(id => modById[id]).map(id => ({ label: modById[id].title })) });
     // Email templates
-    const tSel = s.tplSel || 'overdue', meta = TPL_META.find(x => x[0] === tSel) || TPL_META[0];
-    const cur = tSel === 'overdue' ? (s.emailCfg || EMAIL_DEFAULT) : tpl[tSel];
-    const setTpl = (k) => (e) => { const v = e.target.value; if (tSel === 'overdue') this.setState(st => ({ emailCfg: { ...(st.emailCfg || EMAIL_DEFAULT), [k]: v } })); else this.setState(st => ({ templates: { ...TPL_DEFAULT, ...(st.templates || {}), [tSel]: { ...tpl[tSel], [k]: v } } })); };
+    const CT = s.customTpls || [], ctSel = CT.find(x => x.id === s.tplSel);
+    const tSel = ctSel ? ctSel.id : (TPL_META.some(x => x[0] === s.tplSel) ? s.tplSel : 'overdue'), meta = ctSel ? [ctSel.id, ctSel.label || 'Untitled template', 'Your template · send it below', '{first} {name} {branch} {location} {manager} {link}'] : (TPL_META.find(x => x[0] === tSel) || TPL_META[0]);
+    const cur = ctSel ? ctSel : tSel === 'overdue' ? (s.emailCfg || EMAIL_DEFAULT) : tpl[tSel];
+    const VLAB = { first: 'First name', name: 'Full name', list: 'Training list', trainings: 'Training names', link: 'Training link', training: 'Training', expires: 'Expiry date', due: 'Due date', managers: 'Manager first names', branch: 'Branch', month: 'Month', completed: 'Completed count', total: 'Total', rate: 'Completion rate', question: 'Question', reason: 'Reason', location: 'Office location', manager: 'Branch manager' };
+    const setTpl0 = (k) => (e) => { const v = e.target.value; this.setState(st => ({ customTpls: (st.customTpls || []).map(x => x.id === tSel ? { ...x, [k]: v } : x) })); };
+    const ctTo = s.ctTo || '';
+    const ctTargets = ctTo.startsWith('g:') ? USERS.filter(u => this.inGroup(ctTo.slice(2), u)) : USERS.filter(u => u.id === ctTo);
+    const ctVars = (u) => { const mg = (s.managers || []).find(m => m.branch === u.dept); return { first: u.name.split(' ')[0], name: u.name, branch: u.dept !== 'Not set' ? u.dept : '', location: (mg && mg.location) || BRANCH_LOC[u.dept] || '', manager: mg ? mg.names : '', link: lnk() }; };
     Object.assign(out, {
-      tplRows: TPL_META.map(([k, label, use]) => ({ label, use, bg: k === tSel ? TINT : '#FFFFFF', border: k === tSel ? RED : LINE, onClick: () => this.setState({ tplSel: k }) })),
+      tplIsCustom: !!ctSel, tplNotCustom: !ctSel, tplName: ctSel ? ctSel.label : '', onTplName: setTpl0('label'),
+      addCustomTpl: () => { const id = 'ct' + Date.now(); this.setState(st => ({ customTpls: [...(st.customTpls || []), { id, label: 'New template', subject: '', body: 'Hi {first},\n\n\n\nThanks,\nKatelyn' }], tplSel: id })); },
+      deleteCustomTpl: () => { if (confirm('Delete this email template?')) this.setState(st => ({ customTpls: (st.customTpls || []).filter(x => x.id !== tSel), tplSel: 'overdue' })); },
+      tplVarBtns: meta[3].split(' ').filter(Boolean).map(tok => ({ tok, label: VLAB[tok.replace(/[{}]/g, '')] || tok, onDown: (e) => e.preventDefault(),
+        onClick: () => { const el = this._schField; if (!el || !document.body.contains(el) || !el.closest('[data-sch-editor]')) return this.toastMsg('Click in the subject or message first'); const st = el.selectionStart ?? el.value.length, en = el.selectionEnd ?? st; const nv = el.value.slice(0, st) + tok + el.value.slice(en); const setter = Object.getOwnPropertyDescriptor(el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype, 'value').set; setter.call(el, nv); el.dispatchEvent(new Event('input', { bubbles: true })); el.focus(); try { el.setSelectionRange(st + tok.length, st + tok.length); } catch (e) {} } })),
+      ctTo, onCtTo: (e) => this.setState({ ctTo: e.target.value }), ctNoTo: !ctTargets.length, ctOpacity: ctTargets.length ? 1 : 0.45,
+      ctSendLabel: ctTargets.length ? 'Send to ' + ctTargets.length + (ctTargets.length === 1 ? ' person' : ' people') : 'Send',
+      ctGroups: s.groups.map(g => ({ value: 'g:' + g.id, label: g.name })), ctPeople: USERS.map(u => ({ value: u.id, label: u.name })),
+      sendCustom: () => { if (!ctSel || !ctTargets.length) return; if (!confirm('Send "' + (ctSel.subject || ctSel.label) + '" to ' + ctTargets.length + (ctTargets.length === 1 ? ' person' : ' people') + '?')) return; this.sendMail(ctTargets.map(u => ({ to: mail(u.name), subject: fillT(ctSel.subject, ctVars(u)), text: fillT(ctSel.body, ctVars(u)) }))); },
+    });
+    const setTpl = ctSel ? setTpl0 : (k) => (e) => { const v = e.target.value; if (tSel === 'overdue') this.setState(st => ({ emailCfg: { ...(st.emailCfg || EMAIL_DEFAULT), [k]: v } })); else this.setState(st => ({ templates: { ...TPL_DEFAULT, ...(st.templates || {}), [tSel]: { ...tpl[tSel], [k]: v } } })); };
+    Object.assign(out, {
+      tplRows: [...TPL_META.map(([k, label, use]) => ({ label, use, bg: k === tSel ? TINT : '#FFFFFF', border: k === tSel ? RED : LINE, onClick: () => this.setState({ tplSel: k }) })), ...CT.map(c => ({ label: c.label || 'Untitled template', use: 'Your template', bg: c.id === tSel ? TINT : '#FFFFFF', border: c.id === tSel ? RED : LINE, onClick: () => this.setState({ tplSel: c.id }) }))],
       tplLabel: meta[1], tplUse: meta[2], tplVars: meta[3], tplSubject: cur.subject, tplBody: cur.body, onTplSubject: setTpl('subject'), onTplBody: setTpl('body'),
-      tplPrevSubject: fillT(cur.subject, TPL_SAMPLE), tplPrevBody: fillT(cur.body, TPL_SAMPLE),
+      tplPrevSubject: fillT(cur.subject, { ...TPL_SAMPLE, location: 'Kalamazoo, MI', manager: 'Dani Johnston' }), tplPrevBody: fillT(cur.body, { ...TPL_SAMPLE, location: 'Kalamazoo, MI', manager: 'Dani Johnston' }),
       resetTpl: () => { if (!confirm('Reset this template to the original wording?')) return; if (tSel === 'overdue') this.setState(st => ({ emailCfg: { ...(st.emailCfg || EMAIL_DEFAULT), subject: EMAIL_DEFAULT.subject, body: EMAIL_DEFAULT.body } })); else this.setState(st => ({ templates: { ...(st.templates || {}), [tSel]: TPL_DEFAULT[tSel] } })); },
     });
     // Ninjio
@@ -2427,7 +2557,7 @@ class Component extends DCLogic {
       const branches = [...mgrs.map(m => m.branch), ...Object.keys(bb).filter(b => !mgrs.some(m => m.branch === b))];
       const drafts = mgrs.filter(m => (bb[m.branch] || []).length).map(m => {
         const l = bb[m.branch], nd = l.filter(x => !x.done), ed = edits[m.branch] || {};
-        const v = { managers: m.names, branch: m.branch, month: rep.month, training: rep.training, completed: l.length - nd.length, total: l.length, rate: rateOf(l) + '%', list: nd.length ? nd.map(x => '• ' + x.name + (x.note ? ' (' + x.note + ')' : '')).join('\n') : 'Everyone has completed it.' };
+        const fn = String(m.names || '').split(/\s*,\s*|\s+and\s+|\s*&\s*/).map(p => p.trim().split(/\s+/)[0]).filter(Boolean); const v = { managers: fn.length > 1 ? fn.slice(0, -1).join(', ') + ' and ' + fn[fn.length - 1] : (fn[0] || m.names), branch: m.branch, month: rep.month, training: rep.training, completed: l.length - nd.length, total: l.length, rate: rateOf(l) + '%', list: nd.length ? nd.map(x => '• ' + x.name + (x.note ? ' (' + x.note + ')' : '')).join('\n') : 'Everyone has completed it.' };
         const setE = (k, val) => this.setState(st => ({ ninjioEdits: { ...(st.ninjioEdits || {}), [rep.id]: { ...(((st.ninjioEdits || {})[rep.id]) || {}), [m.branch]: { ...((((st.ninjioEdits || {})[rep.id]) || {})[m.branch] || {}), [k]: val } } } }));
         return { branch: m.branch, to: m.emails.join(', ') || 'No email set', on: !ed.off, subject: ed.subject ?? fillT(tpl.ninjioManager.subject, v), body: ed.body ?? fillT(tpl.ninjioManager.body, v),
           onToggle: () => setE('off', !ed.off), onSubject: (e) => setE('subject', e.target.value), onBody: (e) => setE('body', e.target.value), op: ed.off ? 0.5 : 1, emails: m.emails };
@@ -2445,7 +2575,7 @@ class Component extends DCLogic {
         sendNinjioIndividuals: () => { if (!confirm('Email ' + nd.length + ' people who haven’t finished?')) return; this.sendMail(nd.map(x => { const v = { first: first(x.name), name: x.name, training: rep.training }; return { to: x.email, subject: fillT(tpl.ninjioIndividual.subject, v), text: fillT(tpl.ninjioIndividual.body, v) }; })); },
       });
     }
-    Object.assign(out, this.schedVals(c));
+    Object.assign(out, this.schedVals(c), this.dashExtra(c, out));
     // Branch manager view
     out.isBM = !!bmM;
     if (bmM) {
@@ -2922,7 +3052,7 @@ class Component extends DCLogic {
     const me = meBase ? { ...meBase, initials: ini(meBase.name), first: meBase.name.split(' ')[0] } : {};
     const modById = Object.fromEntries(MODULES.map(m => [m.id, m]));
     const PASS = this.props.passScore ?? 80;
-    const live = {}, uploadsAll = [];
+    const live = {}, uploadsAll = [], formsAll = []; this._uploadsAll = uploadsAll; this._formsAll = formsAll;
     const pathById = Object.fromEntries(s.paths.map(p => [p.id, p]));
     try {
       const localT = JSON.parse(localStorage.getItem('wsi-training-v2') || '{}');
@@ -2930,6 +3060,7 @@ class Component extends DCLogic {
       if (localT.name && !learners.some(x => x.name.toLowerCase() === localT.name.trim().toLowerCase())) learners.push(localT);
       learners.forEach(t => {
       if (t.name) Object.entries(t.prog || {}).forEach(([mid, p]) => Object.entries(p.uploads || {}).forEach(([qi, f]) => uploadsAll.push({ who: t.name, mid, qi: Number(qi), ...f })));
+      if (t.name) Object.entries(t.prog || {}).forEach(([mid, p]) => Object.entries(p.form || {}).forEach(([li, fd]) => fd && fd.at && formsAll.push({ who: t.name, mid, li: Number(li), ...fd })));
       const lu = t.name && USERS.find(u => u.name.toLowerCase() === t.name.trim().toLowerCase());
       if (lu) Object.entries(t.prog || {}).forEach(([mid, p]) => {
         const m = modById[mid]; if (!m) return;
@@ -3084,7 +3215,7 @@ class Component extends DCLogic {
     const empPath = s.paths.find(p => p.id === empPathId);
     const dPaths = du ? Array.from(new Set(detailAs.filter(a => a.pathId).map(a => a.pathId))).map(id => pathById[id]).filter(Boolean) : [];
     const dStart = dPaths.length ? this.pathStart(dPaths[0], du) : null;
-    this._schedule = JSON.stringify({ manager: ACCOUNTS.manager, email: s.emailCfg, people: USERS.map(u => ({ name: u.name, email: mail(u.name), docs: (s.schedDocs || []).filter(d => d.userId === u.id && d.status === 'assigned').map(d => { const mg = (s.managers || []).find(m => m.branch === u.dept); return { id: d.id, title: d.title, kind: d.kind, role: d.role, start: d.start, blocks: d.blocks, ctx: { name: u.name, role: d.role || u.title, branch: u.dept !== 'Not set' ? u.dept : '', manager: mg ? mg.names : '', start: d.start } }; }), journey: (() => { const pa = asFor(u.id).filter(x => x.pathId && pathById[x.pathId]); if (!pa.length) return null; const pr = pa.find(x => pathById[x.pathId].kind === 'Promotion' && x.progress < 100) || pa.find(x => pathById[x.pathId].kind === 'Promotion'); const pick = pr || pa[0], p = pathById[pick.pathId], lp = (u.promotions || []).slice().sort((x, y) => String(x.date).localeCompare(String(y.date))).pop(); return { type: p.kind === 'Promotion' ? 'Promotion' : 'New hire', path: p.name, weeks: p.weeks, start: this.pathStart(p, u), hire: u.start || '', from: lp && p.kind === 'Promotion' ? lp.from : '', to: lp && p.kind === 'Promotion' ? lp.to : '' }; })(), items: asFor(u.id).map(a => ({ moduleId: a.moduleId, title: modById[a.moduleId].title, week: a.week || null, opens: a.opens || null, due: a.due, progress: a.progress, cycleStart: a.cycleStart || null })) })).filter(p => p.items.length || p.docs.length) });
+    this._schedule = JSON.stringify({ manager: ACCOUNTS.manager, email: s.emailCfg, people: USERS.map(u => ({ name: u.name, email: mail(u.name), docs: (s.schedDocs || []).filter(d => d.userId === u.id && d.status === 'assigned').map(d => { const mg = (s.managers || []).find(m => m.branch === u.dept); return { id: d.id, title: d.title, kind: d.kind, role: d.role, start: d.start, blocks: d.blocks, ctx: { name: u.name, role: d.role || u.title, branch: u.dept !== 'Not set' ? u.dept : '', location: (mg && mg.location) || BRANCH_LOC[u.dept] || '', manager: mg ? mg.names : '', start: d.start } }; }), journey: (() => { const pa = asFor(u.id).filter(x => x.pathId && pathById[x.pathId]); if (!pa.length) return null; const pr = pa.find(x => pathById[x.pathId].kind === 'Promotion' && x.progress < 100) || pa.find(x => pathById[x.pathId].kind === 'Promotion'); const pick = pr || pa[0], p = pathById[pick.pathId], lp = (u.promotions || []).slice().sort((x, y) => String(x.date).localeCompare(String(y.date))).pop(); return { type: p.kind === 'Promotion' ? 'Promotion' : 'New hire', path: p.name, weeks: p.weeks, start: this.pathStart(p, u), hire: u.start || '', from: lp && p.kind === 'Promotion' ? lp.from : '', to: lp && p.kind === 'Promotion' ? lp.to : '' }; })(), items: asFor(u.id).map(a => ({ moduleId: a.moduleId, title: modById[a.moduleId].title, week: a.week || null, opens: a.opens || null, due: a.due, progress: a.progress, cycleStart: a.cycleStart || null })) })).filter(p => p.items.length || p.docs.length) });
 
     const autoCount = MODULES.filter(m => s.auto[m.id]).length;
     const csv = () => {
@@ -3101,8 +3232,8 @@ class Component extends DCLogic {
       ...this.extraVals({ USERS, ASG, ASG0, MODULES, modById, pathById, isNew, me, canAssign, bmM }),
       ...(this._sortVals || {}),
       isLearner: s.role === 'learner', isPeople: canAssign && s.tab === 'people' && !s.editing, isModules: canAssign && s.tab === 'modules' && !s.editing,
-      isScores: canAssign && s.tab === 'reports' && !s.editing,
-      isInsights: canAssign && s.tab === 'reports' && !s.editing,
+      isScores: false, isDash: canAssign && s.tab === 'reports' && !s.editing,
+      isInsights: false,
       isAssignments: canAssign && s.tab === 'assignments' && !s.editing,
       isNinjio: canAssign && s.tab === 'ninjio' && !s.editing, isEmails: canAssign && s.tab === 'emails' && !s.editing,
       ...this.dashVals({ ASG: ASGd, USERS: USERSd, MODULES, modById, PASS, avgOf, scored: scoredD, isNew, me, canAssign }),
@@ -3200,7 +3331,7 @@ class Component extends DCLogic {
         ...(s.managers || []).map(m => ({ name: m.names, email: m.emails[0] || '', roleLabel: 'Branch manager · ' + m.branch, initials: ini(m.names), onClick: () => this.setState({ role: 'bm:' + m.branch }) }))],
       googleSignIn: () => this.setState({ role: 'manager', tab: 'reports' }),
       signOut: () => this.setState({ role: null, detailId: null, assignTarget: null, selected: {} }),
-      tabs: [['reports', 'Reports'], ['assignments', 'Assignments'], ['people', 'People'], ['groups', 'Groups'], ['paths', 'Learning paths'], ['modules', 'Modules'], ['schedules', 'Training Schedules'], ['ninjio', 'Ninjio'], ['emails', 'Emails'], ['archive', 'Archive']].map(([k, l]) => ({ label: l, line: s.tab === k ? RED : 'transparent', color: s.tab === k ? INK : '#5C5D5D', onClick: () => { if (s.editing && s.editing.dirty && !confirm('Discard unsaved changes?')) return; this.setState({ tab: k, editing: null }); } })),
+      tabs: [['reports', 'Dashboard'], ['assignments', 'Assignments'], ['people', 'People'], ['groups', 'Groups'], ['paths', 'Learning paths'], ['modules', 'Modules'], ['schedules', 'Training Schedules'], ['ninjio', 'Ninjio'], ['emails', 'Emails'], ['archive', 'Archive']].map(([k, l]) => ({ label: l, line: s.tab === k ? RED : 'transparent', color: s.tab === k ? INK : '#5C5D5D', onClick: () => { if (s.editing && s.editing.dirty && !confirm('Discard unsaved changes?')) return; this.setState({ tab: k, editing: null }); } })),
       learnerSummary: (openCount ? `You have ${openCount} training${openCount === 1 ? '' : 's'} to finish.` : "You're all caught up.") + (laterCount ? ` ${laterCount} more unlock${laterCount === 1 ? 's' : ''} in the coming weeks.` : ''),
       learnerItems,
       stats, filters, rows, noRows: !rows.length, canAssign,

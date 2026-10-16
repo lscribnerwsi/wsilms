@@ -71,7 +71,8 @@ a{color:#C62B1C;font-weight:600}a:hover{color:#9E2216}
     ctx = ctx || {};
     const startIso = doc.start || ctx.start || '';
     const st = startIso ? new Date(startIso + 'T12:00:00') : null;
-    return { startIso, name: ctx.name || doc.personName || '', first: (ctx.name || doc.personName || '').split(' ')[0], role: ctx.role || doc.role || '', branch: ctx.branch || doc.branch || '', manager: ctx.manager || doc.manager || '', start: st ? fmt(st, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '' };
+    const full = ctx.name || doc.personName || '';
+    return { startIso, name: full, first: full.split(' ')[0], last: full.split(' ').slice(1).join(' '), location: ctx.location || '', role: ctx.role || doc.role || '', branch: ctx.branch || doc.branch || '', manager: ctx.manager || doc.manager || '', start: st ? fmt(st, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '' };
   }
   window.WSISchedule = {
     dayDates, weekRange,

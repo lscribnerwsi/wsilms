@@ -1,5 +1,5 @@
 // WSI Learning — module content. To add a module, copy one object below and edit it.
-// Lesson types: text, steps, flashcards, scenario, quiz, resources.
+// Lesson types: text, steps, flashcards, scenario, quiz, resources, form (Google Form or sample survey), link (outside training).
 window.WSI_MODULES = [
 {
   id: 'esta', title: 'Michigan Earned Sick Time Act (ESTA)', cat: 'Compliance', mins: 20, draft: true,
@@ -496,6 +496,32 @@ window.WSI_MODULES = [
       { title: 'Guide to a Successful Onsite Visit (SOP)', meta: 'PDF', href: 'onsite-visit.pdf' },
       { title: 'AM Client Relationship Guide', meta: 'Internal', href: '#' }
     ] }
+  ]
+},
+{
+  id: 'new-hire-survey', title: 'New Hire Onboarding Survey', cat: 'Survey', mins: 5,
+  summary: 'Tell us how your first week went so we can keep improving onboarding.',
+  lessons: [
+    { type: 'form', title: 'Onboarding survey', mins: 5, url: '', nameEntry: '',
+      intro: 'This takes about five minutes. Your answers go to the training team.',
+      questions: [
+        { q: 'How prepared did you feel at the end of your first week?', kind: 'scale' },
+        { q: 'Did you have the equipment and logins you needed on day one?', kind: 'choice', o: ['Yes', 'Mostly', 'No'] },
+        { q: 'What would have made your first week easier?', kind: 'text' }
+      ] }
+  ]
+},
+{
+  id: 'touchpoint-45', title: '45-Day Touchpoint', cat: 'Survey', mins: 5,
+  summary: 'A short check-in at your 45-day mark.',
+  lessons: [
+    { type: 'form', title: '45-day check-in', mins: 5, url: '', nameEntry: '',
+      intro: 'A quick check-in now that you have been with WSI for about 45 days.',
+      questions: [
+        { q: 'How confident do you feel in your role today?', kind: 'scale' },
+        { q: 'Is there a training topic you would like more help with?', kind: 'text' },
+        { q: 'Would you like a follow-up conversation with your manager?', kind: 'choice', o: ['Yes', 'No'] }
+      ] }
   ]
 }
 ];
