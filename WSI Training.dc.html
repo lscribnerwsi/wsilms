@@ -29,7 +29,7 @@ button:disabled { cursor: not-allowed; }
 <div style="min-height: 100vh; display: flex; flex-direction: column;">
   <header style="display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px clamp(16px, 4vw, 48px); background: #FFFFFF; border-bottom: 1px solid #E3E3E1;">
     <button onClick="{{ goDashboard }}" style="display: flex; align-items: center; gap: 14px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;">
-      <img src="assets/wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: 42px;">
+      <img src="wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: 42px;">
       <span style="width: 1px; height: 28px; background: #E3E3E1;"></span>
       <span style="font-size: 17px; font-weight: 700; color: #5C5D5D;">Learning</span>
     </button>
@@ -429,7 +429,7 @@ button:disabled { cursor: not-allowed; }
         <div id="wsi-cert" style="width: 100%; max-width: 960px; aspect-ratio: 11 / 8.5; box-sizing: border-box; background: #FFFFFF; border-radius: 12px; box-shadow: 0 10px 40px rgba(38,38,38,0.10); padding: clamp(24px, 5vw, 64px); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
           <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 10px; background: #EE3826;"></div>
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
-            <img src="assets/wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: clamp(44px, 7vw, 76px);">
+            <img src="wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: clamp(44px, 7vw, 76px);">
             <span style="font-size: clamp(10px, 1.2vw, 13px); font-weight: 700; color: #7D7E7D; text-align: right;">ID {{ certId }}</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.2vw, 14px);">
@@ -518,7 +518,7 @@ class Component extends DCLogic {
     return { c, n: mc.length, pct: Math.round(c / mc.length * 100) };
   }
   renderVals() {
-    const logo = window.WSI_LOGO || 'assets/wsi-logo.png';
+    const logo = window.WSI_LOGO || 'wsi-logo.png';
     const s = this.state, mods = this.mods();
     const first = (s.name || '').trim().split(/\s+/)[0] || '';
     const initials = (s.name || '').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();

@@ -111,7 +111,7 @@ window.WSI_MODULES = [
       { q: 'How often should Indeed posts be reposted?', o: ['Weekly', 'Monthly', 'Quarterly', 'Never'], a: 1, e: 'Monthly, using a new job order each time.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'Posting Jobs Through Avionte (SOP)', meta: 'PDF · 7 pages', href: 'sop/posting-jobs-avionte.pdf' }
+      { title: 'Posting Jobs Through Avionte (SOP)', meta: 'PDF · 7 pages', href: 'posting-jobs-avionte.pdf' }
     ] }
   ]
 },
@@ -169,7 +169,7 @@ window.WSI_MODULES = [
       { q: 'Who goes in Recruiter Rep when starting talent?', o: ['The BD rep', 'The branch manager', 'The person who invited the candidate in', 'Payroll'], a: 2, e: 'Sales Rep is BD; Recruiter Rep invited the candidate.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'Direct Hire Job Orders in Avionte (SOP)', meta: 'PDF', href: 'sop/direct-hire-job-orders.pdf' }
+      { title: 'Direct Hire Job Orders in Avionte (SOP)', meta: 'PDF', href: 'direct-hire-job-orders.pdf' }
     ] }
   ]
 },
@@ -234,7 +234,7 @@ window.WSI_MODULES = [
       { q: 'For a pay rate change, what gets saved to the company profile?', o: ['A PDF of the client\'s email confirmation', 'Call notes', 'The new job description', 'Nothing'], a: 0, e: 'Save the written confirmation as a PDF in Avionte.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'New Client Onboarding & Company Profile Maintenance (SOP)', meta: 'PDF', href: 'sop/new-client-onboarding.pdf' },
+      { title: 'New Client Onboarding & Company Profile Maintenance (SOP)', meta: 'PDF', href: 'new-client-onboarding.pdf' },
       { title: 'Payroll Processing Details Template', meta: 'Company Overview tab', href: '#' }
     ] }
   ]
@@ -281,7 +281,7 @@ window.WSI_MODULES = [
       { q: 'What deductions should you collect?', o: ['Taxes', 'Unreturned uniforms, badges, tools', 'Late arrivals', 'Missed breaks'], a: 1, e: 'Collect deductions for unreturned items.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'Submitting Payroll Hours (SOP)', meta: 'PDF', href: 'sop/submitting-payroll-hours.pdf' },
+      { title: 'Submitting Payroll Hours (SOP)', meta: 'PDF', href: 'submitting-payroll-hours.pdf' },
       { title: 'Kronos Training Guide', meta: 'Internal', href: '#' },
       { title: 'uAttend Training Guide', meta: 'Internal', href: '#' },
       { title: 'Simple VMS Training Guide', meta: 'Internal', href: '#' }
@@ -334,7 +334,7 @@ window.WSI_MODULES = [
       { q: 'When does the Missing Hours report arrive?', o: ['Monday', 'Every Thursday', 'Month end', 'On request'], a: 1, e: 'Branch Managers get it every Thursday.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'Auditing Active Consultants and Missing Hours Reports (SOP)', meta: 'PDF', href: 'sop/auditing-active-consultants.pdf' }
+      { title: 'Auditing Active Consultants and Missing Hours Reports (SOP)', meta: 'PDF', href: 'auditing-active-consultants.pdf' }
     ] }
   ]
 },
@@ -376,7 +376,7 @@ window.WSI_MODULES = [
       { q: 'When sending the Avionte release form, the auto-logout box should be…', o: ['Checked', 'Not checked', "Doesn't matter", 'Removed'], a: 1, e: 'Make sure auto-logout is NOT checked.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'Medical Document Privacy (SOP)', meta: 'PDF', href: 'sop/medical-document-privacy.pdf' },
+      { title: 'Medical Document Privacy (SOP)', meta: 'PDF', href: 'medical-document-privacy.pdf' },
       { title: 'Medical Documentation Release to Client', meta: 'PDF form · Internal', href: '#' }
     ] }
   ]
@@ -444,7 +444,7 @@ window.WSI_MODULES = [
       { q: 'Where can you find accommodation examples and guidance?', o: ['JAN and SOAR', 'Indeed', 'Avionte', 'The client handbook'], a: 0, e: 'The Job Accommodation Network and its SOAR tool.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'Associate Scenarios (SOP)', meta: 'PDF', href: 'sop/associate-scenarios.pdf' },
+      { title: 'Associate Scenarios (SOP)', meta: 'PDF', href: 'associate-scenarios.pdf' },
       { title: 'Job Accommodation Network (JAN)', meta: 'askjan.org', href: 'https://askjan.org' },
       { title: 'Searchable Online Accommodation Resource (SOAR)', meta: 'askjan.org/soar', href: 'https://askjan.org/soar.cfm' }
     ] }
@@ -493,7 +493,7 @@ window.WSI_MODULES = [
       { q: 'A supervisor never replied to your email. What now?', o: ['Escalate to your BM', 'Drop it', 'Note it and follow up in person on your visit', 'Email HR instead'], a: 2, e: 'Follow up in person while you are onsite.' }
     ] },
     { type: 'resources', title: 'Resources', mins: 1, items: [
-      { title: 'Guide to a Successful Onsite Visit (SOP)', meta: 'PDF', href: 'sop/onsite-visit.pdf' },
+      { title: 'Guide to a Successful Onsite Visit (SOP)', meta: 'PDF', href: 'onsite-visit.pdf' },
       { title: 'AM Client Relationship Guide', meta: 'Internal', href: '#' }
     ] }
   ]

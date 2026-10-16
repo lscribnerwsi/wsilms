@@ -29,7 +29,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
     <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: clamp(20px, 5vw, 64px);">
       <div style="width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 22px; padding: clamp(28px, 5vw, 44px); border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; position: relative; overflow: hidden;">
         <div style="position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #EE3826;"></div>
-        <img src="assets/wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: 52px; align-self: flex-start;">
+        <img src="wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: 52px; align-self: flex-start;">
         <div style="display: flex; flex-direction: column; gap: 8px;">
           <h1 style="font-weight: 800; font-size: 30px; letter-spacing: -0.02em; margin: 0;">WSI Learning</h1>
           <p style="font-size: 16px; line-height: 1.55; margin: 0; color: #3F4040;">Choose an account to continue. Google sign-in will replace this step later.</p>
@@ -54,7 +54,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
     <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; padding: 12px clamp(16px, 4vw, 48px); background: #FFFFFF; border-bottom: 1px solid #E3E3E1;">
       <div style="display: flex; align-items: center; gap: 22px; flex-wrap: wrap;">
         <div style="display: flex; align-items: center; gap: 14px;">
-          <img src="assets/wsi-logo.png" data-wsi-logo="1" alt="WSI" style="height: 40px;">
+          <img src="wsi-logo.png" data-wsi-logo="1" alt="WSI" style="height: 40px;">
           <span style="width: 1px; height: 28px; background: #E3E3E1;"></span>
           <span style="font-size: 17px; font-weight: 700; color: #5C5D5D;">Learning</span>
         </div>
@@ -2041,7 +2041,7 @@ class Component extends DCLogic {
     return v;
   }
   renderVals() {
-    const logo = window.WSI_LOGO || 'assets/wsi-logo.png';
+    const logo = window.WSI_LOGO || 'wsi-logo.png';
     const s = this.state;
     const RAW = [...(window.WSI_MODULES || []), ...s.customModules].filter(m => !s.hidden.includes(m.id));
     const MODULES = RAW.map(m => s.overrides[m.id] || m);
