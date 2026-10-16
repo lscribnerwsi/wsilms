@@ -1,5 +1,89 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>WSI Learning</title>
-<meta http-equiv="refresh" content="0; url=WSI%20Learning%20Demo.dc.html">
-<script>location.replace('WSI%20Learning%20Demo.dc.html' + location.search);</script>
-</head><body style="font-family: sans-serif; padding: 40px;"><a href="WSI%20Learning%20Demo.dc.html">Open WSI Learning</a></body></html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap">
+<script src="wsi-store.js"></script>
+<script src="wsi-assets.js"></script>
+<script src="modules.js"></script>
+<style>
+body { margin: 0; background: #F5F5F4; color: #262626; font-family: 'Open Sans', Arial, sans-serif; }
+a { color: #C62B1C; } a:hover { color: #9E2216; }
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#FFFFFF"></rect><path d="M22 52 A28 22 0 0 1 78 52" fill="none" stroke="#EE3826" stroke-width="7" stroke-linecap="round"></path><text x="50" y="74" text-anchor="middle" font-family="Arial" font-weight="700" font-size="22" fill="#7D7E7D">WSI</text></svg></template>
+
+<div style="min-height: 100vh; display: flex; flex-direction: column;">
+  <sc-if value="{{ barOpen }}" hint-placeholder-val="{{ true }}">
+  <div style="position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px clamp(12px, 3vw, 32px); background: #262626; color: #FFFFFF;">
+    <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.04em;">WSI Learning · prototype</span>
+    <div style="display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: #3F4040;">
+      <sc-for list="{{ views }}" as="v" hint-placeholder-count="2">
+        <button onClick="{{ v.onClick }}" style="padding: 7px 16px; border-radius: 999px; border: 0; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; background: {{ v.bg }}; color: #FFFFFF;">{{ v.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 12px; color: #C9CAC8;">{{ hint }}</span>
+      <button onClick="{{ hideBar }}" aria-label="Hide prototype bar" title="Hide this bar" style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; border: 0; background: #3F4040; color: #FFFFFF; cursor: pointer;" style-hover="background: #5C5D5D;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button>
+    </div>
+  </div>
+  </sc-if>
+  <sc-if value="{{ barClosed }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ showBar }}" title="Show the prototype bar" style="position: fixed; left: 14px; bottom: 14px; z-index: 30; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 0; background: #262626; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(38,38,38,0.25);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>{{ viewName }} · switch view</button>
+  </sc-if>
+  <div style="flex: 1;">
+    <sc-if value="{{ hasProblem }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; gap: 10px; align-items: flex-start; padding: 10px clamp(12px, 3vw, 32px); background: #FDECE9; color: #7E1B11; font-size: 13px; line-height: 1.45;"><strong style="flex: none;">Not saving to WSI yet:</strong><span>{{ problem }} Changes are only saved in this browser for now.</span></div>
+    </sc-if>
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 80px 24px; text-align: center; font-size: 15px; color: #5C5D5D;">Loading training data…</div>
+    </sc-if>
+    <sc-if value="{{ isLearner }}" hint-placeholder-val="{{ true }}">
+      <dc-import name="WSI Training" hint-size="100%,100vh"></dc-import>
+    </sc-if>
+    <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="WSI Training Admin" hint-size="100%,100vh"></dc-import>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { barHidden: (() => { try { return localStorage.getItem('wsi-demo-bar') === 'hidden'; } catch (e) { return false; } })(), view: (() => { try { return localStorage.getItem('wsi-demo-view') || 'learner'; } catch (e) { return 'learner'; } })() };
+  componentDidMount() {
+    window.__wsiDemo = (v) => this.set(v);
+    const started = Date.now();
+    const tick = () => {
+      if (window.WSIStore) {
+        const giveUp = setTimeout(() => { if (!this.state.ready) this.setState({ ready: true, server: !!WSIStore.server, problem: WSIStore.server ? 'Connected, but loading saved data is slow. Check Logs → Functions in Netlify for errors from the "data" function.' : (WSIStore.problem || "The storage function didn't answer. Open /api/data/__health on your site to check it.") }); }, 8000);
+        return WSIStore.ready.then(() => { clearTimeout(giveUp); this.setState({ ready: true, server: WSIStore.server, problem: WSIStore.problem || '' }); }, () => { clearTimeout(giveUp); this.setState({ ready: true, server: false, problem: 'Storage failed to load.' }); });
+      }
+      if (Date.now() - started > 5000) return this.setState({ ready: true, server: false, problem: "wsi-store.js didn't load. Make sure it's in the published folder next to the .dc.html files." });
+      setTimeout(tick, 50);
+    };
+    tick();
+  }
+  componentWillUnmount() { delete window.__wsiDemo; }
+  set(view) { try { localStorage.setItem('wsi-demo-view', view); } catch (e) {} this.setState({ view }); window.scrollTo(0, 0); }
+  renderVals() {
+    const v = this.state.view;
+    return {
+      barOpen: !this.state.barHidden, barClosed: !!this.state.barHidden, viewName: v === 'admin' ? 'Manager & admin view' : 'Learner view',
+      hideBar: () => { try { localStorage.setItem('wsi-demo-bar', 'hidden'); } catch (e) {} this.setState({ barHidden: true }); },
+      showBar: () => { try { localStorage.removeItem('wsi-demo-bar'); } catch (e) {} this.setState({ barHidden: false }); },
+      loading: !this.state.ready, hasProblem: !!this.state.problem, problem: this.state.problem, isLearner: this.state.ready && v === 'learner', isAdmin: this.state.ready && v === 'admin',
+      views: [['learner', 'Learner view'], ['admin', 'Manager & admin view']].map(([k, l]) => ({ label: l, bg: v === k ? '#EE3826' : 'transparent', onClick: () => this.set(k) })),
+      hint: this.state.server ? (v === 'learner' ? 'No login · progress saved to WSI' : 'Pick an account (sign-in comes later)') : (v === 'learner' ? 'No login · progress saved in this browser' : 'Pick an account (demo, saved in this browser)'),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -21,15 +21,23 @@ a { color: #C62B1C; } a:hover { color: #9E2216; }
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#FFFFFF"></rect><path d="M22 52 A28 22 0 0 1 78 52" fill="none" stroke="#EE3826" stroke-width="7" stroke-linecap="round"></path><text x="50" y="74" text-anchor="middle" font-family="Arial" font-weight="700" font-size="22" fill="#7D7E7D">WSI</text></svg></template>
 
 <div style="min-height: 100vh; display: flex; flex-direction: column;">
-  <div style="position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px clamp(12px, 3vw, 32px); background: #262626; color: #FFFFFF;">
+  <sc-if value="{{ barOpen }}" hint-placeholder-val="{{ true }}">
+  <div style="position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px clamp(12px, 3vw, 32px); background: #262626; color: #FFFFFF;">
     <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.04em;">WSI Learning · prototype</span>
     <div style="display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: #3F4040;">
       <sc-for list="{{ views }}" as="v" hint-placeholder-count="2">
         <button onClick="{{ v.onClick }}" style="padding: 7px 16px; border-radius: 999px; border: 0; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; background: {{ v.bg }}; color: #FFFFFF;">{{ v.label }}</button>
       </sc-for>
     </div>
-    <span style="font-size: 12px; color: #C9CAC8;">{{ hint }}</span>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 12px; color: #C9CAC8;">{{ hint }}</span>
+      <button onClick="{{ hideBar }}" aria-label="Hide prototype bar" title="Hide this bar" style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; border: 0; background: #3F4040; color: #FFFFFF; cursor: pointer;" style-hover="background: #5C5D5D;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button>
+    </div>
   </div>
+  </sc-if>
+  <sc-if value="{{ barClosed }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ showBar }}" title="Show the prototype bar" style="position: fixed; left: 14px; bottom: 14px; z-index: 30; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 0; background: #262626; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(38,38,38,0.25);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>{{ viewName }} · switch view</button>
+  </sc-if>
   <div style="flex: 1;">
     <sc-if value="{{ hasProblem }}" hint-placeholder-val="{{ false }}">
       <div style="display: flex; gap: 10px; align-items: flex-start; padding: 10px clamp(12px, 3vw, 32px); background: #FDECE9; color: #7E1B11; font-size: 13px; line-height: 1.45;"><strong style="flex: none;">Not saving to WSI yet:</strong><span>{{ problem }} Changes are only saved in this browser for now.</span></div>
@@ -48,7 +56,7 @@ a { color: #C62B1C; } a:hover { color: #9E2216; }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { view: (() => { try { return localStorage.getItem('wsi-demo-view') || 'learner'; } catch (e) { return 'learner'; } })() };
+  state = { barHidden: (() => { try { return localStorage.getItem('wsi-demo-bar') === 'hidden'; } catch (e) { return false; } })(), view: (() => { try { return localStorage.getItem('wsi-demo-view') || 'learner'; } catch (e) { return 'learner'; } })() };
   componentDidMount() {
     window.__wsiDemo = (v) => this.set(v);
     const started = Date.now();
@@ -67,6 +75,9 @@ class Component extends DCLogic {
   renderVals() {
     const v = this.state.view;
     return {
+      barOpen: !this.state.barHidden, barClosed: !!this.state.barHidden, viewName: v === 'admin' ? 'Manager & admin view' : 'Learner view',
+      hideBar: () => { try { localStorage.setItem('wsi-demo-bar', 'hidden'); } catch (e) {} this.setState({ barHidden: true }); },
+      showBar: () => { try { localStorage.removeItem('wsi-demo-bar'); } catch (e) {} this.setState({ barHidden: false }); },
       loading: !this.state.ready, hasProblem: !!this.state.problem, problem: this.state.problem, isLearner: this.state.ready && v === 'learner', isAdmin: this.state.ready && v === 'admin',
       views: [['learner', 'Learner view'], ['admin', 'Manager & admin view']].map(([k, l]) => ({ label: l, bg: v === k ? '#EE3826' : 'transparent', onClick: () => this.set(k) })),
       hint: this.state.server ? (v === 'learner' ? 'No login · progress saved to WSI' : 'Pick an account (sign-in comes later)') : (v === 'learner' ? 'No login · progress saved in this browser' : 'Pick an account (demo, saved in this browser)'),
