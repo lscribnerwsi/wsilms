@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap">
+<script src="wsi-store.js"></script>
+<script src="wsi-assets.js"></script>
+<script src="modules.js"></script>
+<style>
+body { margin: 0; background: #F5F5F4; color: #262626; font-family: 'Open Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: #C62B1C; } a:hover { color: #9E2216; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid #EE3826; outline-offset: 2px; }
+button:disabled { cursor: not-allowed; }
+@media print {
+  body * { visibility: hidden !important; }
+  #wsi-cert, #wsi-cert * { visibility: visible !important; }
+  #wsi-cert { position: fixed; inset: 0; margin: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
+}
+</style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; flex-direction: column;">
+  <header style="display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px clamp(16px, 4vw, 48px); background: #FFFFFF; border-bottom: 1px solid #E3E3E1;">
+    <button onClick="{{ goDashboard }}" style="display: flex; align-items: center; gap: 14px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;">
+      <img src="assets/wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: 42px;">
+      <span style="width: 1px; height: 28px; background: #E3E3E1;"></span>
+      <span style="font-size: 17px; font-weight: 700; color: #5C5D5D;">Learning</span>
+    </button>
+    <sc-if value="{{ hasName }}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; background: #262626; color: #FFFFFF; font-weight: 700; font-size: 13px;">{{ initials }}</span>
+        <span style="font-size: 14px; font-weight: 600;">{{ name }}</span>
+      </div>
+    </sc-if>
+  </header>
+
+  <main style="flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; box-sizing: border-box; padding: clamp(20px, 4vw, 48px);">
+
+    <!-- WELCOME -->
+    <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: center; padding-top: 24px;">
+        <div style="flex: 1 1 420px; max-width: 560px; display: flex; flex-direction: column; gap: 20px;">
+          <span style="align-self: flex-start; padding: 5px 14px; border-radius: 999px; background: #FDECE9; color: #9E2216; font-size: 13px; font-weight: 700;">No login needed</span>
+          <h1 style="font-weight: 800; font-size: clamp(38px, 5vw, 56px); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: pretty;">Training that remembers where you left off.</h1>
+          <p style="font-size: 18px; line-height: 1.6; margin: 0; max-width: 480px; color: #3F4040; text-wrap: pretty;">Your progress is saved in this browser. Tell us your name once so it can appear on your certificates.</p>
+          <form onSubmit="{{ saveName }}" style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 480px;">
+            <label style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-size: 13px; font-weight: 700;">Full name</span>
+              <input value="{{ draftName }}" onChange="{{ onDraftName }}" placeholder="e.g. Kalen Wells" style="min-height: 48px; padding: 0 16px; font: inherit; font-size: 16px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box;">
+            </label>
+            <button type="submit" disabled="{{ draftEmpty }}" style="align-self: flex-end; min-height: 48px; padding: 0 26px; border: 0; border-radius: 8px; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; opacity: {{ draftOpacity }};" style-hover="background: #B42617;">Start learning</button>
+          </form>
+          <p style="font-size: 13px; margin: 0; color: #5C5D5D;">Using a shared computer? Progress stays on this device and browser only.</p>
+        </div>
+        <div style="flex: 0 1 400px; aspect-ratio: 5 / 4; position: relative; display: flex; align-items: flex-end;">
+          <div style="position: absolute; left: 6%; right: 6%; top: 0; height: 40%; border-top: 14px solid #EE3826; border-radius: 50% 50% 0 0 / 100% 100% 0 0;"></div>
+          <div style="width: 100%; height: 78%; border-radius: 12px; background: #E3E3E1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; box-sizing: border-box; font-size: 13px; color: #5C5D5D;">Photo: WSI staff or associates (from Marketing)</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- DASHBOARD -->
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 36px;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <h1 style="font-weight: 800; font-size: clamp(32px, 4vw, 44px); letter-spacing: -0.02em; margin: 0;">Welcome back, {{ firstName }}.</h1>
+            <p style="margin: 0; font-size: 17px; color: #3F4040;">{{ dashSummary }}</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <span style="font-size: 32px; font-weight: 800; color: #C62B1C; line-height: 1;">{{ completeCount }}</span>
+            <span style="font-size: 13px; line-height: 1.35; color: #3F4040;">of {{ moduleCount }} modules<br>complete</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+            <h2 style="font-weight: 800; font-size: 22px; margin: 0;">Modules</h2>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <sc-for list="{{ catFilters }}" as="c" hint-placeholder-count="5">
+                <button onClick="{{ c.onClick }}" style="padding: 7px 16px; border-radius: 999px; border: 1.5px solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.color }}; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">{{ c.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 18px;">
+            <sc-for list="{{ moduleCards }}" as="m" hint-placeholder-count="6">
+              <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; border-top: 4px solid {{ m.topColor }}; opacity: {{ m.cardOp }};">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                  <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #C62B1C;">{{ m.cat }}</span>
+                  <span style="font-size: 13px; color: #5C5D5D;">{{ m.mins }} min</span>
+                </div>
+                <h3 style="font-weight: 800; font-size: 19px; line-height: 1.3; margin: 0; text-wrap: pretty;">{{ m.title }}</h3>
+                <sc-if value="{{ m.hasSched }}" hint-placeholder-val="{{ false }}"><span style="align-self: flex-start; padding: 3px 10px; border-radius: 999px; background: #F5F5F4; font-size: 12px; font-weight: 700; color: #3F4040;">{{ m.schedLabel }}</span></sc-if>
+                <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3F4040; flex: 1;">{{ m.summary }}</p>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #3F4040;"><span>{{ m.progressLabel }}</span><span>{{ m.pct }}%</span></div>
+                  <div style="height: 6px; border-radius: 999px; background: #EBEBEA;"><div style="height: 100%; border-radius: 999px; background: {{ m.barColor }}; width: {{ m.pctWidth }};"></div></div>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                  <sc-if value="{{ m.unlocked }}" hint-placeholder-val="{{ true }}"><button onClick="{{ m.onOpen }}" style="padding: 9px 20px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: #B42617;">{{ m.cta }}</button></sc-if>
+                  <sc-if value="{{ m.locked }}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 8px; background: #EBEBEA; color: #5C5D5D; font-size: 14px; font-weight: 700;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>Locked</span></sc-if>
+                  <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ m.onCert }}" style="padding: 9px 18px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; color: #262626; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: #F5F5F4;">Certificate</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <h2 style="font-weight: 800; font-size: 22px; margin: 0;">Badges</h2>
+          <sc-if value="{{ noBadges }}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; font-size: 14px; color: #5C5D5D;">Finish a module to earn your first badge.</p>
+          </sc-if>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <sc-for list="{{ badges }}" as="b" hint-placeholder-count="0">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+                <span style="width: 40px; height: 40px; border-radius: 999px; background: #EE3826; color: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path></svg>
+                </span>
+                <span style="display: flex; flex-direction: column;"><span style="font-weight: 700; font-size: 14px;">{{ b.label }}</span><span style="font-size: 12px; color: #5C5D5D;">Earned {{ b.date }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onClick="{{ changeName }}" style="padding: 6px 12px; border: 0; background: none; font: inherit; font-size: 13px; color: #5C5D5D; cursor: pointer; text-decoration: underline;">Not {{ firstName }}? Change name</button>
+          <button onClick="{{ resetAll }}" style="padding: 6px 12px; border: 0; background: none; font: inherit; font-size: 13px; color: #5C5D5D; cursor: pointer; text-decoration: underline;">Reset my progress</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- PLAYER -->
+    <sc-if value="{{ isPlayer }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <sc-if value="{{ showDisclaimer }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 10px 16px; border-radius: 8px; background: #FDECE9; color: #9E2216; font-size: 13px; font-weight: 600; align-self: flex-start;">Draft content. Have WSI HR or legal review this module before launch.</div>
+        </sc-if>
+        <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start;">
+          <aside style="flex: 1 1 250px; max-width: 310px; display: flex; flex-direction: column; gap: 14px;">
+            <button onClick="{{ goDashboard }}" style="align-self: flex-start; display: flex; gap: 6px; align-items: center; padding: 6px 10px 6px 4px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; color: #3F4040; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+              All modules
+            </button>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 4px;">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #C62B1C;">{{ mod.cat }}</span>
+              <span style="font-weight: 800; font-size: 18px; line-height: 1.3;">{{ mod.title }}</span>
+            </div>
+            <div style="height: 6px; border-radius: 999px; background: #E3E3E1; margin: 0 4px;"><div style="height: 100%; border-radius: 999px; background: #EE3826; width: {{ progressWidth }};"></div></div>
+            <nav style="display: flex; flex-direction: column; gap: 4px;">
+              <sc-for list="{{ lessonItems }}" as="l" hint-placeholder-count="6">
+                <button onClick="{{ l.onClick }}" disabled="{{ l.locked }}" style="display: flex; align-items: center; gap: 12px; padding: 9px 12px 9px 9px; border-radius: 10px; border: 1px solid {{ l.border }}; font: inherit; text-align: left; cursor: pointer; background: {{ l.bg }}; color: #262626; opacity: {{ l.opacity }};">
+                  <span style="flex: none; width: 28px; height: 28px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: {{ l.dotBg }}; color: {{ l.dotColor }};">
+                    <sc-if value="{{ l.done }}" hint-placeholder-val="{{ false }}">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                    </sc-if>
+                    <sc-if value="{{ l.notDone }}" hint-placeholder-val="{{ true }}">{{ l.num }}</sc-if>
+                  </span>
+                  <span style="display: flex; flex-direction: column;">
+                    <span style="font-size: 14px; font-weight: 600; line-height: 1.3;">{{ l.title }}</span>
+                    <span style="font-size: 12px; color: #5C5D5D;">{{ l.meta }}</span>
+                  </span>
+                </button>
+              </sc-for>
+            </nav>
+          </aside>
+
+          <section style="flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 22px; padding: clamp(22px, 4vw, 44px); border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #C62B1C;">Lesson {{ lessonNum }} of {{ lessonTotal }}</span>
+              <h1 style="font-weight: 800; font-size: clamp(26px, 3vw, 36px); line-height: 1.15; letter-spacing: -0.01em; margin: 0; text-wrap: pretty;">{{ lesson.title }}</h1>
+            </div>
+
+            <!-- text -->
+            <sc-if value="{{ isText }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 18px; max-width: 700px;">
+                <sc-if value="{{ hasVideoUrl }}" hint-placeholder-val="{{ false }}">
+                  <iframe data-src="{{ videoEmbed }}" title="Lesson video" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen="{{ true }}" style="width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 12px; background: #262626;"></iframe>
+                </sc-if>
+                <sc-if value="{{ hasVideoFile }}" hint-placeholder-val="{{ false }}">
+                  <video data-src="{{ videoSrc }}" controls="{{ true }}" preload="metadata" style="width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; background: #262626;"></video>
+                </sc-if>
+                <sc-if value="{{ hasVideoLoading }}" hint-placeholder-val="{{ false }}">
+                  <div style="aspect-ratio: 16 / 9; border-radius: 12px; background: #262626; color: #C9CAC8; display: flex; align-items: center; justify-content: center; font-size: 14px; text-align: center; padding: 20px;">{{ videoMissingText }}</div>
+                </sc-if>
+                <sc-if value="{{ hasVideoLabel }}" hint-placeholder-val="{{ false }}">
+                  <div style="aspect-ratio: 16 / 9; border-radius: 12px; background: #262626; color: #E3E3E1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+                    <span style="width: 68px; height: 68px; border-radius: 999px; background: #EE3826; display: flex; align-items: center; justify-content: center; color: #FFFFFF;"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"></path></svg></span>
+                    <span style="font-size: 14px;">Video embed · {{ lesson.video }}</span>
+                  </div>
+                </sc-if>
+                <sc-for list="{{ paras }}" as="p" hint-placeholder-count="2">
+                  <p style="margin: 0; font-size: 17px; line-height: 1.65; text-wrap: pretty;">{{ p }}</p>
+                </sc-for>
+                <sc-for list="{{ lessonImages }}" as="im" hint-placeholder-count="0">
+                  <figure style="margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                    <sc-if value="{{ im.hasSrc }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ im.onZoom }}" style="padding: 0; border: 1px solid #E3E3E1; border-radius: 10px; background: #F5F5F4; cursor: zoom-in; overflow: hidden; display: block;"><img data-src="{{ im.src }}" alt="{{ im.alt }}" style="display: block; width: 100%; height: auto;"></button>
+                    </sc-if>
+                    <sc-if value="{{ im.noSrc }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding: 24px; border-radius: 10px; background: #F5F5F4; font-size: 13px; color: #5C5D5D; text-align: center;">Image: {{ im.alt }}</div>
+                    </sc-if>
+                    <sc-if value="{{ im.hasCaption }}" hint-placeholder-val="{{ false }}"><figcaption style="font-size: 13px; color: #5C5D5D; line-height: 1.5;">{{ im.caption }}</figcaption></sc-if>
+                  </figure>
+                </sc-for>
+                <sc-if value="{{ hasBullets }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <sc-for list="{{ bullets }}" as="b" hint-placeholder-count="3">
+                      <div style="display: flex; gap: 14px; align-items: flex-start; padding: 14px 18px; border-radius: 10px; background: #F5F5F4;">
+                        <span style="flex: none; width: 8px; height: 8px; margin-top: 8px; border-radius: 999px; background: #EE3826;"></span>
+                        <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 700; font-size: 15px;">{{ b.title }}</span><sc-if value="{{ b.hasText }}" hint-placeholder-val="{{ true }}"><span style="font-size: 14px; line-height: 1.55; color: #3F4040;">{{ b.text }}</span></sc-if></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+                      <span style="padding: 7px 14px; border-radius: 999px; background: #F5F5F4; border: 1px solid #E3E3E1; font-size: 14px; font-weight: 600;">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ hasCallouts }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                    <sc-for list="{{ callouts }}" as="c" hint-placeholder-count="2">
+                      <div style="padding: 16px 20px; border-radius: 10px; background: {{ c.bg }}; color: {{ c.color }};"><div style="font-weight: 800; margin-bottom: 4px;">{{ c.title }}</div><div style="font-size: 14px; line-height: 1.55;">{{ c.text }}</div></div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <!-- steps -->
+            <sc-if value="{{ isSteps }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 16px; max-width: 720px;">
+                <sc-if value="{{ hasIntro }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin: 0; font-size: 17px; line-height: 1.65; text-wrap: pretty;">{{ lesson.intro }}</p>
+                </sc-if>
+                <div style="display: flex; flex-direction: column;">
+                  <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+                    <div style="display: flex; gap: 16px;">
+                      <div style="flex: none; display: flex; flex-direction: column; align-items: center;">
+                        <span style="width: 34px; height: 34px; border-radius: 999px; background: #EE3826; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;">{{ s.num }}</span>
+                        <span style="flex: 1; width: 2px; background: {{ s.lineColor }}; margin: 4px 0;"></span>
+                      </div>
+                      <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 5px 0 22px;">
+                        <span style="font-weight: 800; font-size: 16px;">{{ s.title }}</span>
+                        <span style="font-size: 15px; line-height: 1.6; color: #3F4040;">{{ s.text }}</span>
+                        <sc-if value="{{ s.hasNote }}" hint-placeholder-val="{{ false }}">
+                          <span style="align-self: flex-start; padding: 8px 12px; border-radius: 8px; background: #F5F5F4; border-left: 0; font-size: 13px; line-height: 1.5; color: #3F4040;"><strong style="color: #C62B1C;">Note:</strong> {{ s.note }}</span>
+                        </sc-if>
+                        <sc-if value="{{ s.hasImg }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ s.onZoom }}" style="align-self: flex-start; max-width: 100%; padding: 0; border: 1px solid #E3E3E1; border-radius: 10px; background: #F5F5F4; cursor: zoom-in; overflow: hidden; display: block; margin-top: 4px;"><img data-src="{{ s.imgSrc }}" alt="{{ s.title }}" style="display: block; max-width: 100%; max-height: 340px; height: auto;"></button>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- flashcards -->
+            <sc-if value="{{ isFlash }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <p style="margin: 0; font-size: 17px; line-height: 1.6;">{{ lesson.intro }}</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;">
+                  <sc-for list="{{ flashcards }}" as="f" hint-placeholder-count="6">
+                    <button onClick="{{ f.onClick }}" style="min-height: 160px; border-radius: 12px; padding: 20px; font: inherit; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; background: {{ f.bg }}; color: {{ f.color }}; border: 1.5px solid {{ f.border }};">
+                      <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85;">{{ f.label }}</span>
+                      <span style="font-weight: {{ f.weight }}; font-size: {{ f.size }}; line-height: 1.3;">{{ f.text }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+                <span style="font-size: 13px; color: #5C5D5D;">{{ flipCount }} of {{ cardTotal }} flipped</span>
+              </div>
+            </sc-if>
+
+            <!-- scenario -->
+            <sc-if value="{{ isScen }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 16px; max-width: 700px;">
+                <div style="display: flex; gap: 6px;">
+                  <sc-for list="{{ scenBars }}" as="b" hint-placeholder-count="2">
+                    <span style="height: 6px; flex: 1; border-radius: 999px; background: {{ b.bg }};"></span>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ scenActive }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding: 20px 22px; border-radius: 12px; background: #F5F5F4; font-size: 17px; line-height: 1.6;">{{ scenPrompt }}</div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <sc-for list="{{ scenChoices }}" as="c" hint-placeholder-count="3">
+                      <button onClick="{{ c.onClick }}" style="display: flex; gap: 14px; align-items: flex-start; padding: 14px 18px; border-radius: 10px; border: 1.5px solid {{ c.border }}; background: {{ c.bg }}; font: inherit; font-size: 15px; line-height: 1.5; text-align: left; cursor: pointer; color: #262626;">
+                        <span style="flex: none; width: 26px; height: 26px; border-radius: 999px; background: {{ c.dotBg }}; color: {{ c.dotColor }}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">{{ c.letter }}</span>
+                        <span>{{ c.text }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ hasScenFeedback }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 14px 18px; border-radius: 10px; background: {{ scenFbBg }}; color: {{ scenFbColor }};">
+                    <span style="flex: 1 1 280px; font-size: 15px; line-height: 1.5;"><strong>{{ scenFbTitle }}</strong> {{ scenFbText }}</span>
+                    <button onClick="{{ scenNext }}" style="padding: 8px 18px; border-radius: 8px; border: 1.5px solid currentColor; background: #FFFFFF; color: #262626; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">{{ scenNextLabel }}</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ scenFinished }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding: 20px 22px; border-radius: 12px; background: #262626; color: #FFFFFF; font-size: 17px; line-height: 1.6;"><strong>Scenario complete.</strong> {{ lesson.outro }}</div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <!-- quiz -->
+            <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 22px; max-width: 720px;">
+                <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #3F4040;">Score {{ passScore }}% or higher to complete the module. You can retake it as many times as you need.</p>
+                <sc-for list="{{ quizItems }}" as="q" hint-placeholder-count="4">
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="font-weight: 700; font-size: 16px; line-height: 1.45;">{{ q.num }}. {{ q.q }}</div>
+                    <sc-if value="{{ q.isUpload }}" hint-placeholder-val="{{ false }}">
+                      <label style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 16px; border-radius: 10px; border: 1.5px dashed {{ q.upBorder }}; background: {{ q.upBg }}; cursor: pointer;">
+                        <span style="flex: none; width: 38px; height: 38px; border-radius: 8px; background: #FDECE9; color: #C62B1C; display: flex; align-items: center; justify-content: center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg></span>
+                        <span style="flex: 1 1 220px; display: flex; flex-direction: column; min-width: 0;"><span style="font-weight: 700; font-size: 15px; overflow-wrap: anywhere;">{{ q.upLabel }}</span><span style="font-size: 13px; color: #5C5D5D;">{{ q.upHint }}</span></span>
+                        <input type="file" accept="image/*,.pdf,.doc,.docx,.xlsx,.csv,.txt" onChange="{{ q.onUpload }}" disabled="{{ q.upDisabled }}" style="display: none;">
+                      </label>
+                    </sc-if>
+                    <sc-if value="{{ q.isChoice }}" hint-placeholder-val="{{ true }}">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      <sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="4">
+                        <button onClick="{{ o.onClick }}" style="display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-radius: 10px; border: 1.5px solid {{ o.border }}; background: {{ o.bg }}; font: inherit; font-size: 15px; text-align: left; cursor: pointer; color: #262626;">
+                          <span style="flex: none; width: 16px; height: 16px; border-radius: 999px; border: 2px solid {{ o.ring }}; background: {{ o.fill }}; box-sizing: border-box;"></span>
+                          <span>{{ o.text }}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                    </sc-if>
+                    <sc-if value="{{ q.showExplain }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size: 14px; line-height: 1.5; padding: 0 4px; color: {{ q.explainColor }};"><strong>{{ q.verdict }}</strong> {{ q.explain }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ quizResult }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 18px 22px; border-radius: 12px; background: {{ quizResultBg }}; color: {{ quizResultColor }};">
+                    <span style="font-size: 34px; font-weight: 800;">{{ quizScore }}%</span>
+                    <span style="flex: 1 1 240px; font-size: 15px; line-height: 1.5;">{{ quizResultText }}</span>
+                    <button onClick="{{ retakeQuiz }}" style="padding: 8px 18px; border-radius: 8px; border: 1.5px solid currentColor; background: transparent; color: inherit; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">Retake</button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <!-- resources -->
+            <sc-if value="{{ isRes }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 10px; max-width: 700px;">
+                <p style="margin: 0 0 6px; font-size: 17px; line-height: 1.6;">Keep these handy. They open in a new tab.</p>
+                <sc-for list="{{ resources }}" as="r" hint-placeholder-count="2">
+                  <a href="{{ r.href }}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 16px; padding: 12px 18px 12px 12px; border-radius: 10px; background: #F5F5F4; border: 1px solid #E3E3E1; color: #262626; text-decoration: none;" style-hover="border-color: #EE3826;">
+                    <span style="flex: none; width: 42px; height: 42px; border-radius: 8px; background: #FDECE9; color: #C62B1C; display: flex; align-items: center; justify-content: center;">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+                    </span>
+                    <span style="flex: 1; display: flex; flex-direction: column;"><span style="font-weight: 700; font-size: 15px;">{{ r.title }}</span><span style="font-size: 13px; color: #5C5D5D;">{{ r.meta }}</span></span>
+                  </a>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 18px; border-top: 1px solid #EBEBEA;">
+              <button onClick="{{ prevLesson }}" disabled="{{ isFirst }}" style="padding: 10px 18px; border-radius: 8px; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 700; color: #3F4040; cursor: pointer; opacity: {{ prevOpacity }};">Back</button>
+              <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <sc-if value="{{ nextHint }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">{{ nextHint }}</span></sc-if>
+                <button onClick="{{ nextLesson }}" disabled="{{ nextDisabled }}" style="padding: 11px 26px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; opacity: {{ nextOpacity }};" style-hover="background: #B42617;">{{ nextLabel }}</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- COMPLETE -->
+    <sc-if value="{{ isComplete }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; padding-top: 12px;">
+        <div style="flex: 1 1 420px; max-width: 600px; display: flex; flex-direction: column; gap: 20px;">
+          <span style="align-self: flex-start; padding: 5px 14px; border-radius: 999px; background: #FDECE9; color: #9E2216; font-size: 13px; font-weight: 700;">Module complete</span>
+          <h1 style="font-weight: 800; font-size: clamp(36px, 5vw, 52px); line-height: 1.08; letter-spacing: -0.02em; margin: 0;">Nice work, {{ firstName }}.</h1>
+          <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #3F4040;">You finished <strong>{{ mod.title }}</strong> and earned its badge. Send your completion to WSI so it's on record.</p>
+          <form name="training-completion" method="POST" data-netlify="true" onSubmit="{{ submitCompletion }}" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <input type="hidden" name="form-name" value="training-completion" readOnly="{{ true }}">
+            <input type="hidden" name="learner" value="{{ name }}" readOnly="{{ true }}">
+            <input type="hidden" name="module" value="{{ mod.title }}" readOnly="{{ true }}">
+            <input type="hidden" name="score" value="{{ quizScore }}" readOnly="{{ true }}">
+            <input type="hidden" name="completed" value="{{ completedDate }}" readOnly="{{ true }}">
+            <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+              <button type="submit" style="padding: 12px 24px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;" style-hover="background: #B42617;">Send completion to WSI</button>
+            </sc-if>
+            <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+              <span style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 8px; background: #262626; color: #FFFFFF; font-weight: 700; font-size: 15px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                Sent {{ submittedDate }}
+              </span>
+            </sc-if>
+            <button type="button" onClick="{{ goCertificate }}" style="padding: 12px 24px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; color: #262626; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;">View certificate</button>
+          </form>
+          <button onClick="{{ goDashboard }}" style="align-self: flex-start; padding: 6px 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; color: #3F4040; cursor: pointer; text-decoration: underline;">Back to modules</button>
+        </div>
+        <div style="flex: 1 1 300px; max-width: 380px; display: flex; flex-direction: column; gap: 16px; padding: 26px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <h2 style="font-weight: 800; font-size: 18px; margin: 0;">Score summary</h2>
+          <div style="display: flex; align-items: baseline; gap: 10px;"><span style="font-size: 52px; font-weight: 800; line-height: 1; color: #C62B1C;">{{ quizScore }}%</span><span style="font-size: 14px; color: #3F4040;">{{ correctCount }} of {{ quizTotal }} correct</span></div>
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; padding-top: 12px; border-top: 1px solid #EBEBEA;">
+            <div style="display: flex; justify-content: space-between;"><span>Lessons completed</span><strong>{{ lessonTotal }} of {{ lessonTotal }}</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Quiz attempts</span><strong>{{ attempts }}</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Completed</span><strong>{{ completedDate }}</strong></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- CERTIFICATE -->
+    <sc-if value="{{ isCertificate }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 18px; align-items: flex-start;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button onClick="{{ goDashboard }}" style="padding: 10px 18px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; color: #262626; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">Back to modules</button>
+          <button onClick="{{ printCert }}" style="padding: 10px 20px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">Print or save as PDF</button>
+        </div>
+        <div id="wsi-cert" style="width: 100%; max-width: 960px; aspect-ratio: 11 / 8.5; box-sizing: border-box; background: #FFFFFF; border-radius: 12px; box-shadow: 0 10px 40px rgba(38,38,38,0.10); padding: clamp(24px, 5vw, 64px); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 10px; background: #EE3826;"></div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+            <img src="assets/wsi-logo.png" data-wsi-logo="1" alt="WSI Recruitment and Staffing" style="height: clamp(44px, 7vw, 76px);">
+            <span style="font-size: clamp(10px, 1.2vw, 13px); font-weight: 700; color: #7D7E7D; text-align: right;">ID {{ certId }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.2vw, 14px);">
+            <span style="font-size: clamp(11px, 1.3vw, 14px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #C62B1C;">Certificate of completion</span>
+            <span style="font-weight: 800; font-size: clamp(30px, 5.6vw, 64px); line-height: 1.05; letter-spacing: -0.02em;">{{ name }}</span>
+            <span style="font-size: clamp(13px, 1.7vw, 18px); line-height: 1.55; max-width: 620px; color: #3F4040;">has completed <strong style="color: #262626;">{{ mod.title }}</strong> with a score of {{ quizScore }}%.</span>
+          </div>
+          <div style="display: flex; gap: clamp(20px, 5vw, 64px); flex-wrap: wrap; font-size: clamp(11px, 1.4vw, 15px); padding-bottom: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="color: #5C5D5D;">Date</span><strong>{{ completedDate }}</strong></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="color: #5C5D5D;">Issued by</span><strong>WSI Recruitment and Staffing</strong></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+  <sc-if value="{{ hasZoom }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeZoom }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(38,38,38,0.85); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out;">
+      <img data-src="{{ zoomSrc }}" alt="Enlarged screenshot" style="max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); background: #FFFFFF;">
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;passScore&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 80, &quot;min&quot;: 50, &quot;max&quot;: 100, &quot;step&quot;: 10, &quot;unit&quot;: &quot;%&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Rules&quot;}, &quot;requireSequential&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Rules&quot;}, &quot;showDisclaimer&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Display&quot;}}">
+const vidDB = () => new Promise((res, rej) => { const r = indexedDB.open('wsi-videos', 1); r.onupgradeneeded = () => r.result.createObjectStore('v'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const vidPut = async (k, b) => { if (window.WSIStore && WSIStore.server) return WSIStore.putFile(k, b); const db = await vidDB(); return new Promise((res, rej) => { const tx = db.transaction('v', 'readwrite'); tx.objectStore('v').put(b, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); };
+const vidGet = async (k) => { try { const db = await vidDB(); return await new Promise((res) => { const q = db.transaction('v').objectStore('v').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); } catch (e) { return null; } };
+const vidDel = async (k) => { if (window.WSIStore && WSIStore.server) return WSIStore.delFile(k); try { const db = await vidDB(); db.transaction('v', 'readwrite').objectStore('v').delete(k); } catch (e) {} };
+const VURL = {};
+const vidUrl = (k, cb) => { if (window.WSIStore && WSIStore.server && !VURL[k]) return WSIStore.fileUrl(k); if (VURL[k]) return VURL[k]; if (!(k in VURL)) { VURL[k] = null; vidGet(k).then(b => { if (b) { VURL[k] = URL.createObjectURL(b); cb(); } }); } return null; };
+const parseVid = (v) => { v = v || ''; if (v.startsWith('upload:')) { const [k, name, size] = v.slice(7).split('|'); return { kind: 'file', key: k, name: name || 'video', size: Number(size) || 0 }; } if (/^https?:\/\//.test(v)) return { kind: 'url', url: v }; return v ? { kind: 'label', label: v } : { kind: 'none' }; };
+const toEmbed = (u) => { let m = u.match(/youtube\.com\/watch\?v=([\w-]+)/) || u.match(/youtu\.be\/([\w-]+)/) || u.match(/youtube\.com\/shorts\/([\w-]+)/); if (m) return 'https://www.youtube.com/embed/' + m[1]; m = u.match(/vimeo\.com\/(\d+)/); if (m && !/player\.vimeo/.test(u)) return 'https://player.vimeo.com/video/' + m[1]; m = u.match(/loom\.com\/share\/(\w+)/); if (m) return 'https://www.loom.com/embed/' + m[1]; return u; };
+const fmtSize = (n) => n > 1e9 ? (n / 1e9).toFixed(1) + ' GB' : n > 1e6 ? Math.round(n / 1e6) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB';
+const KEY = 'wsi-training-v2';
+const fmtDate = (t) => t ? new Date(t).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+const blank = () => ({ done: {}, lesson: 0, answers: {}, quizSubmitted: false, attempts: 0, flipped: {}, scenStep: 0, scenChoice: null, scenDone: false, completedAt: null, submittedAt: null });
+const RED = '#EE3826', DEEP = '#C62B1C', INK = '#262626', TINT = '#FDECE9', SOFT = '#F5F5F4', LINE = '#E3E3E1';
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+    this.state = Object.assign({ name: '', draftName: '', current: null, prog: {}, cat: 'All', screen: null }, saved);
+    if (!this.state.name) this.state.screen = 'welcome';
+    else if (!this.state.screen || this.state.screen === 'welcome') this.state.screen = 'dashboard';
+  }
+  componentDidMount() {
+    setTimeout(() => { this.swapLogo(); this.syncMedia(); }, 0);
+    const tick = () => {
+      if (!window.WSI_MODULES) return setTimeout(tick, 50);
+      const q = new URLSearchParams(location.search).get('module') || this.state.pendingModule;
+      if (this.state.pendingModule) this.setState({ pendingModule: null });
+      if (q && this.state.name && window.WSI_MODULES.some(m => m.id === q)) this.open(q);
+      else this.forceUpdate();
+    };
+    tick();
+  }
+  swapLogo() { if (window.WSI_LOGO) document.querySelectorAll('img[data-wsi-logo]').forEach(i => { if (i.naturalWidth === 0 && i.complete) i.src = window.WSI_LOGO; else i.onerror = () => { i.onerror = null; i.src = window.WSI_LOGO; }; }); }
+  syncMedia() { document.querySelectorAll('[data-src]').forEach(el => { const v = el.getAttribute('data-src'); if (v && v.indexOf('{{') === -1 && el.getAttribute('src') !== v) el.setAttribute('src', v); }); }
+  componentDidUpdate() {
+    this.swapLogo(); this.syncMedia();
+    const { draftName, zoom, ...rest } = this.state;
+    try { localStorage.setItem(KEY, JSON.stringify(rest)); } catch (e) {}
+  }
+  mods() { let c = []; try { c = JSON.parse(localStorage.getItem('wsi-custom-modules') || '[]'); } catch (e) {} let o = {}; try { o = JSON.parse(localStorage.getItem('wsi-module-overrides') || '{}'); } catch (e) {} let h = []; try { h = JSON.parse(localStorage.getItem('wsi-hidden-modules') || '[]'); } catch (e) {} return [...(window.WSI_MODULES || []), ...c].filter(m => !h.includes(m.id)).map(m => o[m.id] || m); }
+  sched() { try { const d = JSON.parse(localStorage.getItem('wsi-schedule') || 'null'); const nm = (this.state.name || '').trim().toLowerCase(); return d && nm ? (d.people || []).find(p => p.name.toLowerCase() === nm) || null : null; } catch (e) { return null; } }
+  p(id) { return this.state.prog[id] || blank(); }
+  setP(fn) {
+    const id = this.state.current;
+    this.setState(s => ({ prog: { ...s.prog, [id]: { ...(s.prog[id] || blank()), ...fn(s.prog[id] || blank()) } } }));
+  }
+  open(id) {
+    const m = this.mods().find(x => x.id === id);
+    const pr = this.p(id);
+    const lesson = pr.completedAt ? 0 : Math.max(0, m.lessons.findIndex((_, i) => !pr.done[i]));
+    this.setState(s => ({ current: id, screen: 'player', prog: { ...s.prog, [id]: { ...pr, lesson } } }));
+    window.scrollTo(0, 0);
+  }
+  pass() { return this.props.passScore ?? 80; }
+  score(m, pr) {
+    const qz = m.lessons.find(l => l.type === 'quiz');
+    if (!qz) return { c: 0, n: 0, pct: 100 };
+    const mc = qz.questions.map((q, i) => [q, i]).filter(([q]) => q.kind !== 'upload');
+    if (!mc.length) return { c: 0, n: 0, pct: 100 };
+    const c = mc.filter(([q, i]) => pr.answers[i] === q.a).length;
+    return { c, n: mc.length, pct: Math.round(c / mc.length * 100) };
+  }
+  renderVals() {
+    const logo = window.WSI_LOGO || 'assets/wsi-logo.png';
+    const s = this.state, mods = this.mods();
+    const first = (s.name || '').trim().split(/\s+/)[0] || '';
+    const initials = (s.name || '').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const go = (screen) => () => { this.setState({ screen }); window.scrollTo(0, 0); };
+    const pctOf = (m, pr) => Math.round(m.lessons.filter((_, i) => pr.done[i]).length / m.lessons.length * 100);
+
+    const cats = ['All', ...Array.from(new Set(mods.map(m => m.cat)))];
+    const catFilters = cats.map(c => ({ label: c, bg: s.cat === c ? INK : '#FFFFFF', color: s.cat === c ? '#FFFFFF' : INK, border: s.cat === c ? INK : '#C9CAC8', onClick: () => this.setState({ cat: c }) }));
+    const fmtShort = (d) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const me = this.sched();
+    const itemOf = (id) => me ? me.items.find(i => i.moduleId === id) : null;
+    const wk = (id) => { const it = itemOf(id); return it ? (it.week || 0.5) : 999; };
+    const moduleCards = mods.filter(m => s.cat === 'All' || m.cat === s.cat).sort((a, b) => wk(a.id) - wk(b.id)).map(m => {
+      const pr = this.p(m.id), pct = pctOf(m, pr), done = !!pr.completedAt;
+      const it = itemOf(m.id), locked = !!(it && it.opens && new Date(it.opens + 'T12:00:00') > new Date() && !done);
+      return {
+        ...m, pct, pctWidth: pct + '%', done, locked, unlocked: !locked, cardOp: locked ? 0.55 : 1,
+        hasSched: !!it, schedLabel: it ? (it.week ? 'Week ' + it.week + ' · ' : '') + (locked ? 'Opens ' + fmtShort(it.opens) : done ? 'Done' : 'Due ' + fmtShort(it.due)) : '',
+        topColor: done ? INK : pct ? RED : LINE, barColor: done ? INK : RED,
+        progressLabel: done ? 'Completed ' + fmtDate(pr.completedAt) : `${m.lessons.filter((_, i) => pr.done[i]).length} of ${m.lessons.length} lessons`,
+        cta: done ? 'Review' : pct ? 'Continue' : 'Start',
+        onOpen: () => this.open(m.id),
+        onCert: () => { this.setState({ current: m.id, screen: 'certificate' }); window.scrollTo(0, 0); },
+      };
+    });
+    const completed = mods.filter(m => this.p(m.id).completedAt);
+    const inProg = mods.filter(m => !this.p(m.id).completedAt && pctOf(m, this.p(m.id)) > 0).length;
+    const badges = completed.map(m => ({ label: m.title.split(':')[0].replace(/ \(.*\)/, ''), date: fmtDate(this.p(m.id).completedAt) }));
+
+    const base = {
+      logo, name: s.name, firstName: first, initials, hasName: !!s.name,
+      isWelcome: s.screen === 'welcome', isDashboard: s.screen === 'dashboard', isPlayer: s.screen === 'player' && !!s.current,
+      isComplete: s.screen === 'complete', isCertificate: s.screen === 'certificate',
+      draftName: s.draftName, draftEmpty: !s.draftName.trim(), draftOpacity: s.draftName.trim() ? 1 : 0.45,
+      onDraftName: (e) => this.setState({ draftName: e.target.value }),
+      saveName: (e) => { e.preventDefault(); const nm = s.draftName.trim(); if (!nm) return; const changed = nm.toLowerCase() !== (s.name || '').toLowerCase(); this.setState({ name: nm, draftName: '', screen: 'dashboard', ...(changed ? { prog: {}, current: null } : {}) }); if (window.WSIStore) WSIStore.loadProgress(nm).then(doc => { if (doc && doc.prog) this.setState({ prog: doc.prog }); }); },
+      changeName: () => this.setState({ draftName: s.name, screen: 'welcome' }),
+      resetAll: () => { if (confirm('Clear all training progress saved in this browser?')) this.setState({ prog: {}, current: null }); },
+      goDashboard: go('dashboard'), goCertificate: go('certificate'), printCert: () => window.print(),
+      catFilters, moduleCards, moduleCount: mods.length, completeCount: completed.length,
+      badges, noBadges: !badges.length,
+      dashSummary: completed.length === mods.length && mods.length ? "You're all caught up. Revisit a module any time." : inProg ? 'Pick up where you left off.' : `You have ${mods.length - completed.length} modules to complete.`,
+    };
+
+    const m = mods.find(x => x.id === s.current);
+    if (!m) return base;
+    const pr = this.p(m.id), L = Math.min(pr.lesson, m.lessons.length - 1), lesson = m.lessons[L];
+    const sequential = this.props.requireSequential ?? true;
+    const firstOpen = m.lessons.findIndex((_, j) => !pr.done[j]);
+    const { c: correctCount, n: quizTotal, pct: quizScore } = this.score(m, pr);
+    const passed = quizScore >= this.pass();
+    const pct = pctOf(m, pr);
+
+    const lessonItems = m.lessons.map((l, i) => {
+      const done = !!pr.done[i], active = i === L;
+      const locked = sequential && !done && firstOpen !== -1 && i > firstOpen;
+      return {
+        num: i + 1, title: l.title, meta: locked ? 'Locked' : done ? 'Complete' : `${l.mins || 2} min`,
+        done, notDone: !done, locked, opacity: locked ? 0.5 : 1,
+        bg: active ? '#FFFFFF' : 'transparent', border: active ? LINE : 'transparent',
+        dotBg: done ? INK : active ? RED : LINE, dotColor: done || active ? '#FFFFFF' : INK,
+        onClick: () => { this.setP(() => ({ lesson: i })); window.scrollTo(0, 0); },
+      };
+    });
+
+    const v = { ...base, mod: m, lesson, lessonNum: L + 1, lessonTotal: m.lessons.length, lessonItems, progressWidth: pct + '%',
+      showDisclaimer: !!m.draft && (this.props.showDisclaimer ?? true),
+      isText: lesson.type === 'text', isSteps: lesson.type === 'steps', isFlash: lesson.type === 'flashcards',
+      isScen: lesson.type === 'scenario', isQuiz: lesson.type === 'quiz', isRes: lesson.type === 'resources',
+      passScore: this.pass(), quizScore, correctCount, quizTotal, attempts: pr.attempts,
+      completedDate: fmtDate(pr.completedAt), submitted: !!pr.submittedAt, notSubmitted: !pr.submittedAt, submittedDate: fmtDate(pr.submittedAt),
+      submitCompletion: (e) => { e.preventDefault(); this.setP(() => ({ submittedAt: Date.now() })); if (window.WSIStore && WSIStore.server) fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ 'form-name': 'training-completion', learner: s.name, module: m.title, score: String(quizScore), completed: fmtDate(pr.completedAt || Date.now()) }).toString() }).catch(() => {}); },
+      certId: 'WSI-' + m.id.slice(0, 4).toUpperCase() + '-' + String(pr.completedAt || 0).slice(-6),
+    };
+
+    const fu = () => this.forceUpdate();
+    const zoom = (src) => () => this.setState({ zoom: src });
+    Object.assign(v, { hasZoom: !!s.zoom, zoomSrc: s.zoom, closeZoom: () => this.setState({ zoom: null }) });
+    if (v.isText) v.lessonImages = (lesson.images || []).map(im => { const src = vidUrl(im.key, fu); return { src, hasSrc: !!src, noSrc: !src, alt: im.caption || im.name, caption: im.caption, hasCaption: !!(im.caption || '').trim(), onZoom: zoom(src) }; });
+    if (v.isText) Object.assign(v, {
+      ...(() => {
+        const pv = parseVid(lesson.video);
+        const src = pv.kind === 'file' ? vidUrl(pv.key, () => this.forceUpdate()) : null;
+        return { hasVideoUrl: pv.kind === 'url', videoEmbed: pv.kind === 'url' ? toEmbed(pv.url) : '', hasVideoLabel: pv.kind === 'label',
+          hasVideoFile: pv.kind === 'file' && !!src, videoSrc: src, hasVideoLoading: pv.kind === 'file' && !src,
+          videoMissingText: 'Video: ' + (pv.name || '') + '. It plays on the browser it was uploaded from until the site is live.' };
+      })(), paras: (lesson.paras || []).filter(x => x && x.trim()),
+      bullets: (lesson.bullets || []).map(b => ({ title: b[0], text: b[1], hasText: !!b[1] })), hasBullets: !!(lesson.bullets || []).length,
+      chips: (lesson.chips || []).filter(x => x && x.trim()), hasChips: !!(lesson.chips || []).filter(x => x && x.trim()).length,
+      callouts: (lesson.callouts || []).map(c => ({ ...c, bg: c.tone === 'red' ? TINT : SOFT, color: c.tone === 'red' ? '#7E1B11' : INK })), hasCallouts: !!(lesson.callouts || []).length,
+    });
+    if (v.isSteps) Object.assign(v, {
+      hasIntro: !!lesson.intro,
+      steps: lesson.steps.map((st, i) => ({ ...st, num: i + 1, hasNote: !!st.note, ...(() => { const src = st.image ? vidUrl(st.image.key, fu) : null; return { hasImg: !!src, imgSrc: src, onZoom: zoom(src) }; })(), lineColor: i === lesson.steps.length - 1 ? 'transparent' : LINE })),
+    });
+    if (v.isFlash) Object.assign(v, {
+      cardTotal: lesson.cards.length, flipCount: Object.keys(pr.flipped).length,
+      flashcards: lesson.cards.map((c, i) => {
+        const f = !!pr.flipped[i];
+        return { label: c[0], text: f ? c[2] : c[1], bg: f ? INK : '#FFFFFF', color: f ? '#FFFFFF' : INK, border: f ? INK : LINE,
+          weight: f ? 500 : 800, size: f ? '15px' : (c[1].length > 12 ? '20px' : '32px'),
+          onClick: () => this.setP(p => ({ flipped: { ...p.flipped, [i]: true } })) };
+      }),
+    });
+    if (v.isScen) {
+      const stepIdx = Math.min(pr.scenStep, lesson.steps.length - 1), step = lesson.steps[stepIdx];
+      const picked = pr.scenChoice != null ? step.choices[pr.scenChoice] : null;
+      Object.assign(v, {
+        scenBars: lesson.steps.map((_, i) => ({ bg: pr.scenDone || i <= stepIdx ? RED : LINE })),
+        scenActive: !pr.scenDone, scenFinished: pr.scenDone, scenPrompt: step.prompt,
+        scenChoices: step.choices.map((c, i) => {
+          const sel = pr.scenChoice === i;
+          return { letter: 'ABCD'[i], text: c[0],
+            border: sel ? (c[1] ? INK : RED) : LINE, bg: sel ? (c[1] ? SOFT : TINT) : '#FFFFFF',
+            dotBg: sel ? (c[1] ? INK : RED) : SOFT, dotColor: sel ? '#FFFFFF' : INK,
+            onClick: () => { if (!(picked && picked[1])) this.setP(() => ({ scenChoice: i })); } };
+        }),
+        hasScenFeedback: !!picked && !pr.scenDone,
+        scenFbTitle: picked ? (picked[1] ? 'Right call.' : 'Not quite.') : '', scenFbText: picked ? picked[2] : '',
+        scenFbBg: picked && picked[1] ? INK : TINT, scenFbColor: picked && picked[1] ? '#FFFFFF' : '#7E1B11',
+        scenNextLabel: picked && picked[1] ? (stepIdx < lesson.steps.length - 1 ? 'Next' : 'Finish') : 'Try again',
+        scenNext: () => {
+          if (!picked[1]) return this.setP(() => ({ scenChoice: null }));
+          if (stepIdx < lesson.steps.length - 1) this.setP(() => ({ scenStep: stepIdx + 1, scenChoice: null }));
+          else this.setP(() => ({ scenDone: true, scenChoice: null }));
+        },
+      });
+    }
+    if (v.isQuiz) Object.assign(v, {
+      quizItems: lesson.questions.map((q, qi) => {
+        const isUp = q.kind === 'upload', up = (pr.uploads || {})[qi];
+        const ans = pr.answers[qi], right = isUp ? !!up : ans === q.a;
+        return { num: qi + 1, q: q.q, explain: q.e, showExplain: pr.quizSubmitted, verdict: isUp ? (up ? 'Submitted.' : 'No file.') : right ? 'Correct.' : 'Not quite.',
+          explainColor: right ? INK : DEEP, isUpload: isUp, isChoice: !isUp,
+          upLabel: s.uploading === qi ? 'Uploading…' : up ? up.name : 'Upload a file or screenshot',
+          upHint: up ? (pr.quizSubmitted ? 'Sent to your training manager.' : 'Uploaded. Choose another file to replace it.') : 'Your training manager reviews it. It is not part of your score.',
+          upBorder: up ? INK : '#C9CAC8', upBg: up ? SOFT : '#FFFFFF', upDisabled: !!pr.quizSubmitted,
+          onUpload: async (e) => {
+            const f = e.target.files && e.target.files[0]; e.target.value = '';
+            if (!f) return;
+            if (f.size > 5.5e6) return alert('Please choose a file under 5 MB.');
+            const key = 'q' + Date.now() + Math.random().toString(36).slice(2, 6);
+            this.setState({ uploading: qi });
+            try { await vidPut(key, f); this.setP(p => ({ uploads: { ...(p.uploads || {}), [qi]: { key, name: f.name, at: Date.now() } } })); }
+            catch (err) { alert("Couldn't upload that file. Try a smaller one."); }
+            this.setState({ uploading: null });
+          },
+          opts: (q.o || []).map((t, oi) => {
+            const sel = ans === oi;
+            let border = sel ? INK : LINE, bg = '#FFFFFF';
+            if (pr.quizSubmitted && oi === q.a) { border = INK; bg = SOFT; }
+            else if (pr.quizSubmitted && sel) { border = RED; bg = TINT; }
+            return { text: t, border, bg, ring: sel ? INK : '#A9AAA8', fill: sel ? INK : 'transparent',
+              onClick: () => { if (!pr.quizSubmitted) this.setP(p => ({ answers: { ...p.answers, [qi]: oi } })); } };
+          }) };
+      }),
+      quizResult: pr.quizSubmitted,
+      quizResultBg: passed ? INK : TINT, quizResultColor: passed ? '#FFFFFF' : '#7E1B11',
+      quizResultText: passed ? 'You passed. Continue to finish the module.' : `You need ${this.pass()}% to pass. Review the explanations and try again.`,
+      retakeQuiz: () => this.setP(p => ({ answers: {}, quizSubmitted: false, done: { ...p.done, [L]: false } })),
+    });
+    if (v.isRes) v.resources = lesson.items;
+
+    const last = L === m.lessons.length - 1;
+    let nextLabel = last ? 'Finish module' : 'Continue', nextDisabled = false, nextHint = '';
+    if (v.isFlash && Object.keys(pr.flipped).length < lesson.cards.length) { nextDisabled = true; nextHint = 'Flip every card to continue'; }
+    if (v.isScen && !pr.scenDone) { nextDisabled = true; nextHint = 'Finish the scenario to continue'; }
+    if (v.isQuiz) {
+      const all = lesson.questions.every((q, i) => q.kind === 'upload' ? !!(pr.uploads || {})[i] : pr.answers[i] != null);
+      if (!pr.quizSubmitted) { nextLabel = 'Submit answers'; nextDisabled = !all; nextHint = all ? '' : `Answer all ${lesson.questions.length} questions`; }
+      else if (!passed) { nextDisabled = true; nextHint = 'Retake to continue'; }
+    }
+    Object.assign(v, {
+      nextLabel, nextDisabled, nextHint, nextOpacity: nextDisabled ? 0.45 : 1,
+      isFirst: L === 0, prevOpacity: L === 0 ? 0.35 : 1,
+      prevLesson: () => { this.setP(() => ({ lesson: Math.max(0, L - 1) })); window.scrollTo(0, 0); },
+      nextLesson: () => {
+        if (v.isQuiz && !pr.quizSubmitted) return this.setP(p => ({ quizSubmitted: true, attempts: p.attempts + 1, history: [...(p.history || []), { pct: quizScore, at: Date.now() }] }));
+        if (last) { this.setP(p => ({ done: { ...p.done, [L]: true }, completedAt: p.completedAt || Date.now() })); this.setState({ screen: 'complete' }); return window.scrollTo(0, 0); }
+        this.setP(p => ({ done: { ...p.done, [L]: true }, lesson: L + 1 })); window.scrollTo(0, 0);
+      },
+    });
+    return v;
+  }
+}
+</script>
+</body>
+</html>
