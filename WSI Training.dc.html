@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap">
 <script src="wsi-store.js"></script>
 <script src="wsi-assets.js"></script>
+<script src="wsi-schedule-doc.js"></script>
+<script src="wsi-schedule-templates.js"></script>
 <script src="modules.js"></script>
 <style>
 body { margin: 0; background: #F5F5F4; color: #262626; font-family: 'Open Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -35,6 +37,11 @@ button:disabled { cursor: not-allowed; }
     </button>
     <sc-if value="{{ hasName }}" hint-placeholder-val="{{ true }}">
       <div style="display: flex; align-items: center; gap: 10px;">
+        <sc-if value="{{ hasMyDocs }}" hint-placeholder-val="{{ false }}">
+          <nav style="display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: #F5F5F4; margin-right: 8px;">
+            <sc-for list="{{ navTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="padding: 7px 14px; border-radius: 999px; border: 0; background: {{ t.bg }}; color: {{ t.color }}; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">{{ t.label }}</button></sc-for>
+          </nav>
+        </sc-if>
         <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; background: #262626; color: #FFFFFF; font-weight: 700; font-size: 13px;">{{ initials }}</span>
         <span style="font-size: 14px; font-weight: 600;">{{ name }}</span>
       </div>
@@ -50,6 +57,13 @@ button:disabled { cursor: not-allowed; }
           <span style="align-self: flex-start; padding: 5px 14px; border-radius: 999px; background: #FDECE9; color: #9E2216; font-size: 13px; font-weight: 700;">No login needed</span>
           <h1 style="font-weight: 800; font-size: clamp(38px, 5vw, 56px); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: pretty;">Training that remembers where you left off.</h1>
           <p style="font-size: 18px; line-height: 1.6; margin: 0; max-width: 480px; color: #3F4040; text-wrap: pretty;">{{ saveWhere }} Pick who you are to continue.</p>
+          <div style="display: flex; flex-direction: column; gap: 8px; max-width: 480px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 1.5px dashed #C9CAC8;">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #C62B1C;">Preview a sample journey</span>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button onClick="{{ simAustin }}" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; cursor: pointer; color: #262626; text-align: left;" style-hover="background: #FDECE9;"><span style="font-weight: 800; font-size: 14px;">Austin · new hire</span><span style="font-size: 12px; color: #5C5D5D;">Account Manager onboarding</span></button>
+              <button onClick="{{ simMaddie }}" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; cursor: pointer; color: #262626; text-align: left;" style-hover="background: #FDECE9;"><span style="font-weight: 800; font-size: 14px;">Maddie · promotion</span><span style="font-size: 12px; color: #5C5D5D;">FOA to Staffing Coordinator</span></button>
+            </div>
+          </div>
           <div style="display: flex; flex-direction: column; gap: 8px; max-width: 480px;">
             <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #C62B1C;">Continue as</span>
             <sc-for list="{{ pickPeople }}" as="u" hint-placeholder-count="5">
@@ -76,6 +90,9 @@ button:disabled { cursor: not-allowed; }
     <!-- DASHBOARD -->
     <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
       <div style="display: flex; flex-direction: column; gap: 36px;">
+        <sc-if value="{{ isSim }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 16px; border-radius: 10px; background: #262626; color: #FFFFFF; font-size: 14px;"><strong>Sample journey</strong><span style="flex: 1; min-width: 200px;">Simulated progress for {{ name }}. Click into any module to see what they see.</span><button onClick="{{ exitSim }}" style="padding: 6px 14px; border-radius: 8px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">Exit sample</button></div>
+        </sc-if>
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px;">
           <div style="display: flex; flex-direction: column; gap: 8px;">
             <h1 style="font-weight: 800; font-size: clamp(32px, 4vw, 44px); letter-spacing: -0.02em; margin: 0;">Welcome back, {{ firstName }}.</h1>
@@ -86,6 +103,32 @@ button:disabled { cursor: not-allowed; }
             <span style="font-size: 13px; line-height: 1.35; color: #3F4040;">of {{ moduleCount }} modules<br>complete</span>
           </div>
         </div>
+        <sc-if value="{{ hasJourney }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 16px; padding: 22px 24px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E3E3E1; border-left: 6px solid {{ jEdge }};">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; background: {{ jTagBg }}; color: {{ jTagColor }};">{{ jType }}</span>
+              <span style="font-weight: 800; font-size: 20px;">{{ jPath }}</span>
+            </div>
+            <sc-if value="{{ jIsPromo }}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px;"><span style="color: #5C5D5D;">{{ jFrom }}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C62B1C" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><strong>{{ jTo }}</strong></div></sc-if>
+            <div style="display: grid; grid-template-columns: repeat({{ jWeekCount }}, minmax(0, 1fr)); gap: 6px;">
+              <sc-for list="{{ jWeeks }}" as="w" hint-placeholder-count="5">
+                <div style="display: flex; flex-direction: column; gap: 6px;"><div style="height: 8px; border-radius: 999px; background: {{ w.bg }};"></div><span style="font-size: 12px; font-weight: {{ w.weight }}; color: {{ w.color }};">{{ w.label }}</span></div>
+              </sc-for>
+            </div>
+            <div style="display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; color: #3F4040;"><strong style="color: #262626;">{{ jNow }}</strong><span>{{ jDates }}</span></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ hasMyDocs }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ myDocs }}" as="d" hint-placeholder-count="1">
+              <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 18px 22px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+                <span style="flex: none; width: 44px; height: 44px; border-radius: 12px; background: #FDECE9; color: #C62B1C; display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path></svg></span>
+                <span style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">{{ d.title }}</span><span style="font-size: 13px; color: #3F4040;">Your day-by-day schedule, goals and to-do lists · starts {{ d.start }}</span></span>
+                <button onClick="{{ d.onOpen }}" style="padding: 10px 20px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">Open schedule</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
 
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
@@ -143,6 +186,24 @@ button:disabled { cursor: not-allowed; }
           <button onClick="{{ changeName }}" style="padding: 6px 12px; border: 0; background: none; font: inherit; font-size: 13px; color: #5C5D5D; cursor: pointer; text-decoration: underline;">Not {{ firstName }}? Change name</button>
           <button onClick="{{ resetAll }}" style="padding: 6px 12px; border: 0; background: none; font: inherit; font-size: 13px; color: #5C5D5D; cursor: pointer; text-decoration: underline;">Reset my progress</button>
         </div>
+      </div>
+    </sc-if>
+
+    <!-- MY SCHEDULE -->
+    <sc-if value="{{ isSchedule }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <h1 style="font-weight: 800; font-size: clamp(30px, 4vw, 40px); letter-spacing: -0.02em; margin: 0;">My training schedule</h1>
+            <p style="margin: 0; font-size: 16px; color: #3F4040; max-width: 640px;">Your day-by-day plan, weekly goals and to-do lists. Links open the guides you'll need.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <sc-if value="{{ multiDocs }}" hint-placeholder-val="{{ false }}"><select value="{{ schedSel }}" onChange="{{ onSchedSel }}" aria-label="Choose schedule" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; font-weight: 700; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"><sc-for list="{{ docOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if>
+            <button onClick="{{ printSched }}" style="padding: 10px 18px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">Print or save as PDF</button>
+          </div>
+        </div>
+        <sc-if value="{{ hasThisWeek }}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 16px; border-radius: 10px; background: #FDECE9; color: #7E1B11; font-size: 14px;"><strong>{{ thisWeekLabel }}</strong><span>{{ thisWeekSub }}</span></div></sc-if>
+        <iframe srcDoc="{{ schedHtml }}" title="My training schedule" style="width: 100%; height: 80vh; border: 1px solid #E3E3E1; border-radius: 14px; background: #FFFFFF;"></iframe>
       </div>
     </sc-if>
 
@@ -361,6 +422,44 @@ button:disabled { cursor: not-allowed; }
               </div>
             </sc-if>
 
+            <!-- form -->
+            <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 14px; max-width: 760px;">
+                <sc-if value="{{ formIntro }}" hint-placeholder-val="{{ false }}"><p style="margin: 0; font-size: 17px; line-height: 1.6;">{{ formIntro }}</p></sc-if>
+                <sc-if value="{{ formDone }}" hint-placeholder-val="{{ false }}"><div style="padding: 14px 16px; border-radius: 10px; background: #262626; color: #FFFFFF; font-size: 15px; font-weight: 700;">{{ formDoneText }}</div></sc-if>
+                <sc-if value="{{ formHasUrl }}" hint-placeholder-val="{{ false }}">
+                  <iframe src="{{ formSrc }}" onLoad="{{ formOnLoad }}" title="Survey" style="width: 100%; height: 720px; border: 1px solid #E3E3E1; border-radius: 12px; background: #FFFFFF;"></iframe>
+                  <sc-if value="{{ formNotDone }}" hint-placeholder-val="{{ true }}"><div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;"><span style="font-size: 14px; color: #3F4040;">Submitted the form but this didn't update?</span><button onClick="{{ formConfirm }}" style="padding: 8px 16px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: #262626;">I submitted it</button></div></sc-if>
+                </sc-if>
+                <sc-if value="{{ formDemo }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding: 10px 14px; border-radius: 10px; background: #F5F5F4; font-size: 13px; line-height: 1.5; color: #3F4040;">Sample survey. Once the Google Form link is added, the real form appears here and responses go to its Google Sheet.</div>
+                  <sc-for list="{{ formQs }}" as="q" hint-placeholder-count="3">
+                    <div style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+                      <span style="font-weight: 700; font-size: 16px; line-height: 1.45;">{{ q.num }}. {{ q.q }}</span>
+                      <sc-if value="{{ q.isText }}" hint-placeholder-val="{{ true }}"><textarea value="{{ q.value }}" onChange="{{ q.onText }}" rows="3" style="padding: 10px 12px; font: inherit; font-size: 15px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; resize: vertical;"></textarea></sc-if>
+                      <sc-if value="{{ q.isScale }}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;"><span style="font-size: 12px; color: #5C5D5D;">Poor</span><sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.onClick }}" style="width: 44px; height: 44px; border-radius: 999px; border: 1.5px solid {{ o.border }}; background: {{ o.bg }}; color: {{ o.color }}; font: inherit; font-weight: 700; cursor: pointer;">{{ o.label }}</button></sc-for><span style="font-size: 12px; color: #5C5D5D;">Great</span></div></sc-if>
+                      <sc-if value="{{ q.isChoice }}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 8px; flex-wrap: wrap;"><sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="padding: 8px 16px; border-radius: 999px; border: 1.5px solid {{ o.border }}; background: {{ o.bg }}; color: {{ o.color }}; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">{{ o.label }}</button></sc-for></div></sc-if>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ formNotDone }}" hint-placeholder-val="{{ true }}"><button onClick="{{ formSubmitDemo }}" style="align-self: flex-start; padding: 11px 26px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;">Submit survey</button></sc-if>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <!-- outside link -->
+            <sc-if value="{{ isLink }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 16px; max-width: 700px;">
+                <sc-if value="{{ linkDesc }}" hint-placeholder-val="{{ false }}"><p style="margin: 0; font-size: 17px; line-height: 1.6;">{{ linkDesc }}</p></sc-if>
+                <a href="{{ linkUrl }}" target="_blank" rel="noopener" onClick="{{ linkOpen }}" style="align-self: flex-start; display: flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 8px; background: #262626; color: #FFFFFF; font-size: 15px; font-weight: 700; text-decoration: none;">Open the training<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></a>
+                <span style="font-size: 13px; color: #5C5D5D;">It opens in a new tab. Come back here when you're done.</span>
+                <sc-if value="{{ linkDone }}" hint-placeholder-val="{{ false }}"><div style="padding: 14px 16px; border-radius: 10px; background: #F5F5F4; border: 1.5px solid #262626; font-size: 15px; font-weight: 700;">{{ linkDoneText }}</div></sc-if>
+                <sc-if value="{{ linkNotDone }}" hint-placeholder-val="{{ true }}">
+                  <sc-if value="{{ linkConfirmMode }}" hint-placeholder-val="{{ true }}"><button onClick="{{ linkConfirm }}" style="align-self: flex-start; padding: 10px 20px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; color: #262626;">I finished this training</button></sc-if>
+                  <sc-if value="{{ linkUploadMode }}" hint-placeholder-val="{{ false }}"><label style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 10px; border: 1.5px dashed #C9CAC8; background: #FFFFFF; cursor: pointer;"><span style="flex: none; width: 38px; height: 38px; border-radius: 8px; background: #FDECE9; color: #C62B1C; display: flex; align-items: center; justify-content: center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg></span><span style="font-weight: 700; font-size: 15px;">{{ linkUploadLabel }}</span><input type="file" accept="image/*,.pdf" onChange="{{ linkOnUpload }}" style="display: none;"></label></sc-if>
+                </sc-if>
+              </div>
+            </sc-if>
+
             <!-- resources -->
             <sc-if value="{{ isRes }}" hint-placeholder-val="{{ false }}">
               <div style="display: flex; flex-direction: column; gap: 10px; max-width: 700px;">
@@ -471,6 +570,15 @@ const toEmbed = (u) => { let m = u.match(/youtube\.com\/watch\?v=([\w-]+)/) || u
 const fmtSize = (n) => n > 1e9 ? (n / 1e9).toFixed(1) + ' GB' : n > 1e6 ? Math.round(n / 1e6) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB';
 const KEY = 'wsi-training-v2';
 const fmtDate = (t) => t ? new Date(t).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+const SIMS = {
+  austin: { name: 'Austin McKendrick', title: 'Account Manager', journey: { type: 'New hire', path: 'Account Manager onboarding', start: '2026-10-05', hire: '2026-10-05', weeks: 5 },
+    items: [['esta', 1], ['client-onboarding', 1], ['onsite-visit', 2], ['payroll-hours', 3], ['audits', 4], ['associate-scenarios', 5]],
+    prog: { esta: 'done', 'client-onboarding': 'done', 'onsite-visit': 'half' } },
+  maddie: { name: 'Maddie Bonnewell', title: 'Staffing Coordinator', journey: { type: 'Promotion', path: 'Promotion: FOA to Staffing Coordinator', start: '2026-10-12', hire: '', weeks: 3, from: 'Front Office Administrator', to: 'Staffing Coordinator' },
+    items: [['posting-jobs', 1], ['associate-scenarios', 2], ['payroll-hours', 3]],
+    prog: { 'posting-jobs': 'half' } },
+};
+const addDaysL = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
 const blank = () => ({ done: {}, lesson: 0, answers: {}, quizSubmitted: false, attempts: 0, flipped: {}, scenStep: 0, scenChoice: null, scenDone: false, completedAt: null, submittedAt: null });
 const RED = '#EE3826', DEEP = '#C62B1C', INK = '#262626', TINT = '#FDECE9', SOFT = '#F5F5F4', LINE = '#E3E3E1';
 
@@ -510,6 +618,46 @@ class Component extends DCLogic {
   }
   mods() { let c = []; try { c = JSON.parse(localStorage.getItem('wsi-custom-modules') || '[]'); } catch (e) {} let o = {}; try { o = JSON.parse(localStorage.getItem('wsi-module-overrides') || '{}'); } catch (e) {} let h = []; try { h = JSON.parse(localStorage.getItem('wsi-hidden-modules') || '[]'); } catch (e) {} return [...(window.WSI_MODULES || []), ...c].filter(m => !h.includes(m.id)).map(m => o[m.id] || m); }
   sched() { try { const d = JSON.parse(localStorage.getItem('wsi-schedule') || 'null'); const nm = (this.state.name || '').trim().toLowerCase(); return d && nm ? (d.people || []).find(p => p.name.toLowerCase() === nm) || null : null; } catch (e) { return null; } }
+  simulate(key) {
+    const sim = SIMS[key], mods = this.mods(), byId = Object.fromEntries(mods.map(m => [m.id, m]));
+    let plan = sim.items.filter(([id]) => byId[id]), progPlan = sim.prog;
+    if (plan.length < sim.items.length) {
+      const pool = mods.filter(m => !['new-hire-survey', 'touchpoint-45'].includes(m.id)), n = sim.journey.weeks;
+      plan = pool.slice(0, n).map((m, i) => [m.id, i + 1]);
+      if (key === 'austin') { if (byId['new-hire-survey']) plan.unshift(['new-hire-survey', 1]); if (byId['touchpoint-45']) plan.push(['touchpoint-45', n]); }
+      const ids = plan.map(([id]) => id);
+      progPlan = key === 'austin' ? { ...(ids.length > 1 ? { [ids[0]]: 'done' } : {}), ...(ids[1] ? { [ids[1]]: 'half' } : ids[0] ? { [ids[0]]: 'half' } : {}) } : ids[0] ? { [ids[0]]: 'half' } : {};
+    }
+    const items = plan.map(([id, w]) => ({ moduleId: id, title: byId[id].title, week: w, opens: addDaysL(sim.journey.start, 7 * (w - 1)), due: addDaysL(sim.journey.start, 7 * w - 1), progress: 0 }));
+    try {
+      const d = JSON.parse(localStorage.getItem('wsi-schedule') || 'null') || { people: [] };
+      const ex = (d.people || []).find(p => p.name.toLowerCase() === sim.name.toLowerCase());
+      const okEx = ex && ex.items && ex.items.length && ex.items.every(i => byId[i.moduleId]);
+      const T = (() => { try { const a = JSON.parse(localStorage.getItem('wsi-admin-v5') || '{}'); return a.schedTemplates || window.WSI_SCHEDULE_TEMPLATES || []; } catch (e) { return window.WSI_SCHEDULE_TEMPLATES || []; } })();
+      const tp = T.find(t => (t.role || '').toLowerCase() === sim.title.toLowerCase()) || T[0];
+      const simDocs = ex && ex.docs && ex.docs.length ? ex.docs : tp ? [{ id: 'sim-' + key, title: tp.name.replace(/\s*[–-]\s*(New Hire|Promotion)$/i, '') + ' Training Schedule', kind: sim.journey.type, role: sim.title, start: sim.journey.start, blocks: tp.blocks, ctx: { name: sim.name, role: sim.title, branch: key === 'maddie' ? 'Kalamazoo' : 'Battle Creek', manager: key === 'maddie' ? 'Dani Johnston' : 'Sara Coppo', start: sim.journey.start } }] : [];
+      const entry = { ...(ex || {}), docs: simDocs, name: sim.name, items: okEx ? ex.items : items, journey: { ...(ex && ex.journey || {}), ...sim.journey } };
+      d.people = [...(d.people || []).filter(p => p !== ex), entry];
+      localStorage.setItem('wsi-schedule', JSON.stringify(d));
+    } catch (e) {}
+    const prog = {};
+    Object.entries(progPlan).forEach(([id, how]) => {
+      const m = byId[id]; if (!m) return;
+      const n = m.lessons.length, it = items.find(x => x.moduleId === id), p = blank();
+      const k = how === 'done' ? n : Math.max(1, Math.floor(n / 2));
+      for (let j = 0; j < k; j++) p.done[j] = true;
+      p.lesson = Math.min(k, n - 1);
+      if (how === 'done') {
+        const qi = m.lessons.findIndex(l => l.type === 'quiz');
+        if (qi >= 0) { m.lessons[qi].questions.forEach((q, x) => { if (q.kind !== 'upload') p.answers[x] = q.a; }); p.quizSubmitted = true; p.attempts = 1; }
+        p.completedAt = new Date(addDaysL(it ? it.opens : sim.journey.start, 3) + 'T15:00:00').getTime();
+        p.scenDone = true;
+      }
+      prog[id] = p;
+    });
+    this.setState({ name: sim.name, draftName: '', screen: 'dashboard', prog, current: null, sim: key });
+    window.scrollTo(0, 0);
+  }
   pickName(nm) { const s = this.state; if (!nm) return; const changed = nm.toLowerCase() !== (s.name || '').toLowerCase(); this.setState({ name: nm, draftName: '', screen: 'dashboard', ...(changed ? { prog: {}, current: null } : {}) }); if (window.WSIStore) WSIStore.loadProgress(nm).then(doc => { if (doc && doc.prog) this.setState({ prog: doc.prog }); });  }
   people() {
     let a = {}; try { a = JSON.parse(localStorage.getItem('wsi-admin-v5') || '{}'); } catch (e) {}
@@ -517,10 +665,32 @@ class Component extends DCLogic {
     const edits = a.userEdits || {};
     return [...PEOPLE, ...(a.extraUsers || [])].filter(u => !gone.has(u.id)).map(u => ({ ...u, ...(edits[u.id] || {}) }));
   }
-  p(id) { return this.state.prog[id] || blank(); }
+  p(id) {
+    const pr = this.state.prog[id] || blank(), me = this.sched(), it = me && me.items.find(i => i.moduleId === id);
+    if (it && it.cycleStart && pr.completedAt && pr.completedAt < it.cycleStart) return blank();
+    return pr;
+  }
+  adminCfg() { try { return JSON.parse(localStorage.getItem('wsi-admin-v5') || '{}'); } catch (e) { return {}; } }
+  async aiCheck(lesson, qi, up) {
+    const q = lesson.questions[qi];
+    if (!(window.WSIStore && WSIStore.server) || !q.example) return { verdict: 'review', reason: q.example ? 'Waiting for review' : 'No example screenshot set; sent for review' };
+    try {
+      const r = await fetch('/api/check-upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ upload: up.key, example: q.example, expect: q.expect || '', question: q.q || '' }) });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || r.status);
+      return { verdict: j.verdict === 'match' ? 'match' : 'review', reason: j.reason || '' };
+    } catch (e) { return { verdict: 'review', reason: 'Automatic check unavailable' }; }
+  }
+  notifyReview(m, q, up) {
+    if (!(window.WSIStore && WSIStore.server)) return;
+    const cfg = this.adminCfg(), t = (cfg.templates || {}).uploadReview || { subject: 'Upload needs review: {training}', body: 'Hi Katelyn,\n\n{name} uploaded a file for "{question}" in {training}. The automatic check could not confirm it matches the example.\n\nReason: {reason}\n\nReview it under Reports → Uploaded answers.' };
+    const f = (x) => String(x || '').replace(/\{name\}/g, this.state.name).replace(/\{training\}/g, m.title).replace(/\{question\}/g, q.q || '').replace(/\{reason\}/g, (up.ai && up.ai.reason) || '');
+    fetch('/api/email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ to: 'katelyn.drummond@wsitalent.com', subject: f(t.subject), text: f(t.body) }] }) }).catch(() => {});
+  }
   setP(fn) {
     const id = this.state.current;
-    this.setState(s => ({ prog: { ...s.prog, [id]: { ...(s.prog[id] || blank()), ...fn(s.prog[id] || blank()) } } }));
+    const base = this.p(id);
+    this.setState(s => { const b0 = s.prog[id] === this.state.prog[id] ? base : (s.prog[id] || blank()); return { prog: { ...s.prog, [id]: { ...b0, ...fn(b0) } } }; });
   }
   open(id) {
     const m = this.mods().find(x => x.id === id);
@@ -572,7 +742,43 @@ class Component extends DCLogic {
     const inProg = mods.filter(m => !this.p(m.id).completedAt && pctOf(m, this.p(m.id)) > 0).length;
     const badges = completed.map(m => ({ label: m.title.split(':')[0].replace(/ \(.*\)/, ''), date: fmtDate(this.p(m.id).completedAt) }));
 
+    const J = me && me.journey;
+    const jWeekNow = J && J.start ? Math.max(1, Math.floor((Date.now() - new Date(J.start + 'T00:00:00').getTime()) / 6048e5) + 1) : 0;
+    const jVals = !J ? { hasJourney: false } : (() => {
+      const promo = J.type === 'Promotion', n = Math.max(1, J.weeks || Math.max(...me.items.map(i => i.week || 1)));
+      const wkDone = (w) => { const its = me.items.filter(i => i.week === w); return its.length && its.every(i => this.p(i.moduleId).completedAt); };
+      const fl = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+      return {
+        hasJourney: true, jIsPromo: promo, jType: promo ? 'Promotion' : 'New hire', jPath: J.path, jFrom: J.from || '', jTo: J.to || '',
+        jEdge: promo ? INK : RED, jTagBg: promo ? INK : TINT, jTagColor: promo ? '#FFFFFF' : '#9E2216',
+        jWeekCount: n,
+        jWeeks: Array.from({ length: n }, (_, i) => { const w = i + 1, cur = w === jWeekNow, dn = wkDone(w); return { label: 'Week ' + w + (cur ? ' · now' : ''), bg: dn ? INK : cur ? RED : '#EBEBEA', color: cur || dn ? INK : '#5C5D5D', weight: cur ? 800 : 600 }; }),
+        jNow: jWeekNow > n ? 'Path finished' : 'Week ' + jWeekNow + ' of ' + n,
+        jDates: promo ? 'Promoted ' + fl(J.start) + (J.hire ? ' · With WSI since ' + fl(J.hire) : '') : 'Started ' + fl(J.start),
+      };
+    })();
     const base = {
+      ...jVals, isSim: !!s.sim,
+      hasMyDocs: !!(me && me.docs && me.docs.length),
+      myDocs: (me && me.docs || []).map(d => ({ title: d.title, start: d.start ? new Date(d.start + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—', onOpen: () => { this.setState({ screen: 'schedule', schedSel: d.id }); window.scrollTo(0, 0); } })),
+      ...(() => {
+        const docs = (me && me.docs) || [], d = docs.find(x => x.id === s.schedSel) || docs[0];
+        const onS = s.screen === 'schedule' && !!d;
+        const v = { isSchedule: onS, multiDocs: docs.length > 1, schedSel: d ? d.id : '', docOptions: docs.map(x => ({ value: x.id, label: x.title })), onSchedSel: (e) => this.setState({ schedSel: e.target.value }),
+          navTabs: [['dashboard', 'My training'], ['schedule', 'My schedule']].map(([k, l]) => ({ label: l, bg: (s.screen === k || (k === 'dashboard' && s.screen !== 'schedule')) ? '#262626' : 'transparent', color: (s.screen === k || (k === 'dashboard' && s.screen !== 'schedule')) ? '#FFFFFF' : '#262626', onClick: () => { this.setState({ screen: k }); window.scrollTo(0, 0); } })),
+          schedHtml: '', printSched: () => {}, hasThisWeek: false };
+        if (d && window.WSISchedule) {
+          const ctx = d.ctx || { name: s.name, start: d.start };
+          v.schedHtml = onS ? WSISchedule.html(d, ctx, { logo: window.WSI_LOGO || logo }) : '';
+          v.printSched = () => WSISchedule.open(d, ctx, { logo: window.WSI_LOGO || logo });
+          if (d.start) { const st = new Date(d.start + 'T12:00:00'), mon = new Date(st); mon.setDate(st.getDate() - ((st.getDay() + 6) % 7)); const wk = Math.floor((Date.now() - mon.getTime()) / 6048e5) + 1, maxW = Math.max(1, ...(d.blocks || []).map(b => b.week || 1));
+            if (wk >= 1 && wk <= maxW) { v.hasThisWeek = true; v.thisWeekLabel = 'This is week ' + wk + ' of ' + maxW + '.'; v.thisWeekSub = WSISchedule.weekRange(wk, d.start); }
+            else if (wk < 1) { v.hasThisWeek = true; v.thisWeekLabel = 'Your schedule starts ' + st.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) + '.'; v.thisWeekSub = ''; } }
+        }
+        return v;
+      })(),
+      simAustin: () => this.simulate('austin'), simMaddie: () => this.simulate('maddie'),
+      exitSim: () => { this.setState({ sim: null, prog: {}, name: '', screen: 'welcome', current: null }); window.scrollTo(0, 0); },
       logo, name: s.name, firstName: first, initials, hasName: !!s.name,
       isWelcome: s.screen === 'welcome', isDashboard: s.screen === 'dashboard', isPlayer: s.screen === 'player' && !!s.current,
       isComplete: s.screen === 'complete', isCertificate: s.screen === 'certificate',
@@ -611,7 +817,7 @@ class Component extends DCLogic {
     const v = { ...base, mod: m, lesson, lessonNum: L + 1, lessonTotal: m.lessons.length, lessonItems, progressWidth: pct + '%',
       showDisclaimer: !!m.draft && (this.props.showDisclaimer ?? true),
       isText: lesson.type === 'text', isSteps: lesson.type === 'steps', isFlash: lesson.type === 'flashcards',
-      isScen: lesson.type === 'scenario', isQuiz: lesson.type === 'quiz', isRes: lesson.type === 'resources',
+      isScen: lesson.type === 'scenario', isQuiz: lesson.type === 'quiz', isRes: lesson.type === 'resources', isForm: lesson.type === 'form', isLink: lesson.type === 'link',
       passScore: this.pass(), quizScore, correctCount, quizTotal, attempts: pr.attempts,
       completedDate: fmtDate(pr.completedAt), submitted: !!pr.submittedAt, notSubmitted: !pr.submittedAt, submittedDate: fmtDate(pr.submittedAt),
       submitCompletion: (e) => { e.preventDefault(); this.setP(() => ({ submittedAt: Date.now() })); if (window.WSIStore && WSIStore.server) fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ 'form-name': 'training-completion', learner: s.name, module: m.title, score: String(quizScore), completed: fmtDate(pr.completedAt || Date.now()) }).toString() }).catch(() => {}); },
@@ -678,7 +884,7 @@ class Component extends DCLogic {
         return { num: qi + 1, q: q.q, explain: q.e, showExplain: pr.quizSubmitted, verdict: isUp ? (up ? 'Submitted.' : 'No file.') : right ? 'Correct.' : 'Not quite.',
           explainColor: right ? INK : DEEP, isUpload: isUp, isChoice: !isUp,
           upLabel: s.uploading === qi ? 'Uploading…' : up ? up.name : 'Upload a file or screenshot',
-          upHint: up ? (pr.quizSubmitted ? 'Sent to your training manager.' : 'Uploaded. Choose another file to replace it.') : 'Your training manager reviews it. It is not part of your score.',
+          upHint: !up ? 'Upload a screenshot of what you completed. It is checked against an example; anything unclear goes to your training manager.' : up.ai && up.ai.verdict === 'checking' ? 'Checking your upload…' : up.ai && up.ai.verdict === 'match' ? 'Looks right. It matches the example.' : 'Sent to your training manager for review.',
           upBorder: up ? INK : '#C9CAC8', upBg: up ? SOFT : '#FFFFFF', upDisabled: !!pr.quizSubmitted,
           onUpload: async (e) => {
             const f = e.target.files && e.target.files[0]; e.target.value = '';
@@ -686,7 +892,14 @@ class Component extends DCLogic {
             if (f.size > 5.5e6) return alert('Please choose a file under 5 MB.');
             const key = 'q' + Date.now() + Math.random().toString(36).slice(2, 6);
             this.setState({ uploading: qi });
-            try { await vidPut(key, f); this.setP(p => ({ uploads: { ...(p.uploads || {}), [qi]: { key, name: f.name, at: Date.now() } } })); }
+            try {
+              await vidPut(key, f);
+              const up = { key, name: f.name, at: Date.now(), ai: { verdict: 'checking' } };
+              this.setP(p => ({ uploads: { ...(p.uploads || {}), [qi]: up } }));
+              const ai = await this.aiCheck(lesson, qi, up);
+              this.setP(p => ({ uploads: { ...(p.uploads || {}), [qi]: { ...up, ai } } }));
+              if (ai.verdict !== 'match') this.notifyReview(m, q, { ...up, ai });
+            }
             catch (err) { alert("Couldn't upload that file. Try a smaller one."); }
             this.setState({ uploading: null });
           },
@@ -705,11 +918,52 @@ class Component extends DCLogic {
       retakeQuiz: () => this.setP(p => ({ answers: {}, quizSubmitted: false, done: { ...p.done, [L]: false } })),
     });
     if (v.isRes) v.resources = lesson.items;
+    if (v.isForm) {
+      const url = (lesson.url || '').trim(), fd = (pr.form || {})[L] || {};
+      let src = url;
+      if (url) { src = url + (url.includes('?') ? '&' : '?') + 'embedded=true'; if (lesson.nameEntry) src += '&' + encodeURIComponent(lesson.nameEntry) + '=' + encodeURIComponent(s.name || ''); }
+      Object.assign(v, {
+        formIntro: lesson.intro || '', formHasUrl: !!url, formDemo: !url, formSrc: src, formDone: !!fd.at, formNotDone: !fd.at,
+        formDoneText: fd.at ? 'Submitted ' + fmtDate(fd.at) + '. Thank you.' : '',
+        formOnLoad: () => { this._formLoads = (this._formLoads || 0) + 1; if (this._formLoads >= 2 && !fd.at) this.setP(p => ({ form: { ...(p.form || {}), [L]: { at: Date.now(), via: 'google' } } })); },
+        formConfirm: () => this.setP(p => ({ form: { ...(p.form || {}), [L]: { at: Date.now(), via: 'confirm' } } })),
+        formQs: (lesson.questions || []).map((q, qi) => {
+          const val = (s.formDraft || {})[qi] ?? (fd.answers || {})[qi] ?? '';
+          const set = (x) => this.setState(st => ({ formDraft: { ...(st.formDraft || {}), [qi]: x } }));
+          return { num: qi + 1, q: q.q, isText: (q.kind || 'text') === 'text', isScale: q.kind === 'scale', isChoice: q.kind === 'choice', value: String(val), onText: (e) => set(e.target.value),
+            opts: (q.kind === 'scale' ? ['1', '2', '3', '4', '5'] : q.o || []).map(o => ({ label: o, bg: String(val) === o ? INK : '#FFFFFF', color: String(val) === o ? '#FFFFFF' : INK, border: String(val) === o ? INK : LINE, onClick: () => { if (!fd.at) set(o); } })) };
+        }),
+        formSubmitDemo: () => { const ans = { ...(s.formDraft || {}) }; this.setP(p => ({ form: { ...(p.form || {}), [L]: { at: Date.now(), via: 'demo', answers: ans } } })); this.setState({ formDraft: {} }); },
+      });
+    }
+    if (v.isLink) {
+      const ld = (pr.link || {})[L] || {}, proofUp = lesson.proof === 'upload';
+      Object.assign(v, {
+        linkUrl: lesson.url || '#', linkDesc: lesson.desc || '', linkOpened: !!ld.opened || !!ld.at,
+        linkOpen: () => { if (!ld.opened) this.setP(p => ({ link: { ...(p.link || {}), [L]: { ...((p.link || {})[L] || {}), opened: Date.now() } } })); },
+        linkConfirmMode: !proofUp, linkUploadMode: proofUp, linkDone: !!ld.at, linkNotDone: !ld.at,
+        linkDoneText: ld.at ? (ld.file ? 'Proof uploaded: ' + ld.file.name : 'Marked complete ' + fmtDate(ld.at)) : '',
+        linkConfirm: () => this.setP(p => ({ link: { ...(p.link || {}), [L]: { ...((p.link || {})[L] || {}), at: Date.now() } } })),
+        linkUploadLabel: s.uploading === 'link' ? 'Uploading…' : 'Upload your certificate or a screenshot',
+        linkOnUpload: async (e) => {
+          const f = e.target.files && e.target.files[0]; e.target.value = '';
+          if (!f) return;
+          if (f.size > 5.5e6) return alert('Please choose a file under 5 MB.');
+          const key = 'p' + Date.now() + Math.random().toString(36).slice(2, 6);
+          this.setState({ uploading: 'link' });
+          try { await vidPut(key, f); this.setP(p => ({ link: { ...(p.link || {}), [L]: { ...((p.link || {})[L] || {}), at: Date.now(), file: { key, name: f.name } } } })); }
+          catch (err) { alert("Couldn't upload that file. Try a smaller one."); }
+          this.setState({ uploading: null });
+        },
+      });
+    }
 
     const last = L === m.lessons.length - 1;
     let nextLabel = last ? 'Finish module' : 'Continue', nextDisabled = false, nextHint = '';
     if (v.isFlash && Object.keys(pr.flipped).length < lesson.cards.length) { nextDisabled = true; nextHint = 'Flip every card to continue'; }
     if (v.isScen && !pr.scenDone) { nextDisabled = true; nextHint = 'Finish the scenario to continue'; }
+    if (v.isForm && !v.formDone) { nextDisabled = true; nextHint = 'Submit the form to continue'; }
+    if (v.isLink && !v.linkDone) { nextDisabled = true; nextHint = lesson.proof === 'upload' ? 'Upload proof to continue' : 'Confirm you finished to continue'; }
     if (v.isQuiz) {
       const all = lesson.questions.every((q, i) => q.kind === 'upload' ? !!(pr.uploads || {})[i] : pr.answers[i] != null);
       if (!pr.quizSubmitted) { nextLabel = 'Submit answers'; nextDisabled = !all; nextHint = all ? '' : `Answer all ${lesson.questions.length} questions`; }

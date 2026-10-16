@@ -13,6 +13,10 @@
 <script src="wsi-store.js"></script>
 <script src="wsi-assets.js"></script>
 <script src="modules.js"></script>
+<script src="wsi-xlsx.js"></script>
+<script src="wsi-schedule-templates.js"></script>
+<script src="wsi-schedule-doc.js"></script>
+<script src="wsi-schedule-import.js"></script>
 <style>
 body { margin: 0; background: #F5F5F4; color: #262626; font-family: 'Open Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
 a { color: #C62B1C; } a:hover { color: #9E2216; }
@@ -57,6 +61,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
           <img src="wsi-logo.png" data-wsi-logo="1" alt="WSI" style="height: 40px;">
           <span style="width: 1px; height: 28px; background: #E3E3E1;"></span>
           <span style="font-size: 17px; font-weight: 700; color: #5C5D5D;">Learning</span>
+          <span title="Admin file version" style="font-size: 11px; font-weight: 600; color: #7D7E7D;">v2026.10.16-r7</span>
         </div>
         <sc-if value="{{ isStaffView }}" hint-placeholder-val="{{ false }}">
           <nav style="display: flex; gap: 2px; flex-wrap: wrap;">
@@ -101,6 +106,73 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
               <sc-if value="{{ m.unlocked }}" hint-placeholder-val="{{ true }}"><a href="{{ m.href }}" onClick="{{ m.onClick }}" style="padding: 10px 22px; border-radius: 8px; background: {{ m.btnBg }}; color: {{ m.btnColor }}; border: 1.5px solid {{ m.btnBorder }}; font-size: 14px; font-weight: 700; text-decoration: none;">{{ m.cta }}</a></sc-if>
             </div>
           </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- BRANCH MANAGER -->
+    <sc-if value="{{ isBM }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">{{ bmBranch }} branch</h1>
+          <p style="margin: 0; font-size: 15px; color: #3F4040;">Training for your branch: new hires, promotions, surveys and Ninjio.</p>
+        </div>
+        <sc-if value="{{ bmEmpty }}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;"><span style="font-weight: 800; font-size: 17px;">No one is set to {{ bmBranch }} yet</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">An admin sets each person’s branch in their profile on the People tab.</span></div></sc-if>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+          <sc-for list="{{ bmStats }}" as="x" hint-placeholder-count="4"><div style="display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; border-top: 4px solid #262626;"><span style="font-weight: 800; font-size: 30px;">{{ x.value }}</span><span style="font-size: 13px; font-weight: 600; color: #3F4040;">{{ x.label }}</span></div></sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Training in progress</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">New hires and promotions in your branch.</span></div>
+          <sc-if value="{{ bmNoInProg }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Nothing in progress.</span></sc-if>
+          <div style="overflow-x: auto;"><table style="width: 100%; min-width: 720px; border-collapse: collapse;">
+            <thead><tr><th style="padding-left: 0;">Person</th><th>Type</th><th>Training</th><th>Progress</th><th>Due</th><th>Status</th></tr></thead>
+            <tbody><sc-for list="{{ bmInProg }}" as="r" hint-placeholder-count="3"><tr>
+              <td style="padding-left: 0;"><div style="display: flex; align-items: center; gap: 10px;"><span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ r.initials }}</span><span style="font-weight: 700;">{{ r.name }}</span></div></td><td><span style="padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: {{ r.tBg }}; color: {{ r.tColor }};">{{ r.type }}</span></td><td style="font-weight: 600;">{{ r.training }}</td>
+              <td><div style="display: flex; align-items: center; gap: 8px; min-width: 120px;"><div style="flex: 1; height: 5px; border-radius: 999px; background: #EBEBEA;"><div style="height: 100%; border-radius: 999px; background: #EE3826; width: {{ r.pctWidth }};"></div></div><span style="font-size: 12px; font-weight: 700;">{{ r.pct }}</span></div></td>
+              <td style="white-space: nowrap;">{{ r.due }}</td><td><span style="padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: {{ r.stBg }}; color: {{ r.stColor }}; border: {{ r.stBorder }};">{{ r.status }}</span></td>
+            </tr></sc-for></tbody></table></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Completed trainings</span></div>
+          <sc-if value="{{ bmNoDone }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">No completed trainings yet.</span></sc-if>
+          <div style="overflow-x: auto;"><table style="width: 100%; min-width: 620px; border-collapse: collapse;">
+            <thead><tr><th style="padding-left: 0;">Person</th><th>Type</th><th>Training</th><th>Completed</th><th>Score</th></tr></thead>
+            <tbody><sc-for list="{{ bmDone }}" as="r" hint-placeholder-count="3"><tr>
+              <td style="padding-left: 0;"><div style="display: flex; align-items: center; gap: 10px;"><span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ r.initials }}</span><span style="font-weight: 700;">{{ r.name }}</span></div></td><td><span style="padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: {{ r.tBg }}; color: {{ r.tColor }};">{{ r.type }}</span></td><td style="font-weight: 600;">{{ r.training }}</td><td style="white-space: nowrap;">{{ r.completed }}</td><td style="font-weight: 700;">{{ r.score }}</td>
+            </tr></sc-for></tbody></table></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Onboarding survey and 45-day touchpoint</span></div>
+          <sc-if value="{{ bmNoSurveys }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">No new hires with surveys right now.</span></sc-if>
+          <div style="overflow-x: auto;"><table style="width: 100%; min-width: 620px; border-collapse: collapse;">
+            <thead><tr><th style="padding-left: 0;">Person</th><sc-for list="{{ surveyHeads }}" as="h" hint-placeholder-count="2"><th>{{ h.label }}</th></sc-for></tr></thead>
+            <tbody><sc-for list="{{ bmSurveys }}" as="p" hint-placeholder-count="3"><tr>
+              <td style="padding-left: 0;"><div style="display: flex; align-items: center; gap: 10px;"><span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ p.initials }}</span><span style="display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ p.name }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ p.meta }}</span></span></div></td>
+              <sc-for list="{{ p.cells }}" as="c" hint-placeholder-count="2"><td><div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                <span style="font-size: 13px; font-weight: 700; color: {{ c.color }};">{{ c.label }}</span>
+                <sc-if value="{{ c.hasDue }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #5C5D5D;">{{ c.dueText }}</span></sc-if>
+              </div></td></sc-for>
+            </tr></sc-for></tbody></table></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Training schedules</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Schedules assigned to people in your branch.</span></div>
+          <sc-if value="{{ bmNoDocs }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">None assigned yet.</span></sc-if>
+          <sc-for list="{{ bmDocs }}" as="d" hint-placeholder-count="1">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid #F0F0EF;">
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ d.initials }}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ d.name }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ d.title }} · starts {{ d.start }}</span></span>
+              <button onClick="{{ d.onView }}" style="padding: 5px 12px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;">View</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Ninjio</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">{{ bmNinjioTitle }}</span></div>
+          <sc-if value="{{ bmNinjioNone }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">No Ninjio report for your branch yet.</span></sc-if>
+          <sc-if value="{{ bmNinjioHas }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; align-items: baseline; gap: 12px;"><span style="font-weight: 800; font-size: 30px;">{{ bmNinjioRate }}</span><span style="font-size: 14px; color: #3F4040;">{{ bmNinjioDone }}</span></div>
+            <sc-if value="{{ bmNinjioAllDone }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Everyone has completed it.</span></sc-if>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;"><sc-for list="{{ bmNinjioMissing }}" as="x" hint-placeholder-count="2"><span style="padding: 4px 12px; border-radius: 999px; background: #FDECE9; color: #7E1B11; font-size: 13px; font-weight: 700;">{{ x.name }} · {{ x.note }}</span></sc-for></div>
+          </sc-if>
         </div>
       </div>
     </sc-if>
@@ -279,25 +351,13 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px;">
           <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;"><h2 style="font-weight: 800; font-size: 17px; margin: 0;">Completions per week</h2><span style="font-size: 13px; color: #5C5D5D;">{{ insWeekTotal }} in the last 8 weeks</span></div>
-            <div style="display: flex; align-items: flex-end; gap: 10px; height: 170px; padding-top: 8px;">
-              <sc-for list="{{ insWeeks }}" as="w" hint-placeholder-count="8">
-                <div style="flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; min-width: 0;">
-                  <span style="font-size: 12px; font-weight: 800;">{{ w.count }}</span>
-                  <div style="width: 100%; max-width: 40px; height: {{ w.height }}; border-radius: 6px 6px 2px 2px; background: {{ w.color }};"></div>
-                  <span style="font-size: 11px; color: #5C5D5D; white-space: nowrap;">{{ w.label }}</span>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;"><h2 style="font-weight: 800; font-size: 17px; margin: 0;">New hire onboarding</h2><span style="font-size: 13px; color: #5C5D5D;">Started in the last 60 days</span></div>
-            <sc-if value="{{ insNoNewHires }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">No new hires right now.</span></sc-if>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;"><h2 style="font-weight: 800; font-size: 17px; margin: 0;">Training in Progress</h2><span style="font-size: 13px; color: #5C5D5D;">New hires and promotions</span></div>
+            <sc-if value="{{ insNoNewHires }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">{{ insEmptyText }}</span></sc-if>
             <div style="display: flex; flex-direction: column;">
               <sc-for list="{{ insNewHires }}" as="n" hint-placeholder-count="5">
                 <button onClick="{{ n.onOpen }}" style="display: grid; grid-template-columns: 30px minmax(0, 1fr) 90px 80px; align-items: center; gap: 12px; padding: 9px 0; border: 0; border-top: 1px solid #F0F0EF; background: none; font: inherit; text-align: left; cursor: pointer; color: #262626;">
                   <span style="width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">{{ n.initials }}</span>
-                  <span style="min-width: 0; display: flex; flex-direction: column;"><span style="font-size: 14px; font-weight: 700;">{{ n.name }}</span><span style="font-size: 12px; color: #5C5D5D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ n.meta }} · {{ n.days }}</span></span>
+                  <span style="min-width: 0; display: flex; flex-direction: column;"><span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><span style="font-size: 14px; font-weight: 700;">{{ n.name }}</span><span style="padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: {{ n.tBg }}; color: {{ n.tColor }};">{{ n.type }}</span></span><span style="font-size: 12px; color: #5C5D5D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ n.meta }} · {{ n.days }}</span></span>
                   <span style="display: flex; align-items: center; gap: 6px;"><span style="flex: 1; height: 6px; border-radius: 999px; background: #EBEBEA;"><span style="display: block; height: 100%; border-radius: 999px; background: #EE3826; width: {{ n.width }};"></span></span><span style="font-size: 12px; font-weight: 700; width: 32px; text-align: right;">{{ n.pctLabel }}</span></span>
                   <span style="justify-self: end; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; background: {{ n.stBg }}; color: {{ n.stColor }}; border: {{ n.stBorder }};">{{ n.status }}</span>
                 </button>
@@ -316,7 +376,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
               </sc-for>
             </div>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0;">
+          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0; grid-column: 1 / -1;">
             <h2 style="font-weight: 800; font-size: 17px; margin: 0;">Completion by role</h2>
             <div style="display: flex; flex-direction: column; gap: 12px;">
               <sc-for list="{{ insRoles }}" as="b" hint-placeholder-count="5">
@@ -328,25 +388,42 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
               </sc-for>
             </div>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 8px;"><h2 style="font-weight: 800; font-size: 17px; margin: 0;">Hardest knowledge checks</h2><button onClick="{{ goProgress }}" style="border: 0; background: none; padding: 0; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer;">All scores</button></div>
-            <sc-for list="{{ insHardest }}" as="r" hint-placeholder-count="3">
-                <div style="display: flex; align-items: center; gap: 14px; padding: 10px 0; border-top: 1px solid #F0F0EF;">
-                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; font-weight: 700; line-height: 1.35;">{{ r.title }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ r.sub }}</span></span>
-                  <span style="flex: none; font-size: 22px; font-weight: 800; color: {{ r.color }};">{{ r.value }}</span>
-                </div>
-              </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- REPORTS: RECERT + SURVEYS -->
+    <sc-if value="{{ isInsights }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px; padding-top: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Recertification</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Trainings that have expired or expire in the next 60 days. Modules set to recertify: {{ recertModules }}</span></div>
+            <sc-if value="{{ hasRecert }}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 8px; flex-wrap: wrap;"><button onClick="{{ emailRecertAll }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Email reminders</button><button onClick="{{ reassignExpired }}" style="padding: 8px 16px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">Reassign expired</button></div></sc-if>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; min-width: 0; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 8px;"><h2 style="font-weight: 800; font-size: 17px; margin: 0;">Most overdue modules</h2><button onClick="{{ goAssignOverdue }}" style="border: 0; background: none; padding: 0; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer;">View overdue</button></div>
-            <sc-if value="{{ insNoOverdue }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D; padding: 10px 0;">Nothing is overdue.</span></sc-if>
-            <sc-for list="{{ insOverdueMods }}" as="r" hint-placeholder-count="3">
-                <div style="display: flex; align-items: center; gap: 14px; padding: 10px 0; border-top: 1px solid #F0F0EF;">
-                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; font-weight: 700; line-height: 1.35;">{{ r.title }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ r.sub }}</span></span>
-                  <span style="flex: none; font-size: 22px; font-weight: 800; color: {{ r.color }};">{{ r.value }}</span>
-                </div>
-              </sc-for>
-          </div>
+          <sc-if value="{{ noRecert }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Nothing is expiring soon.</span></sc-if>
+          <sc-if value="{{ hasRecert }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; font-weight: 700;">{{ recertSummary }}</span>
+          <div style="overflow-x: auto;"><table style="width: 100%; min-width: 720px; border-collapse: collapse;">
+            <thead><tr><th style="padding-left: 0;">Person</th><th>Training</th><th>Completed</th><th>Expires</th><th>Status</th><th></th></tr></thead>
+            <tbody><sc-for list="{{ recertRows }}" as="r" hint-placeholder-count="2"><tr>
+              <td style="padding-left: 0;"><div style="display: flex; align-items: center; gap: 10px;"><span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ r.initials }}</span><span style="font-weight: 700;">{{ r.name }}</span></div></td><td><div style="display: flex; flex-direction: column;"><span style="font-weight: 600;">{{ r.module }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ r.every }}</span></div></td>
+              <td style="white-space: nowrap;">{{ r.completed }}</td><td style="white-space: nowrap;">{{ r.expires }}</td><td style="font-weight: 700; color: {{ r.statusColor }};">{{ r.status }}</td>
+              <td><div style="display: flex; gap: 8px; justify-content: flex-end;"><button onClick="{{ r.onEmail }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626; padding: 5px 10px; font-size: 12px;">Email</button><button onClick="{{ r.onReassign }}" style="padding: 8px 16px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px 12px; font-size: 12px;">Reassign</button></div></td>
+            </tr></sc-for></tbody></table></div></sc-if>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Surveys and touchpoints</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">New hires’ onboarding survey and 45-day touchpoint. Set or change each due date here.</span></div>
+          <sc-if value="{{ noSurveyRows }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">No new hires right now.</span></sc-if>
+          <div style="overflow-x: auto;"><table style="width: 100%; min-width: 620px; border-collapse: collapse;">
+            <thead><tr><th style="padding-left: 0;">Person</th><sc-for list="{{ surveyHeads }}" as="h" hint-placeholder-count="2"><th>{{ h.label }}</th></sc-for></tr></thead>
+            <tbody><sc-for list="{{ surveyRows }}" as="p" hint-placeholder-count="3"><tr>
+              <td style="padding-left: 0;"><div style="display: flex; align-items: center; gap: 10px;"><span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ p.initials }}</span><span style="display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ p.name }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ p.meta }}</span></span></div></td>
+              <sc-for list="{{ p.cells }}" as="c" hint-placeholder-count="2"><td><div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                <span style="font-size: 13px; font-weight: 700; color: {{ c.color }};">{{ c.label }}</span>
+                <sc-if value="{{ c.canEdit }}" hint-placeholder-val="{{ false }}"><sc-if value="{{ c.hasDue }}" hint-placeholder-val="{{ false }}"><label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #3F4040;">Due<input type="date" value="{{ c.due }}" onChange="{{ c.onDue }}" style="min-height: 32px; padding: 0 8px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px;"></label></sc-if></sc-if>
+                <sc-if value="{{ c.showRemind }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.onRemind }}" style="padding: 0; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Send reminder</button></sc-if>
+                <sc-if value="{{ c.canAssign }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.onAssign }}" style="padding: 0; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Assign</button></sc-if>
+              </div></td></sc-for>
+            </tr></sc-for></tbody></table></div>
         </div>
       </div>
     </sc-if>
@@ -439,6 +516,31 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
             </tbody>
           </table>
           <sc-if value="{{ asgEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding: 32px; text-align: center; font-size: 14px; color: #5C5D5D;">{{ asgEmptyText }}</div></sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- RECURRING -->
+    <sc-if value="{{ isAssignments }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; margin-top: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Recurring trainings</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Assign a training to a group on a schedule, like quarterly E-Verify for the front desk. New cycles are assigned automatically when the site opens.</span></div>
+          <button onClick="{{ runSchedulesNow }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Check schedules now</button>
+        </div>
+        <sc-if value="{{ noRecur }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">No recurring trainings yet.</span></sc-if>
+        <sc-for list="{{ recurRows }}" as="r" hint-placeholder-count="1">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-radius: 10px; background: #F5F5F4;">
+            <div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 800; font-size: 15px;">{{ r.title }}</span><span style="font-size: 13px; color: #3F4040;">{{ r.meta }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ r.cycle }}</span></div>
+            <button onClick="{{ r.onRemove }}" style="padding: 4px 6px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Stop</button>
+          </div>
+        </sc-for>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; align-items: end; padding-top: 6px;">
+          <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Training</span><select value="{{ recDraft.moduleId }}" onChange="{{ onRecMod }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"><option value="">Choose…</option><sc-for list="{{ recModOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+          <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Group</span><select value="{{ recDraft.groupId }}" onChange="{{ onRecGroup }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"><option value="">Choose…</option><sc-for list="{{ recGroupOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+          <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Repeats every</span><select value="{{ recDraft.every }}" onChange="{{ onRecEvery }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"><option value="1">Month</option><option value="3">3 months (quarterly)</option><option value="6">6 months</option><option value="12">Year</option></select></label>
+          <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">First cycle starts</span><input type="date" value="{{ recDraft.start }}" onChange="{{ onRecStart }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+          <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Due within (days)</span><input type="number" min="1" value="{{ recDraft.dueDays }}" onChange="{{ onRecDue }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+          <button onClick="{{ addRecur }}" disabled="{{ recInvalid }}" style="padding: 8px 16px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; min-height: 38px; opacity: {{ recOpacity }};">Add schedule</button>
         </div>
       </div>
     </sc-if>
@@ -637,18 +739,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
             Export scores
           </button>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: 10px; background: {{ scopeBg }}; border: 1.5px solid {{ scopeBorder }};">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg>
-          <span style="font-size: 13px; font-weight: 700;">Showing</span>
-          <select value="{{ scopeVal }}" onChange="{{ onScope }}" aria-label="Filter by group, department or branch" style="min-height: 38px; min-width: 220px; padding: 0 10px; font: inherit; font-size: 14px; font-weight: 700; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626;">
-            <option value="">Everyone</option>
-            <optgroup label="Groups"><sc-for list="{{ scopeGroups }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></optgroup>
-            <optgroup label="Departments"><sc-for list="{{ scopeDepts }}" as="o" hint-placeholder-count="0"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></optgroup>
-            <optgroup label="Branches"><sc-for list="{{ scopeBranches }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></optgroup>
-          </select>
-          <span style="font-size: 13px; color: #3F4040;">{{ scopeText }}</span>
-          <sc-if value="{{ scopeOn }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearScope }}" style="padding: 4px 6px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Clear filter</button></sc-if>
-        </div>
+        
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; max-width: 1100px;">
           <sc-for list="{{ scoreStats }}" as="st" hint-placeholder-count="4">
@@ -748,13 +839,284 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
           <sc-for list="{{ uploadRows }}" as="f" hint-placeholder-count="0">
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid #EBEBEA;">
               <span style="flex: none; width: 32px; height: 32px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ f.initials }}</span>
-              <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 700; font-size: 14px;">{{ f.who }} · {{ f.module }}</span><span style="font-size: 13px; color: #3F4040;">{{ f.question }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ f.file }} · {{ f.date }}</span></div>
+              <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 700; font-size: 14px;">{{ f.who }} · {{ f.module }}</span><span style="font-size: 13px; color: #3F4040;">{{ f.question }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ f.file }} · {{ f.date }}</span><sc-if value="{{ f.hasAi }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 700; color: {{ f.aiColor }};">{{ f.aiLabel }}</span></sc-if></div>
               <sc-if value="{{ f.hasHref }}" hint-placeholder-val="{{ false }}"><a href="{{ f.href }}" target="_blank" rel="noopener" style="padding: 6px 12px; border-radius: 8px; border: 1.5px solid #262626; font-size: 12px; font-weight: 700; color: #262626; text-decoration: none;">Open file</a></sc-if>
               <sc-if value="{{ f.notReviewed }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.onReview }}" style="padding: 6px 12px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;">Mark reviewed</button></sc-if>
               <sc-if value="{{ f.reviewed }}" hint-placeholder-val="{{ false }}"><span style="padding: 3px 10px; border-radius: 999px; background: #262626; color: #FFFFFF; font-size: 12px; font-weight: 700;">Reviewed</span></sc-if>
             </div>
           </sc-for>
         </div>
+      </div>
+    </sc-if>
+
+    <!-- NINJIO -->
+    <sc-if value="{{ isNinjio }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Ninjio</h1><p style="margin: 0; font-size: 15px; color: #3F4040; max-width: 640px;">Upload the monthly Ninjio completion report. You’ll see completion by branch, then review the emails before they go to branch managers.</p></div>
+          <label style="display: flex; gap: 8px; align-items: center; padding: 10px 18px; border-radius: 8px; background: #D42E1D; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>Upload report<input type="file" accept=".xlsx,.csv" onChange="{{ onNinjioFile }}" style="display: none;"></label>
+        </div>
+        <sc-if value="{{ ninjioBusy }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Reading the report…</span></sc-if>
+        <sc-if value="{{ ninjioNoReport }}" hint-placeholder-val="{{ true }}"><div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;"><span style="font-weight: 800; font-size: 17px;">No report yet</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Export the Advanced Training Report from Ninjio as .xlsx and upload it. The “User Performance” sheet is used: email, name, department and completed date.</span></div></sc-if>
+        <sc-if value="{{ ninjioHasReport }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select value="{{ ninjioSelVal }}" onChange="{{ onNinjioSel }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626; width: auto; min-width: 280px; font-weight: 700;"><sc-for list="{{ ninjioReportOptions }}" as="o" hint-placeholder-count="1"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+            <button onClick="{{ deleteNinjio }}" style="padding: 4px 6px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Remove report</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+              <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">{{ ninjioTitle }}</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">{{ ninjioMeta }}</span></div>
+              <div style="display: flex; align-items: baseline; gap: 10px;"><span style="font-weight: 800; font-size: 34px;">{{ ninjioOverall }}</span><span style="font-size: 13px; color: #3F4040;">{{ ninjioOverallSub }}</span></div>
+            </div>
+            <sc-if value="{{ ninjioOdd }}" hint-placeholder-val="{{ false }}"><div style="padding: 10px 14px; border-radius: 10px; background: #F5F5F4; font-size: 13px; line-height: 1.45;">{{ ninjioOddText }}</div></sc-if>
+            <div style="overflow-x: auto;"><table style="width: 100%; min-width: 720px; border-collapse: collapse;">
+              <thead><tr><th style="padding-left: 0;">Branch</th><th>Manager</th><th>Completed</th><th>Rate</th><th>Still to complete</th></tr></thead>
+              <tbody><sc-for list="{{ ninjioBranches }}" as="b" hint-placeholder-count="5"><tr>
+                <td style="padding-left: 0; font-weight: 800;">{{ b.branch }}</td><td style="font-size: 13px;">{{ b.manager }}</td><td style="white-space: nowrap;">{{ b.done }}</td>
+                <td><div style="display: flex; align-items: center; gap: 8px; min-width: 120px;"><div style="flex: 1; height: 6px; border-radius: 999px; background: #EBEBEA;"><div style="height: 100%; border-radius: 999px; background: #EE3826; width: {{ b.barW }};"></div></div><span style="font-weight: 800;">{{ b.rate }}</span></div></td>
+                <td style="font-size: 13px; line-height: 1.45; color: {{ b.missColor }}; max-width: 360px;">{{ b.missing }}</td>
+              </tr></sc-for></tbody></table></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+              <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Review emails to branch managers</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">One email per branch, from Katelyn with Katelyn cc’d. Edit any of them before sending. Wording comes from the “Monthly Ninjio report” template on the Emails tab.</span></div>
+              <button onClick="{{ sendNinjioManagers }}" style="padding: 8px 16px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">Send {{ ninjioDraftCount }} emails</button>
+            </div>
+            <sc-for list="{{ ninjioDrafts }}" as="d" hint-placeholder-count="3">
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 10px; border: 1.5px solid #E3E3E1; opacity: {{ d.op }};">
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; cursor: pointer;"><input type="checkbox" checked="{{ d.on }}" onChange="{{ d.onToggle }}" style="width: 17px; height: 17px; accent-color: #EE3826;">{{ d.branch }}<span style="font-size: 12px; font-weight: 600; color: #5C5D5D; overflow-wrap: anywhere;">To {{ d.to }}</span></label>
+                <input value="{{ d.subject }}" onChange="{{ d.onSubject }}" aria-label="Subject" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626; font-weight: 700;">
+                <textarea value="{{ d.body }}" onChange="{{ d.onBody }}" rows="8" aria-label="Message" style="padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; resize: vertical;"></textarea>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ ninjioHasInd }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Remind people who haven’t finished</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">{{ ninjioIndCount }} people. Uses the “Ninjio reminder to individuals” template.</span></div>
+                <button onClick="{{ sendNinjioIndividuals }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Email {{ ninjioIndCount }} people</button>
+              </div>
+              <div style="padding: 12px 14px; border-radius: 10px; background: #F5F5F4; font-size: 13px; line-height: 1.55; white-space: pre-wrap;">{{ ninjioIndPreview }}</div>
+            </div>
+          </sc-if>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">Branch managers</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Used for Ninjio emails and branch manager accounts. A branch matches when its name appears in the report’s department, like “Kalamazoo Staffing”.</span></div>
+            <button onClick="{{ addManager }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Add branch</button>
+          </div>
+          <sc-for list="{{ managerRows }}" as="m" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: minmax(110px, 0.7fr) minmax(120px, 0.7fr) minmax(150px, 1fr) minmax(200px, 1.5fr) 34px; gap: 8px; align-items: center;">
+              <input value="{{ m.branch }}" onChange="{{ m.onBranch }}" aria-label="Branch" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626; font-weight: 700;">
+              <input value="{{ m.location }}" onChange="{{ m.onLocation }}" aria-label="Office location" placeholder="City, ST" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;">
+              <input value="{{ m.names }}" onChange="{{ m.onNames }}" aria-label="Manager names" placeholder="Manager name(s)" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;">
+              <input value="{{ m.emails }}" onChange="{{ m.onEmails }}" aria-label="Emails" placeholder="Emails, separated by commas" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;">
+              <button onClick="{{ m.onRemove }}" aria-label="Remove branch" style="width: 32px; height: 32px; border-radius: 8px; border: 0; background: transparent; color: #5C5D5D; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: #FDECE9; color: #C62B1C;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- EMAILS -->
+    <sc-if value="{{ isEmails }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;"><h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Email templates</h1><p style="margin: 0; font-size: 15px; color: #3F4040; max-width: 640px;">Every email comes from Katelyn with Katelyn cc’d. Words in {braces} are filled in for each person.</p></div>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+          <div style="flex: 1 1 260px; max-width: 340px; display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{ tplRows }}" as="t" hint-placeholder-count="7"><button onClick="{{ t.onClick }}" style="display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid {{ t.border }}; background: {{ t.bg }}; font: inherit; text-align: left; cursor: pointer; color: #262626;"><span style="font-weight: 800; font-size: 14px;">{{ t.label }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ t.use }}</span></button></sc-for>
+          </div>
+          <div style="flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; gap: 14px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 17px;">{{ tplLabel }}</span><span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">{{ tplUse }}</span></div>
+            <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Subject</span><input value="{{ tplSubject }}" onChange="{{ onTplSubject }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+            <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Message</span><textarea value="{{ tplBody }}" onChange="{{ onTplBody }}" rows="10" style="padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; resize: vertical;"></textarea></label>
+            <span style="font-size: 12px; color: #5C5D5D;">Available: {{ tplVars }}</span>
+            <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 10px; background: #F5F5F4;"><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #C62B1C;">Preview</span><span style="font-weight: 800; font-size: 14px;">{{ tplPrevSubject }}</span><span style="font-size: 14px; line-height: 1.55; white-space: pre-wrap;">{{ tplPrevBody }}</span></div>
+            <button onClick="{{ resetTpl }}" style="align-self: flex-start; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Reset to original wording</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- TRAINING SCHEDULES -->
+    <sc-if value="{{ isSchedules }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <sc-if value="{{ schList }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; flex-direction: column; gap: 4px;"><h1 style="font-weight: 800; font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.02em; margin: 0;">Training Schedules</h1><p style="margin: 0; font-size: 15px; color: #3F4040; max-width: 640px;">Week-by-week schedules for new hires and promotions. Edit a template once, then create and adjust a copy for each person.</p></div>
+            <div style="display: flex; gap: 6px; padding: 4px; border-radius: 999px; background: #EBEBEA;">
+              <sc-for list="{{ schSubTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="padding: 8px 18px; border-radius: 999px; border: 0; background: {{ t.bg }}; color: {{ t.color }}; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">{{ t.label }}</button></sc-for>
+            </div>
+          </div>
+
+          <sc-if value="{{ schIsDocs }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+              <span style="font-weight: 800; font-size: 17px;">Create a schedule</span>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; align-items: end;">
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Person</span><select value="{{ schNew.userId }}" onChange="{{ onSchNewUser }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626;"><option value="">Choose…</option><sc-for list="{{ schPeople }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Template</span><select value="{{ schNew.tplId }}" onChange="{{ onSchNewTpl }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626;"><option value="">Choose…</option><sc-for list="{{ schTplOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">{{ schNewDateLabel }}</span><input type="date" value="{{ schNew.start }}" onChange="{{ onSchNewStart }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626;"></label>
+                <button onClick="{{ createSchDoc }}" disabled="{{ schNewInvalid }}" style="min-height: 40px; padding: 0 18px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; opacity: {{ schNewOpacity }};">Create and edit</button>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;"><span style="font-size: 12px; color: #5C5D5D;">Dates on each day fill in from this date. You can change any text before assigning it.</span><span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #3F4040;">Template not listed?<label style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; color: #262626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>{{ schUpLabel }}<input type="file" accept=".pdf,.docx" onChange="{{ onSchUpload }}" style="display: none;"></label></span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+              <span style="font-weight: 800; font-size: 17px;">Schedules</span>
+              <sc-if value="{{ schNoDocs }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5C5D5D;">No schedules yet. Create one above.</span></sc-if>
+              <div style="overflow-x: auto;"><table style="width: 100%; min-width: 720px; border-collapse: collapse;">
+                <thead><tr><th style="padding-left: 0;">Person</th><th>Schedule</th><th>Starts</th><th>Status</th><th>Updated</th><th></th></tr></thead>
+                <tbody><sc-for list="{{ schDocRows }}" as="d" hint-placeholder-count="2"><tr>
+                  <td style="padding-left: 0;"><div style="display: flex; align-items: center; gap: 10px;"><span style="flex: none; width: 30px; height: 30px; border-radius: 999px; background: #EBEBEA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">{{ d.initials }}</span><span style="display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ d.name }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ d.meta }}</span></span></div></td>
+                  <td style="font-weight: 600;">{{ d.title }}</td><td style="white-space: nowrap;">{{ d.start }}</td>
+                  <td><span style="padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: {{ d.stBg }}; color: {{ d.stColor }};">{{ d.status }}</span></td>
+                  <td style="white-space: nowrap; font-size: 13px; color: #5C5D5D;">{{ d.updated }}</td>
+                  <td><div style="display: flex; gap: 8px; justify-content: flex-end;"><button onClick="{{ d.onView }}" style="padding: 5px 12px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;">View</button><button onClick="{{ d.onEdit }}" style="padding: 6px 12px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;">Edit</button></div></td>
+                </tr></sc-for></tbody></table></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ schIsTpls }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; flex-wrap: wrap;"><span style="font-size: 12px; color: #5C5D5D;">PDF or Word. For a Google Doc, download it as PDF or Word first.</span><label style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; color: #262626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>{{ schUpLabel }}<input type="file" accept=".pdf,.docx" onChange="{{ onSchUpload }}" style="display: none;"></label><button onClick="{{ newSchTpl }}" style="padding: 9px 18px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">New template</button></div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;">
+              <sc-for list="{{ schTplRows }}" as="t" hint-placeholder-count="2">
+                <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1; border-top: 4px solid {{ t.edge }};">
+                  <span style="align-self: flex-start; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; background: {{ t.tagBg }}; color: {{ t.tagColor }};">{{ t.kind }}</span>
+                  <span style="font-weight: 800; font-size: 17px; line-height: 1.3;">{{ t.name }}</span>
+                  <span style="font-size: 13px; color: #3F4040;">{{ t.meta }}</span>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px;">
+                    <button onClick="{{ t.onEdit }}" style="padding: 6px 14px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">Edit</button>
+                    <button onClick="{{ t.onView }}" style="padding: 5px 12px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Preview</button>
+                    <button onClick="{{ t.onDup }}" style="padding: 5px 12px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Duplicate</button>
+                    <button onClick="{{ t.onDelete }}" style="padding: 4px 6px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Delete</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ schEditing }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <button onClick="{{ schBack }}" style="display: flex; align-items: center; gap: 6px; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #262626; cursor: pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Training Schedules</button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <span style="padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{ schEd.stBg }}; color: {{ schEd.stColor }};">{{ schEd.status }}</span>
+              <button onClick="{{ schOpenPrint }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Print or PDF</button>
+              <sc-if value="{{ schEd.isDoc }}" hint-placeholder-val="{{ false }}"><button onClick="{{ schToggleAssign }}" style="padding: 8px 16px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">{{ schEd.assignLabel }}</button></sc-if>
+              <button onClick="{{ schDelete }}" style="padding: 4px 6px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Delete</button>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; padding: 18px 20px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <label style="display: flex; flex-direction: column; gap: 5px; grid-column: span 2;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">{{ schEd.titleLabel }}</span><input value="{{ schEd.title }}" onChange="{{ onSchTitle }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 15px; font-weight: 700; border: 1.5px solid #C9CAC8; border-radius: 8px; color: #262626;"></label>
+            <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Role</span><input value="{{ schEd.role }}" onChange="{{ onSchRole }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; color: #262626;"></label>
+            <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Type</span><select value="{{ schEd.kind }}" onChange="{{ onSchKind }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626;"><option value="New hire">New hire</option><option value="Promotion">Promotion</option></select></label>
+            <sc-if value="{{ schEd.isDoc }}" hint-placeholder-val="{{ false }}">
+              <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">{{ schEd.dateLabel }}</span><input type="date" value="{{ schEd.start }}" onChange="{{ onSchStart }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; color: #262626;"></label>
+            </sc-if>
+          </div>
+          <span style="font-size: 12px; line-height: 1.5; color: #5C5D5D;">{{ schEd.help }} Links use [link text](https://…). Lines starting with “- ” show as sub-bullets. In lists, put one item per line.</span>
+          <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start;">
+            <div style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button onClick="{{ schExpandAll }}" style="padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Expand all</button><button onClick="{{ schCollapseAll }}" style="padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Collapse all</button></div>
+              <sc-for list="{{ schBlocks }}" as="b" hint-placeholder-count="6">
+                <sc-if value="{{ b.weekStart }}" hint-placeholder-val="{{ false }}"><span style="padding-top: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #C62B1C;">Week {{ b.week }}</span></sc-if>
+                <div style="display: flex; flex-direction: column; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+                  <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;">
+                    <button onClick="{{ b.onToggle }}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; color: #262626;">
+                      <sc-if value="{{ b.isDay }}" hint-placeholder-val="{{ false }}">
+                        <span style="flex: 1; min-width: 0; display: grid; grid-template-columns: minmax(90px, 0.9fr) minmax(100px, 1fr) minmax(0, 1.6fr); gap: 12px; align-items: baseline;">
+                          <span style="display: flex; flex-direction: column; min-width: 0;"><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5D5D;">Date</span><span style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.dDate }}</span></span>
+                          <span style="display: flex; flex-direction: column; min-width: 0;"><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5D5D;">Time</span><span style="font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.dHours }}</span></span>
+                          <span style="display: flex; flex-direction: column; min-width: 0;"><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5D5D;">Task</span><span style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.dTask }}</span></span>
+                        </span>
+                      </sc-if>
+                      <sc-if value="{{ b.notDay }}" hint-placeholder-val="{{ true }}">
+                      <span style="flex: none; padding: 2px 8px; border-radius: 6px; background: #F5F5F4; font-size: 11px; font-weight: 800; color: #3F4040;">{{ b.typeLabel }}</span>
+                      <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; font-size: 14px;">{{ b.summary }}</span>
+                      </sc-if>
+                    </button>
+                    <label style="flex: none; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: #5C5D5D;">Wk<input type="number" min="1" value="{{ b.week }}" onChange="{{ b.onWeek }}" aria-label="Week" style="width: 48px; min-height: 30px; padding: 0 6px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 6px;"></label>
+                    <button onClick="{{ b.onUp }}" aria-label="Move up" style="flex: none; width: 28px; height: 28px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; color: #3F4040;" style-hover="background: #F5F5F4;">↑</button>
+                    <button onClick="{{ b.onDown }}" aria-label="Move down" style="flex: none; width: 28px; height: 28px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; color: #3F4040;" style-hover="background: #F5F5F4;">↓</button>
+                    <button onClick="{{ b.onRemove }}" aria-label="Delete section" style="flex: none; width: 28px; height: 28px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; color: #5C5D5D; display: flex; align-items: center; justify-content: center;" style-hover="background: #FDECE9; color: #C62B1C;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                  </div>
+                  <sc-if value="{{ b.open }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-direction: column; gap: 10px; padding: 4px 14px 16px; border-top: 1px solid #F0F0EF;">
+                      <sc-if value="{{ b.hasText }}" hint-placeholder-val="{{ false }}"><textarea value="{{ b.text }}" onChange="{{ b.onText }}" rows="2" style="padding: 9px 11px; font: inherit; font-size: 14px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; resize: vertical; margin-top: 8px;"></textarea></sc-if>
+                      <sc-if value="{{ b.hasTitle }}" hint-placeholder-val="{{ false }}"><input value="{{ b.title }}" onChange="{{ b.onTitle }}" placeholder="Section title" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; font-weight: 700; border: 1.5px solid #C9CAC8; border-radius: 8px; margin-top: 8px;"></sc-if>
+                      <sc-if value="{{ b.isDay }}" hint-placeholder-val="{{ false }}">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 8px;">
+                          <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #3F4040;">Day</span><select value="{{ b.dDay }}" onChange="{{ b.onDDay }}" style="min-height: 36px; padding: 0 8px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626; box-sizing: border-box; width: 100%; font-weight: 700;"><sc-for list="{{ b.dayOptions }}" as="o" hint-placeholder-count="7"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+                          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #3F4040;">Date</span><span style="min-height: 36px; display: flex; align-items: center; padding: 0 10px; border-radius: 8px; background: #F5F5F4; font-size: 13px; font-weight: 700;">{{ b.dDateFull }}</span></div>
+                          <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #3F4040;">Start time</span><input type="time" value="{{ b.dFrom }}" onChange="{{ b.onDFrom }}" style="min-height: 36px; padding: 0 8px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626; box-sizing: border-box; width: 100%;"></label>
+                          <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #3F4040;">End time</span><input type="time" value="{{ b.dTo }}" onChange="{{ b.onDTo }}" style="min-height: 36px; padding: 0 8px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626; box-sizing: border-box; width: 100%;"></label>
+                          <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #3F4040;">Location</span><input value="{{ b.dLoc }}" onChange="{{ b.onDLoc }}" placeholder="{{ b.dLocPh }}" style="min-height: 36px; padding: 0 8px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626; box-sizing: border-box; width: 100%;"></label>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 28px; gap: 8px; padding-top: 4px;"><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5D5D;">Time</span><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5D5D;">Task</span><span></span></div>
+                        <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="3">
+                          <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 28px; gap: 8px; align-items: start;">
+                            <input value="{{ r.time }}" onChange="{{ r.onTime }}" placeholder="9AM - 10AM" style="min-height: 36px; padding: 0 8px; font: inherit; font-size: 13px; font-weight: 700; border: 1.5px solid #C9CAC8; border-radius: 8px;">
+                            <textarea value="{{ r.text }}" onChange="{{ r.onText }}" rows="{{ r.rowsN }}" style="padding: 8px 10px; font: inherit; font-size: 13px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; resize: vertical;"></textarea>
+                            <button onClick="{{ r.onRemove }}" aria-label="Remove row" style="width: 28px; height: 28px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; color: #5C5D5D;" style-hover="background: #FDECE9; color: #C62B1C;">×</button>
+                          </div>
+                        </sc-for>
+                        <button onClick="{{ b.onAddRow }}" style="align-self: flex-start; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer;">+ Add time slot</button>
+                      </sc-if>
+                      <sc-if value="{{ b.isItems }}" hint-placeholder-val="{{ false }}">
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <sc-for list="{{ b.itemRows }}" as="it" hint-placeholder-count="4">
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                              <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="flex: none; width: 16px; display: flex; justify-content: center;"><span style="width: {{ it.dot }}; height: {{ it.dot }}; border-radius: {{ it.dotRadius }}; border: {{ it.dotBorder }}; background: {{ it.dotBg }};"></span></span>
+                                <input value="{{ it.plain }}" onChange="{{ it.onText }}" onKeyDown="{{ it.onKey }}" placeholder="Type an item" style="min-height: 36px; padding: 0 10px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626; box-sizing: border-box; width: 100%; flex: 1;">
+                                <button onClick="{{ it.onLink }}" title="Add a link" style="flex: none; display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;" style-hover="border-color: #262626;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>Link</button>
+                                <button onClick="{{ it.onUp }}" aria-label="Move up" style="flex: none; width: 26px; height: 26px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; color: #3F4040;" style-hover="background: #F5F5F4;">↑</button>
+                                <button onClick="{{ it.onRemove }}" aria-label="Remove item" style="flex: none; width: 26px; height: 26px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; color: #5C5D5D;" style-hover="background: #FDECE9; color: #C62B1C;">×</button>
+                              </div>
+                              <sc-if value="{{ it.hasLinks }}" hint-placeholder-val="{{ false }}">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap; padding-left: 24px;">
+                                  <sc-for list="{{ it.links }}" as="l" hint-placeholder-count="1">
+                                    <span style="display: flex; align-items: center; gap: 6px; padding: 3px 4px 3px 10px; border-radius: 999px; background: #FDECE9; font-size: 12px; max-width: 100%;"><a href="{{ l.url }}" target="_blank" rel="noopener" style="font-weight: 700; color: #9E2216; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ l.label }}</a><span style="color: #7E1B11; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;">{{ l.host }}</span><button onClick="{{ l.onRemove }}" aria-label="Remove link" style="width: 20px; height: 20px; border-radius: 999px; border: 0; background: transparent; cursor: pointer; color: #7E1B11;">×</button></span>
+                                  </sc-for>
+                                </div>
+                              </sc-if>
+                              <sc-if value="{{ it.linkOpen }}" hint-placeholder-val="{{ false }}">
+                                <div style="display: grid; grid-template-columns: minmax(140px, 1fr) minmax(180px, 1.4fr) auto auto; gap: 8px; align-items: end; margin-left: 24px; padding: 10px 12px; border-radius: 10px; background: #F5F5F4;">
+                                  <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #3F4040;">Words to link</span><input value="{{ it.lLabel }}" onChange="{{ it.onLLabel }}" style="min-height: 36px; padding: 0 10px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626; box-sizing: border-box; width: 100%;"></label>
+                                  <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #3F4040;">Web address</span><input value="{{ it.lUrl }}" onChange="{{ it.onLUrl }}" placeholder="https://docs.google.com/…" style="min-height: 36px; padding: 0 10px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626; box-sizing: border-box; width: 100%;"></label>
+                                  <button onClick="{{ it.onLSave }}" style="min-height: 36px; padding: 0 14px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">Add link</button>
+                                  <button onClick="{{ it.onLCancel }}" style="min-height: 36px; padding: 0 6px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Cancel</button>
+                                </div>
+                              </sc-if>
+                            </div>
+                          </sc-for>
+                          <button onClick="{{ b.onAddItem }}" style="align-self: flex-start; margin-left: 24px; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer;">+ Add item</button>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ b.isGoals }}" hint-placeholder-val="{{ false }}">
+                        <sc-for list="{{ b.goals }}" as="g" hint-placeholder-count="3">
+                          <div style="display: grid; grid-template-columns: minmax(120px, 0.6fr) minmax(0, 1.4fr) 28px; gap: 8px; align-items: start;">
+                            <textarea value="{{ g.topic }}" onChange="{{ g.onTopic }}" rows="2" placeholder="Topic" style="padding: 8px 10px; font: inherit; font-size: 13px; font-weight: 700; line-height: 1.4; border: 1.5px solid #C9CAC8; border-radius: 8px; resize: vertical;"></textarea>
+                            <textarea value="{{ g.items }}" onChange="{{ g.onItems }}" rows="{{ g.rowsN }}" placeholder="One goal per line" style="padding: 8px 10px; font: inherit; font-size: 13px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; resize: vertical;"></textarea>
+                            <button onClick="{{ g.onRemove }}" aria-label="Remove topic" style="width: 28px; height: 28px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; color: #5C5D5D;" style-hover="background: #FDECE9; color: #C62B1C;">×</button>
+                          </div>
+                        </sc-for>
+                        <button onClick="{{ b.onAddGoal }}" style="align-self: flex-start; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #C62B1C; cursor: pointer;">+ Add topic</button>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 12px; border: 1.5px dashed #C9CAC8;">
+                <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #3F4040;">Add a section</span>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;"><sc-for list="{{ schAddTypes }}" as="a" hint-placeholder-count="7"><button onClick="{{ a.onClick }}" style="padding: 6px 12px; border-radius: 999px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;" style-hover="background: #FDECE9;">{{ a.label }}</button></sc-for></div>
+              </div>
+            </div>
+            <div style="flex: 1 1 420px; min-width: 0; position: sticky; top: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #3F4040;">Preview</span>
+              <iframe srcDoc="{{ schPreview }}" title="Schedule preview" style="width: 100%; height: 78vh; border: 1px solid #E3E3E1; border-radius: 12px; background: #FFFFFF;"></iframe>
+            </div>
+          </div>
+        </sc-if>
       </div>
     </sc-if>
 
@@ -822,6 +1184,11 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
               </div>
               <label style="display: flex; flex-direction: column; gap: 5px; min-width: 0; "><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Short description</span><textarea value="{{ ed.summary.value }}" onChange="{{ ed.summary.onChange }}" placeholder="" style="min-height: 40px; padding: 0 12px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626; padding: 9px 12px; min-height: 76px; resize: vertical; line-height: 1.5;"></textarea></label>
               <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer;"><input type="checkbox" checked="{{ edDraftFlag }}" onChange="{{ toggleDraftFlag }}" style="width: 16px; height: 16px; accent-color: #EE3826;">Show "needs review" banner to learners</label>
+              <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid #EBEBEA;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;">Recertify every<input value="{{ ed.recert.value }}" onChange="{{ ed.recert.onChange }}" inputmode="numeric" style="width: 56px; min-height: 34px; padding: 0 8px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; box-sizing: border-box;">months</label>
+                <span style="font-size: 12px; color: #5C5D5D;">0 means it never expires.</span>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer;"><input type="checkbox" checked="{{ edAutoRecert }}" onChange="{{ toggleAutoRecert }}" style="width: 16px; height: 16px; accent-color: #EE3826;">Reassign automatically when it expires</label>
+              </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E3E1;">
               <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #C62B1C;">Lessons</span>
@@ -941,7 +1308,13 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
                   <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 10px; border: 1px solid #E3E3E1;">
                     <div style="display: flex; gap: 8px; align-items: center;"><span style="flex: none; font-weight: 800; font-size: 14px; width: 26px;">{{ q.num }}.</span><input value="{{ q.q.value }}" onChange="{{ q.q.onChange }}" placeholder="Question" style="min-height: 40px; padding: 0 12px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"><button onClick="{{ q.onRemove }}" aria-label="Remove" title="Remove" style="flex: none; width: 32px; height: 32px; border-radius: 8px; border: 0; background: transparent; color: #5C5D5D; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: #FDECE9; color: #C62B1C;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>
                     <div style="padding-left: 26px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Answer type</span><select value="{{ q.kind.value }}" onChange="{{ q.kind.onChange }}" style="min-height: 36px; padding: 0 10px; font: inherit; font-size: 13px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; color: #262626;"><option value="choice">Multiple choice</option><option value="upload">File or screenshot upload</option></select></div>
-                    <sc-if value="{{ q.isUpload }}" hint-placeholder-val="{{ false }}"><div style="margin-left: 26px; padding: 12px 14px; border-radius: 10px; background: #F5F5F4; font-size: 13px; line-height: 1.5; color: #3F4040;">Learners upload a file or screenshot as their answer. You review it under Progress &amp; scores. It isn't counted in the score.</div></sc-if>
+                    <sc-if value="{{ q.isUpload }}" hint-placeholder-val="{{ false }}"><div style="margin-left: 26px; padding: 12px 14px; border-radius: 10px; background: #F5F5F4; font-size: 13px; line-height: 1.5; color: #3F4040;">Learners upload a file or screenshot as their answer. You review it under Progress &amp; scores. It isn't counted in the score.</div>
+                      <div style="margin-left: 26px; display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1.5px dashed #C9CAC8; cursor: pointer; font-size: 13px; font-weight: 700;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C62B1C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"></path></svg>{{ q.exLabel }}<input type="file" accept="image/*" onChange="{{ q.onExample }}" style="display: none;"></label>
+                        <sc-if value="{{ q.hasExample }}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: flex-start; gap: 10px;"><img src="{{ q.exUrl }}" alt="Example" style="max-width: 220px; max-height: 140px; border-radius: 8px; border: 1px solid #E3E3E1;"><button onClick="{{ q.onClearExample }}" style="padding: 0; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 700; color: #C62B1C; cursor: pointer; text-decoration: underline;">Remove</button></div></sc-if>
+                        <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">What the screenshot should show</span><input value="{{ q.expect.value }}" onChange="{{ q.expect.onChange }}" placeholder="e.g. The E-Verify case result page showing Employment Authorized" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+                        <span style="font-size: 12px; line-height: 1.45; color: #5C5D5D;">On the Netlify site, AI compares each upload to the example. Matches are marked reviewed; anything unclear is emailed to Katelyn.</span>
+                      </div></sc-if>
                     <sc-if value="{{ q.isChoice }}" hint-placeholder-val="{{ true }}">
                     <sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="4">
                       <div style="display: flex; gap: 8px; align-items: center; padding-left: 26px;">
@@ -954,6 +1327,19 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
                   </div>
                 </sc-for>
                 <button onClick="{{ addQuestion }}" style="align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1.5px dashed #C9CAC8; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #3F4040; cursor: pointer;" style-hover="border-color: #EE3826; color: #C62B1C;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Add question</button>
+              </sc-if>
+
+              <sc-if value="{{ eForm }}" hint-placeholder-val="{{ false }}">
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Google Form link</span><input value="{{ lx.url.value }}" onChange="{{ lx.url.onChange }}" placeholder="https://docs.google.com/forms/d/e/…/viewform" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+                <span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Use the form’s “Send → link” address. Responses go to the form’s own Google Sheet. Leave blank to show the sample survey ({{ formQCount }} questions).</span>
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Name field ID (optional)</span><input value="{{ lx.nameEntry.value }}" onChange="{{ lx.nameEntry.onChange }}" placeholder="entry.123456789" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+                <span style="font-size: 13px; line-height: 1.45; color: #5C5D5D;">Fills in the learner’s name automatically. In Google Forms: ⋮ → Get pre-filled link, type a name, copy the link, and find the entry.number before the name.</span>
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Intro</span><textarea value="{{ le.intro.value }}" onChange="{{ le.intro.onChange }}" rows="3" style="padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; resize: vertical;"></textarea></label>
+              </sc-if>
+              <sc-if value="{{ eLink }}" hint-placeholder-val="{{ false }}">
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Link to the outside training</span><input value="{{ lx.url.value }}" onChange="{{ lx.url.onChange }}" placeholder="https://www.e-verify.gov/…" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Instructions</span><textarea value="{{ lx.desc.value }}" onChange="{{ lx.desc.onChange }}" rows="4" placeholder="What to do on the site, and what counts as finished." style="padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; resize: vertical;"></textarea></label>
+                <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">How learners show they finished</span><select value="{{ lx.proof.value }}" onChange="{{ lx.proof.onChange }}" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"><option value="confirm">They confirm they finished</option><option value="upload">They upload proof (certificate or screenshot)</option></select></label>
               </sc-if>
 
               <sc-if value="{{ eRes }}" hint-placeholder-val="{{ false }}">
@@ -977,7 +1363,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
   <!-- DRAWER -->
   <sc-if value="{{ hasDetail }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeDetail }}" style="position: fixed; inset: 0; background: rgba(38,38,38,0.35); z-index: 40;"></div>
-    <aside style="position: fixed; top: 0; right: 0; bottom: 0; width: min(500px, 100%); background: #FFFFFF; box-shadow: -10px 0 40px rgba(38,38,38,0.15); z-index: 41; overflow-y: auto; padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; border-top: 6px solid #EE3826;">
+    <aside style="position: fixed; top: 0; right: 0; bottom: 0; width: min(1000px, 100%); background: #FFFFFF; box-shadow: -10px 0 40px rgba(38,38,38,0.15); z-index: 41; overflow-y: auto; padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; border-top: 6px solid #EE3826;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
         <div style="display: flex; gap: 14px; align-items: center;">
           <span style="flex: none; width: 52px; height: 52px; border-radius: 999px; background: #262626; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px;">{{ detail.initials }}</span>
@@ -992,8 +1378,32 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
         </button>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;">
-        <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Start date (week 1 of their path)</span><input type="date" value="{{ detailStart }}" onChange="{{ onDetailStart }}" disabled="{{ detailReadOnly }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+        <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Original start date</span><input type="date" value="{{ detailStart }}" onChange="{{ onDetailStart }}" disabled="{{ detailReadOnly }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
         <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Branch</span><select value="{{ detailBranch }}" onChange="{{ onDetailBranch }}" disabled="{{ detailReadOnly }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"><sc-for list="{{ deptOptions }}" as="o" hint-placeholder-count="8"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; border: 1px solid #E3E3E1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;">
+          <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #C62B1C;">Promotions</span>
+          <span style="font-size: 12px; color: #5C5D5D;">{{ detailTenure }}</span>
+        </div>
+        <sc-if value="{{ detailNoPromos }}" hint-placeholder-val="{{ true }}"><span style="font-size: 13px; color: #5C5D5D;">No promotions recorded.</span></sc-if>
+        <sc-for list="{{ detailPromos }}" as="p" hint-placeholder-count="1">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid #F0F0EF;">
+            <span style="flex: none; width: 96px; font-size: 13px; font-weight: 800;">{{ p.date }}</span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; line-height: 1.4;"><span style="color: #5C5D5D;">{{ p.from }}</span> → <strong>{{ p.to }}</strong></span>
+            <sc-if value="{{ p.canEdit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ p.onRemove }}" aria-label="Remove promotion" style="flex: none; width: 30px; height: 30px; border-radius: 8px; border: 0; background: transparent; color: #5C5D5D; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: #FDECE9; color: #C62B1C;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ detailCanPromo }}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; padding-top: 10px; border-top: 1px solid #F0F0EF;">
+            <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">Promotion date</span><input type="date" value="{{ promoDraft.date }}" onChange="{{ onPromoDate }}" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+            <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">From</span><input value="{{ promoDraft.from }}" onChange="{{ onPromoFrom }}" list="wsi-titles" placeholder="Previous title" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+            <label style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 12px; font-weight: 700; color: #3F4040;">To</span><input value="{{ promoDraft.to }}" onChange="{{ onPromoTo }}" list="wsi-titles" placeholder="New title" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626;"></label>
+            <datalist id="wsi-titles"><sc-for list="{{ titleOptions }}" as="t" hint-placeholder-count="4"><option value="{{ t }}"></option></sc-for></datalist>
+          </div>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer;"><input type="checkbox" checked="{{ promoDraft.assign }}" onChange="{{ onPromoAssign }}" style="width: 16px; height: 16px; accent-color: #EE3826;">Assign a promotion learning path starting on this date</label>
+          <button onClick="{{ addPromo }}" disabled="{{ promoInvalid }}" style="align-self: flex-start; padding: 8px 16px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; opacity: {{ promoOpacity }};">Add promotion</button>
+        </sc-if>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 16px; border-radius: 10px; border: 1px solid #E3E3E1;">
         <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
@@ -1023,6 +1433,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
             <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px;">
               <sc-if value="{{ d.hasWeek }}" hint-placeholder-val="{{ false }}"><span style="font-weight: 700;">{{ d.weekLabel }}</span></sc-if>
               <span style="font-weight: 600; color: {{ d.dueColor }};">{{ d.dueLabel }}</span>
+              <sc-if value="{{ d.canEditDue }}" hint-placeholder-val="{{ false }}"><label style="display: flex; align-items: center; gap: 6px; font-weight: 700;">Change<input type="date" value="{{ d.dueValue }}" onChange="{{ d.onDueChange }}" aria-label="Due date" style="min-height: 30px; padding: 0 6px; font: inherit; font-size: 12px; border: 1.5px solid #C9CAC8; border-radius: 6px;"></label></sc-if>
               <span>Quiz: {{ d.score }}</span>
               <span style="color: #5C5D5D;">Last active {{ d.last }}</span>
             </div>
@@ -1317,8 +1728,8 @@ const BASE_USERS = [
   {"id":"w8","name":"Katelyn Drummond","title":"Training Manager","dept":"Not set","start":""},
   {"id":"w9","name":"Lindsey Scribner","title":"Manager of Technology and Implementation","dept":"Not set","start":""},
   {"id":"w11","name":"John Johnstone","title":"Recruitment Training & Support Specialist","dept":"Not set","start":""},
-  {"id":"w33","name":"Austin McKendrick","title":"Account Manager","dept":"Not set","start":""},
-  {"id":"w46","name":"Maddie Bonnewell","title":"Staffing Coordinator","dept":"Not set","start":""}
+  {"id":"w33","name":"Austin McKendrick","title":"Account Manager","dept":"Battle Creek","start":"2026-10-05"},
+  {"id":"w46","name":"Maddie Bonnewell","title":"Staffing Coordinator","dept":"Kalamazoo","start":""}
 ];
 const A = (userId, moduleId, due, progress, score, last) => ({ userId, moduleId, due, progress, score, last, by: 'Katelyn Drummond' });
 const addDays = (s, n) => { const x = new Date(s + 'T12:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
@@ -1353,8 +1764,53 @@ const PATHS_SEED = [
   { id: 'p2', name: 'Account Manager onboarding', kind: 'New hire', groupId: '', weeks: 5, items: [PI('esta', 1), PI('client-onboarding', 1), PI('onsite-visit', 2), PI('payroll-hours', 3), PI('audits', 4), PI('associate-scenarios', 5)] },
   { id: 'p3', name: 'Payroll onboarding', kind: 'New hire', groupId: '', weeks: 2, items: [PI('esta', 1), PI('payroll-hours', 1), PI('audits', 2)] },
   { id: 'p4', name: 'Promotion to Branch Manager', kind: 'Promotion', groupId: '', weeks: 3, items: [PI('client-onboarding', 1), PI('audits', 2), PI('associate-scenarios', 3)] },
+  { id: 'p5', name: 'Promotion: FOA to Staffing Coordinator', kind: 'Promotion', groupId: '', weeks: 3, items: [PI('posting-jobs', 1), PI('associate-scenarios', 2), PI('payroll-hours', 3)] },
 ];
-const BRANCHES = ['Kalamazoo', 'Battle Creek', 'Grand Rapids', 'Holland', 'Sturgis', 'Wisconsin', 'TalentSync', 'Corporate'];
+const SEED_V3 = () => [
+  ...PATHS_SEED.find(p => p.id === 'p2').items.map(it => AP('w33', it.moduleId, it.week, '2026-10-05', 'p2', it.moduleId === 'esta' ? 100 : 0, it.moduleId === 'esta' ? 92 : null, it.moduleId === 'esta' ? '2026-10-08' : null)),
+  ...PATHS_SEED.find(p => p.id === 'p5').items.map(it => AP('w46', it.moduleId, it.week, '2026-10-12', 'p5', it.week === 1 ? 50 : 0, null, it.week === 1 ? '2026-10-14' : null)),
+];
+const BRANCHES = ['Kalamazoo', 'Battle Creek', 'Grand Rapids', 'Holland', 'Sturgis', 'CJSG', 'Wisconsin', 'TalentSync', 'Corporate'];
+const MANAGERS_SEED = [
+  { branch: 'Kalamazoo', names: 'Dani Johnston', emails: ['DJohnston@wsitalent.com'] },
+  { branch: 'Grand Rapids', names: 'Alivia Jesko', emails: ['AJesko@wsitalent.com'] },
+  { branch: 'Battle Creek', names: 'Sara Coppo', emails: ['SCoppo@wsitalent.com'] },
+  { branch: 'Sturgis', names: 'Mallory Schlegelmilch', emails: ['mschlegelmilch@wsitalent.com'] },
+  { branch: 'Holland', names: 'LaQueisha Price', emails: ['lprice@wsitalent.com'] },
+  { branch: 'CJSG', names: 'Brittany, Ashley and Kristin', emails: ['Bshumate@cjsearchgroup.com', 'Awertz@cjsearchgroup.com', 'Khenning@cjsearchgroup.com'] },
+];
+const BRANCH_LOC = { 'Kalamazoo': 'Kalamazoo, MI', 'Battle Creek': 'Battle Creek, MI', 'Grand Rapids': 'Grand Rapids, MI', 'Holland': 'Holland, MI', 'Sturgis': 'Sturgis, MI', 'Corporate': 'Kalamazoo, MI', 'TalentSync': 'Kalamazoo, MI', 'Wisconsin': 'Wisconsin', 'CJSG': 'Kalamazoo, MI' };
+const TPL_DEFAULT = {
+  assigned: { subject: 'New training assigned: {trainings}', body: 'Hi {first},\n\nYou have new training to complete:\n\n{list}\n\nStart here:\n{link}\n\nThanks,\nKatelyn' },
+  recert: { subject: 'Time to renew: {training}', body: 'Hi {first},\n\nYour {training} training expires on {expires}. Please complete it again by {due}:\n{link}\n\nThanks,\nKatelyn' },
+  survey: { subject: 'Please complete: {training}', body: 'Hi {first},\n\nPlease take a few minutes to complete the {training} by {due}:\n{link}\n\nThanks,\nKatelyn' },
+  ninjioManager: { subject: 'Ninjio completion for {branch}: {rate}', body: 'Hi {managers},\n\nHere is the {month} Ninjio completion for {branch} ({training}):\n\nCompleted: {completed} of {total} ({rate})\n\nStill need to complete:\n{list}\n\nPlease remind your team to finish by the end of the month.\n\nThanks,\nKatelyn' },
+  ninjioIndividual: { subject: 'Reminder: finish your Ninjio training', body: "Hi {first},\n\nOur records show you haven't finished this month's Ninjio training, {training}. Please complete it as soon as you can.\n\nThanks,\nKatelyn" },
+  uploadReview: { subject: 'Upload needs review: {training}', body: 'Hi Katelyn,\n\n{name} uploaded a file for "{question}" in {training}. The automatic check could not confirm it matches the example.\n\nReason: {reason}\n\nReview it under Reports → Uploaded answers.' },
+};
+const TPL_META = [
+  ['overdue', 'Overdue training', 'Remind buttons and the automatic daily email', '{first} {list} {trainings} {link}'],
+  ['assigned', 'Training assigned', 'When you assign training with "Email them" ticked', '{first} {list} {trainings} {link}'],
+  ['recert', 'Recertification due', 'Reports → Recertification', '{first} {training} {expires} {due} {link}'],
+  ['survey', 'Survey / touchpoint reminder', 'Reports → Surveys & touchpoints', '{first} {training} {due} {link}'],
+  ['ninjioManager', 'Monthly Ninjio report to managers', 'Ninjio tab, one email per branch', '{managers} {branch} {month} {training} {completed} {total} {rate} {list}'],
+  ['ninjioIndividual', 'Ninjio reminder to individuals', 'Ninjio tab, people who haven’t finished', '{first} {training}'],
+  ['uploadReview', 'Upload needs review', 'Sent to Katelyn when an upload doesn’t match the example', '{name} {training} {question} {reason}'],
+];
+const TPL_SAMPLE = { first: 'Jordan', name: 'Jordan Ellis', list: '• Posting Jobs in Avionte (due Oct 30, 2026)', trainings: 'Posting Jobs in Avionte', training: 'E-Verify Training', link: 'https://your-site.netlify.app/WSI%20Training.dc.html', expires: 'Nov 15, 2026', due: 'Nov 30, 2026', managers: 'Dani Johnston', branch: 'Kalamazoo', month: 'October 2026', completed: '14', total: '16', rate: '88%', question: 'Upload your E-Verify confirmation', reason: 'The screenshot shows a different page.' };
+const SURVEY_IDS = ['new-hire-survey', 'touchpoint-45'];
+const toD = (x) => x == null || x === '' ? new Date(NaN) : typeof x === 'number' ? new Date(x) : new Date(String(x).length === 10 ? x + 'T12:00:00' : x);
+const fmtD = (x) => { const d = toD(x); return isNaN(d) ? '—' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); };
+const isoD = (x) => { const d = toD(x); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
+const addMonths = (s, n) => { const d = toD(s); d.setMonth(d.getMonth() + n); return d.toISOString().slice(0, 10); };
+const fillT = (t, v) => String(t || '').replace(/\{(\w+)\}/g, (m, k) => v[k] != null ? String(v[k]) : m);
+const everyLabel = (n) => ({ 1: 'month', 3: '3 months (quarterly)', 6: '6 months', 12: 'year' })[n] || n + ' months';
+const periodStart = (r) => {
+  if (!r.start || diff(r.start) > 0) return null;
+  const S = toD(r.start), T = TODAY, ev = Math.max(1, +r.every || 3);
+  const months = (T.getFullYear() - S.getFullYear()) * 12 + (T.getMonth() - S.getMonth()) - (T.getDate() < S.getDate() ? 1 : 0);
+  return addMonths(r.start, Math.floor(months / ev) * ev);
+};
 const EMAIL_DEFAULT = { auto: true, repeatDays: 3, subject: 'Overdue training: {trainings}', body: 'Hi {first},\n\nThis training is past its due date:\n\n{list}\n\nPlease finish it as soon as you can:\n{link}\n\nThanks,\nKatelyn' };
 const AUDIT_SEED = [
   { moduleId: 'esta', title: '', by: 'Katelyn Drummond', at: Date.parse('2026-10-02T14:20:00'), action: 'Edited', detail: 'lesson 2' },
@@ -1389,7 +1845,7 @@ const parseVid = (v) => { v = v || ''; if (v.startsWith('upload:')) { const [k, 
 const toEmbed = (u) => { let m = u.match(/youtube\.com\/watch\?v=([\w-]+)/) || u.match(/youtu\.be\/([\w-]+)/) || u.match(/youtube\.com\/shorts\/([\w-]+)/); if (m) return 'https://www.youtube.com/embed/' + m[1]; m = u.match(/vimeo\.com\/(\d+)/); if (m && !/player\.vimeo/.test(u)) return 'https://player.vimeo.com/video/' + m[1]; m = u.match(/loom\.com\/share\/(\w+)/); if (m) return 'https://www.loom.com/embed/' + m[1]; return u; };
 const fmtSize = (n) => n > 1e9 ? (n / 1e9).toFixed(1) + ' GB' : n > 1e6 ? Math.round(n / 1e6) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB';
 const OVR = 'wsi-module-overrides';
-const TYPES = [['text', 'Reading'], ['steps', 'Step-by-step'], ['flashcards', 'Flashcards'], ['scenario', 'Scenario'], ['quiz', 'Quiz'], ['resources', 'Resources']];
+const TYPES = [['text', 'Reading'], ['steps', 'Step-by-step'], ['flashcards', 'Flashcards'], ['scenario', 'Scenario'], ['quiz', 'Quiz'], ['resources', 'Resources'], ['form', 'Survey form'], ['link', 'Outside training']];
 const TYPE_LABEL = Object.fromEntries(TYPES);
 const NEW_LESSON = {
   text: () => ({ type: 'text', title: 'New reading', mins: 3, paras: [''] }),
@@ -1398,6 +1854,8 @@ const NEW_LESSON = {
   scenario: () => ({ type: 'scenario', title: 'New scenario', mins: 3, outro: '', steps: [{ prompt: '', choices: [['', true, ''], ['', false, '']] }] }),
   quiz: () => ({ type: 'quiz', title: 'Knowledge check', mins: 3, questions: [{ q: '', o: ['', ''], a: 0, e: '' }] }),
   resources: () => ({ type: 'resources', title: 'Resources', mins: 1, items: [{ title: '', meta: 'PDF', href: '' }] }),
+  form: () => ({ type: 'form', title: 'Survey', mins: 5, url: '', nameEntry: '', intro: '', questions: [{ q: 'How is it going so far?', kind: 'scale' }, { q: 'Anything we could do better?', kind: 'text' }] }),
+  link: () => ({ type: 'link', title: 'Outside training', mins: 15, url: '', desc: '', proof: 'confirm' }),
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const getAt = (o, p) => p.reduce((a, k) => (a == null ? a : a[k]), o);
@@ -1434,12 +1892,15 @@ class Component extends DCLogic {
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
     this.state = Object.assign({
-      role: null, tab: 'insights', asgFilter: 'overdue', filter: 'all', search: '', selected: {},
+      role: null, tab: 'reports', asgFilter: 'overdue', filter: 'all', search: '', selected: {},
       assignments: [], auto: { esta: true, 'associate-scenarios': true }, extraUsers: [], roles: ROLES_SEED,
       groups: GROUPS_SEED, paths: PATHS_SEED, audit: [], archive: [], emailCfg: EMAIL_DEFAULT, reviewed: {},
-    }, saved, saved.rolesV !== 2 ? { roles: (saved.roles || ROLES_SEED).filter(r => ROLE_KEEP.includes(r.title)).concat(ROLES_SEED.filter(r => !(saved.roles || []).some(x => x.title === r.title))).filter((r, i, arr) => arr.findIndex(x => x.title === r.title) === i), groups: (saved.groups || GROUPS_SEED).map(g => ({ ...g, roles: (g.roles || []).filter(t => ROLE_KEEP.includes(t)) })), rolesV: 2 } : {}, saved.tab === 'scores' ? { tab: 'progress' } : saved.tab === 'roles' ? { tab: 'groups' } : {}, { pathDlg: null, mail: null, aiBusy: false, mailSending: false, customModules: (() => { try { return JSON.parse(localStorage.getItem('wsi-custom-modules') || '[]'); } catch (e) { return []; } })(), dialog: null, emp: {}, nm: {}, editing: null, delId: null, newLessonType: 'text', hidden: (() => { try { return JSON.parse(localStorage.getItem('wsi-hidden-modules') || '[]'); } catch (e) { return []; } })(), overrides: (() => { try { return JSON.parse(localStorage.getItem(OVR) || '{}'); } catch (e) { return {}; } })(), toast: null, assignTarget: null, detailId: null, draft: { mods: {}, due: plus(14), notify: true } });
+      templates: TPL_DEFAULT, managers: MANAGERS_SEED, ninjio: [], recurring: [], ninjioEdits: {},
+    }, saved, { templates: { ...TPL_DEFAULT, ...(saved.templates || {}) } }, saved.tab === 'insights' || saved.tab === 'progress' ? { tab: 'reports' } : {}, saved.foaV !== 1 ? (() => { const fix = (x) => typeof x === 'string' ? x.replace(/Front Office Assistant/g, 'Front Office Administrator') : x; const ue = {}; Object.entries(saved.userEdits || {}).forEach(([k, v]) => { ue[k] = { ...v, title: fix(v.title), promotions: (v.promotions || []).map(p => ({ ...p, from: fix(p.from), to: fix(p.to) })) }; if (!v.promotions) delete ue[k].promotions; if (v.title == null) delete ue[k].title; }); return { foaV: 1, ...(saved.userEdits ? { userEdits: ue } : {}) }; })() : {}, saved.branchV !== 1 ? (() => { const ue = { ...(saved.userEdits || {}) }; const setB = (id, b) => { ue[id] = { ...(ue[id] || {}), dept: b }; }; setB('w46', 'Kalamazoo'); setB('w33', 'Battle Creek'); const xu = (saved.extraUsers || []).map(u => /^kalen wells$/i.test(u.name.trim()) ? { ...u, dept: 'Battle Creek' } : u); xu.filter(u => /^kalen wells$/i.test(u.name.trim())).forEach(u => { if (ue[u.id]) setB(u.id, 'Battle Creek'); }); return { branchV: 1, userEdits: ue, extraUsers: xu }; })() : {}, { scope: '' }, saved.seedV !== 4 ? (() => { const pv = saved.paths || PATHS_SEED, as = (saved.assignments || []).filter(x => !(x.userId === 'w46' && x.pathId && x.pathId !== 'p5' && (pv.find(p => p.id === x.pathId) || {}).kind === 'Promotion' && !(x.progress >= 100))); const seed = SEED_V3(), moved = as.map(x => { const sd = seed.find(y => y.userId === 'w46' && y.userId === x.userId && y.moduleId === x.moduleId); return sd && x.pathId !== 'p5' && !(x.progress >= 100) ? { ...x, pathId: 'p5', week: sd.week, opens: sd.opens, due: sd.due } : x; }); as.length = 0; as.push(...moved); const add = seed.filter(a => !as.some(x => x.userId === a.userId && x.moduleId === a.moduleId)); return { seedV: 4, paths: pv.some(p => p.id === 'p5') ? pv : [...pv, PATHS_SEED.find(p => p.id === 'p5')], assignments: [...as, ...add], userEdits: { ...(saved.userEdits || {}), w33: { ...((saved.userEdits || {}).w33 || {}), start: ((saved.userEdits || {}).w33 || {}).start || '2026-10-05' } } }; })() : {}, saved.promoV !== 1 ? (() => { const ue = { ...(saved.userEdits || {}) }; if (saved.seedV !== 4) ue.w33 = { ...(ue.w33 || {}), start: (ue.w33 || {}).start || '2026-10-05' }; const m = { ...(ue.w46 || {}) }; if (!m.promotions) m.promotions = [{ id: 'pr-maddie', date: '2026-10-12', from: 'Front Office Administrator', to: 'Staffing Coordinator' }]; if (saved.branchV !== 1) { m.dept = 'Kalamazoo'; ue.w33 = { ...(ue.w33 || {}), dept: 'Battle Creek' }; } ue.w46 = m; return { promoV: 1, userEdits: ue }; })() : {}, saved.rolesV !== 2 ? { roles: (saved.roles || ROLES_SEED).filter(r => ROLE_KEEP.includes(r.title)).concat(ROLES_SEED.filter(r => !(saved.roles || []).some(x => x.title === r.title))).filter((r, i, arr) => arr.findIndex(x => x.title === r.title) === i), groups: (saved.groups || GROUPS_SEED).map(g => ({ ...g, roles: (g.roles || []).filter(t => ROLE_KEEP.includes(t)) })), rolesV: 2 } : {}, saved.tab === 'scores' ? { tab: 'reports' } : saved.tab === 'roles' ? { tab: 'groups' } : {}, { pathDlg: null, mail: null, aiBusy: false, mailSending: false, customModules: (() => { try { return JSON.parse(localStorage.getItem('wsi-custom-modules') || '[]'); } catch (e) { return []; } })(), dialog: null, emp: {}, nm: {}, editing: null, delId: null, newLessonType: 'text', hidden: (() => { try { return JSON.parse(localStorage.getItem('wsi-hidden-modules') || '[]'); } catch (e) { return []; } })(), overrides: (() => { try { return JSON.parse(localStorage.getItem(OVR) || '{}'); } catch (e) { return {}; } })(), toast: null, assignTarget: null, detailId: null, draft: { mods: {}, due: plus(14), notify: true } });
   }
   componentDidMount() {
+    const sched = () => window.WSI_MODULES && this._ctx ? (this.fixSamples(), this.runSchedules()) : setTimeout(sched, 400);
+    setTimeout(sched, 800);
     setTimeout(() => { this.swapLogo(); this.syncMedia(); }, 0);
     const tick = () => window.WSI_MODULES ? this.forceUpdate() : setTimeout(tick, 50);
     tick();
@@ -1448,8 +1909,8 @@ class Component extends DCLogic {
   syncMedia() { document.querySelectorAll('[data-src]').forEach(el => { const v = el.getAttribute('data-src'); if (v && v.indexOf('{{') === -1 && el.getAttribute('src') !== v) el.setAttribute('src', v); }); }
   componentDidUpdate() {
     this.swapLogo(); this.syncMedia();
-    const { role, tab, filter, assignments, auto, extraUsers, customModules, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, scope, archivedUsers, deletedUsers, rolesV } = this.state;
-    try { localStorage.setItem(KEY, JSON.stringify({ role, tab, filter, assignments, auto, extraUsers, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, scope, archivedUsers, deletedUsers, rolesV })); localStorage.setItem('wsi-custom-modules', JSON.stringify(customModules)); localStorage.setItem(OVR, JSON.stringify(this.state.overrides)); localStorage.setItem('wsi-hidden-modules', JSON.stringify(this.state.hidden)); if (this._schedule && this._schedule !== this._lastSched) { this._lastSched = this._schedule; localStorage.setItem('wsi-schedule', this._schedule); } } catch (e) {}
+    const { role, tab, filter, assignments, auto, extraUsers, customModules, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits } = this.state;
+    try { localStorage.setItem(KEY, JSON.stringify({ role, tab, filter, assignments, auto, extraUsers, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits })); localStorage.setItem('wsi-custom-modules', JSON.stringify(customModules)); localStorage.setItem(OVR, JSON.stringify(this.state.overrides)); localStorage.setItem('wsi-hidden-modules', JSON.stringify(this.state.hidden)); if (this._schedule && this._schedule !== this._lastSched) { this._lastSched = this._schedule; localStorage.setItem('wsi-schedule', this._schedule); } } catch (e) {}
   }
   edit(fn) {
     this.setState(s => { const d = clone(s.editing.draft); fn(d, s.editing.li); return { editing: { ...s.editing, draft: d, dirty: true } }; });
@@ -1482,7 +1943,10 @@ class Component extends DCLogic {
     const wk = weeks.map(w => done.filter(a => a.last && a.last >= w.start && a.last <= w.end).length);
     const wmax = Math.max(1, ...wk);
     const modStats = MODULES.map(m => { const sc = scored.filter(a => a.moduleId === m.id); return { m, avg: avgOf(sc.map(a => a.score)), taken: sc.length, od: overdue.filter(a => a.moduleId === m.id).length }; });
-    const nh = USERS.filter(isNew).sort((a, b) => b.start.localeCompare(a.start));
+    const pById = Object.fromEntries((s.paths || []).map(p => [p.id, p]));
+    const promoOf = (u) => valid.filter(a => a.userId === u.id && a.pathId && pById[a.pathId] && pById[a.pathId].kind === 'Promotion').sort((x, y) => (x.progress >= 100) - (y.progress >= 100) || String(y.opens || y.due || '').localeCompare(String(x.opens || x.due || '')))[0];
+    const nhList = USERS.map(u => { const pr = promoOf(u); const pathDone = pr && valid.filter(a => a.userId === u.id && a.pathId === pr.pathId).every(a => a.progress >= 100); return pr && !pathDone ? { u, type: 'Promotion', path: pById[pr.pathId] } : isNew(u) && u.start ? { u, type: 'New hire' } : null; }).filter(Boolean);
+    const nh = nhList.map(x => x.u);
     const kpi = (value, label, sub, edge, color) => ({ value, label, sub, edge, color: color || INK });
     const out = {
       insKpis: [
@@ -1502,11 +1966,13 @@ class Component extends DCLogic {
         const as = valid.filter(a => a.userId === u.id), p = as.length ? Math.round(as.reduce((t, a) => t + a.progress, 0) / as.length) : 0;
         const od = as.some(a => aStatus(a) === 'Overdue'), complete = as.length && as.every(a => a.progress >= 100);
         const st = !as.length ? 'Unassigned' : complete ? 'Complete' : od ? 'Overdue' : 'In progress';
-        return { name: u.name, initials: ini(u.name), meta: `${u.title} · ${u.dept}`, days: `Day ${Math.max(1, -diff(u.start) + 1)}`, width: p + '%', pctLabel: p + '%', status: st === 'In progress' ? 'On track' : st === 'Overdue' ? 'Behind' : st, ...stStyle(st), onOpen: () => this.setState({ detailId: u.id }) };
+        const nx = nhList.find(x => x.u === u), promo = nx.type === 'Promotion', ps = promo ? (as.filter(a => a.pathId === nx.path.id).map(a => a.opens).filter(Boolean).sort()[0] || u.start) : u.start;
+        return { type: nx.type, tBg: promo ? '#262626' : TINT, tColor: promo ? '#FFFFFF' : '#9E2216', name: u.name, initials: ini(u.name), meta: promo ? nx.path.name : `${u.title} · ${u.dept}`, days: ps ? `Day ${Math.max(1, -diff(ps) + 1)}` : '', width: p + '%', pctLabel: p + '%', status: st === 'In progress' ? 'On track' : st === 'Overdue' ? 'Behind' : st, ...stStyle(st), onOpen: () => this.setState({ detailId: u.id }) };
       }),
       insNoNewHires: !nh.length,
+      insEmptyText: s.scope ? 'No one in this filter is in training. Clear the filter above to see everyone.' : 'No new hires or promotions in progress.',
       goAssignOverdue: () => this.setState({ tab: 'assignments', asgFilter: 'overdue' }),
-      goProgress: () => this.setState({ tab: 'progress' }),
+      goProgress: () => this.setState({ tab: 'reports' }),
     };
     // module progress (Progress & scores)
     out.modProgress = MODULES.map(m => {
@@ -1577,7 +2043,8 @@ class Component extends DCLogic {
   pathStart(p, u) {
     const e = this.state.assignments.find(a => a.userId === u.id && a.pathId === p.id && a.opens && a.week);
     if (e) return addDays(e.opens, -7 * (e.week - 1));
-    return p.kind === 'Promotion' ? todayS() : u.start;
+    if (p.kind === 'Promotion') { const pr = (u.promotions || []).map(x => x.date).filter(Boolean).sort().pop(); return pr || todayS(); }
+    return u.start;
   }
   openPathDlg(u, pid) {
     const s = this.state;
@@ -1619,6 +2086,398 @@ class Component extends DCLogic {
       return parseLessons(await window.claude.complete({ max_tokens: 6000, system: AI_SPEC, messages: [{ role: 'user', content: src }] }));
     }
     throw new Error("it isn't available here. It works on the Netlify site once the AI key is added.");
+  }
+  async sendMail(msgs, what) {
+    msgs = msgs.filter(m => m.to);
+    if (!msgs.length) return this.toastMsg('No one to email');
+    const n = msgs.length + ' email' + (msgs.length === 1 ? '' : 's');
+    if (!(window.WSIStore && WSIStore.server)) return this.toastMsg('Demo only: on the Netlify site this sends ' + n + ' from Katelyn');
+    try {
+      const r = await fetch('/api/email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: msgs }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || 'error ' + r.status);
+      this.toastMsg('Sent ' + j.sent + ' email' + (j.sent === 1 ? '' : 's') + (j.skipped ? ' · ' + j.skipped + ' skipped (outside address)' : ''));
+    } catch (err) { this.toastMsg('Email not sent: ' + err.message); }
+  }
+  setDue(uid, mid, v) { if (v) this.setState(st => ({ assignments: st.assignments.map(a => a.userId === uid && a.moduleId === mid ? { ...a, due: v } : a) })); }
+  resetMany(items, msg) {
+    const c = this._ctx; if (!c || !items.length) return;
+    this.setState(st => {
+      const as = st.assignments.slice(), arch = [];
+      items.forEach(it => {
+        const i = as.findIndex(a => a.userId === it.uid && a.moduleId === it.mid);
+        if (i < 0) { if (it.create) as.push({ userId: it.uid, moduleId: it.mid, progress: 0, score: null, last: null, attempts: 0, by: it.by || 'Schedule', ...it.extra }); return; }
+        if (it.keep) { as[i] = { ...as[i], ...it.extra }; return; }
+        const lv = c.ASG0.find(a => a.userId === it.uid && a.moduleId === it.mid) || as[i];
+        if (lv.progress >= 100) { const u = c.USERS.find(x => x.id === it.uid); if (u && c.modById[it.mid]) arch.push({ name: u.name, email: mail(u.name), module: c.modById[it.mid].title, completed: isoD(lv.last) || lv.due, score: lv.score, path: '' }); }
+        as[i] = { ...as[i], progress: 0, score: null, last: null, attempts: 0, first: null, opens: null, cycleStart: Date.now(), ...it.extra };
+      });
+      return { assignments: as, archive: [...(st.archive || []), ...arch] };
+    });
+    if (msg) this.toastMsg(msg);
+  }
+  fixSamples() {
+    const c = this._ctx; if (!c || this.state.sampleFix === 2) return;
+    const core = c.MODULES.filter(m => !['new-hire-survey', 'touchpoint-45'].includes(m.id));
+    const surv = ['new-hire-survey', 'touchpoint-45'].filter(id => c.modById[id]);
+    const plan = { w33: { pid: 'p2', start: '2026-10-05', weeks: 5 }, w46: { pid: 'p5', start: '2026-10-12', weeks: 3 } };
+    const add = [], pathFix = {}, redo = new Set();
+    Object.entries(plan).forEach(([uid, P]) => {
+      if (!c.USERS.some(u => u.id === uid)) return;
+      let items = core.slice(0, P.weeks).map((m, i) => ({ moduleId: m.id, week: i + 1 }));
+      if (uid === 'w33') { if (surv.includes('new-hire-survey')) items.unshift({ moduleId: 'new-hire-survey', week: 1 }); if (surv.includes('touchpoint-45')) items.push({ moduleId: 'touchpoint-45', week: Math.min(P.weeks, 7) }); }
+      if (!items.length) return;
+      pathFix[P.pid] = items; redo.add(uid);
+      // Austin: first item done only if something else stays in progress; Maddie: first item half done
+      const prog = items.map((it, i) => uid === 'w33' ? (i === 0 && items.length > 1 ? 100 : i === 1 ? 50 : 0) : (i === 0 ? 50 : 0));
+      items.forEach((it, i) => add.push(AP(uid, it.moduleId, it.week, P.start, P.pid, prog[i], prog[i] === 100 && it.moduleId !== 'new-hire-survey' ? 92 : null, prog[i] ? addDays(P.start, 3) : null)));
+    });
+    this.setState(st => ({ sampleFix: 2,
+      paths: st.paths.map(p => pathFix[p.id] ? { ...p, items: pathFix[p.id] } : p),
+      assignments: [...st.assignments.filter(x => !(redo.has(x.userId) && (x.pathId === 'p2' || x.pathId === 'p5' || !c.modById[x.moduleId]))), ...add] }));
+  }
+  runSchedules() {
+    const c = this._ctx; if (!c) return 0;
+    const s = this.state, items = [];
+    (s.recurring || []).forEach(r => {
+      const ps = periodStart(r); if (!ps || !c.modById[r.moduleId]) return;
+      const due = addDays(ps, +r.dueDays || 30);
+      c.USERS.filter(u => this.inGroup(r.groupId, u)).forEach(u => {
+        const a = c.ASG0.find(x => x.userId === u.id && x.moduleId === r.moduleId);
+        if (!a) items.push({ uid: u.id, mid: r.moduleId, create: true, by: 'Recurring schedule', extra: { due, period: ps, recurId: r.id } });
+        else if (a.period !== ps) {
+          if (a.progress >= 100 && toD(a.last) < toD(ps)) items.push({ uid: u.id, mid: r.moduleId, extra: { due, period: ps, recurId: r.id } });
+          else if (a.progress < 100 && !a.period) items.push({ uid: u.id, mid: r.moduleId, keep: true, extra: { period: ps, recurId: r.id } });
+        }
+      });
+    });
+    c.ASG0.forEach(a => {
+      const m = c.modById[a.moduleId];
+      if (!m || !m.autoRecert || !(+m.recertMonths > 0) || a.progress < 100 || !a.last || !c.USERS.some(u => u.id === a.userId)) return;
+      if (diff(addMonths(a.last, +m.recertMonths)) < 0) items.push({ uid: a.userId, mid: a.moduleId, extra: { due: addDays(todayS(), 14) } });
+    });
+    if (items.length) this.resetMany(items);
+    return items.filter(i => !i.keep).length;
+  }
+  surveyCells(u, ASG, modById, canEdit) {
+    const s = this.state, tpl = { ...TPL_DEFAULT, ...(s.templates || {}) };
+    return SURVEY_IDS.filter(id => modById[id]).map(sid => {
+      const m = modById[sid], a = ASG.find(x => x.userId === u.id && x.moduleId === sid);
+      if (!a) return { label: 'Not assigned', color: '#5C5D5D', hasDue: false, canAssign: canEdit, showRemind: false,
+        onAssign: () => { const due = addDays(u.start || todayS(), sid === 'touchpoint-45' ? 45 : 7); this.setState(st => ({ assignments: [...st.assignments, { userId: u.id, moduleId: sid, due, progress: 0, score: null, last: null, attempts: 0, by: 'Katelyn Drummond' }] })); } };
+      const st = aStatus(a), done = a.progress >= 100;
+      return { label: done ? 'Submitted ' + fmtD(a.last) : st, color: st === 'Overdue' ? DEEP : INK, hasDue: !done, due: a.due || '', dueText: 'Due ' + fmtD(a.due), canEdit, canAssign: false, showRemind: canEdit && !done,
+        onDue: (e) => this.setDue(u.id, sid, e.target.value),
+        onRemind: () => { const v = { first: u.name.split(' ')[0], name: u.name, training: m.title, due: fmtD(a.due), link: siteBase() + 'WSI%20Training.dc.html?module=' + sid }; this.sendMail([{ to: mail(u.name), subject: fillT(tpl.survey.subject, v), text: fillT(tpl.survey.body, v) }]); } };
+    });
+  }
+  parseNinjio(sheets, fileName) {
+    const mgr = this.state.managers || [];
+    let best = null;
+    Object.entries(sheets).forEach(([name, rows]) => {
+      const hi = rows.findIndex(r => r.some(c => /^e-?mail$/i.test(String(c).trim())));
+      if (hi < 0) return;
+      const h = rows[hi].map(c => String(c).trim().toLowerCase());
+      const score = (h.some(x => /completed_date|completion_date|date_completed|completed date/.test(x)) ? 3 : 0) + (h.some(x => /complet/.test(x)) ? 1 : 0);
+      if (!best || score > best.score) best = { name, rows, hi, h, score };
+    });
+    if (!best) throw new Error('no sheet with an email column');
+    const idx = (re) => best.h.findIndex(x => re.test(x));
+    const cE = idx(/^e-?mail/), cF = idx(/^first/), cL = idx(/^last/), cN = idx(/^(full_?)?name$/), cB = idx(/^branch$/), cD = idx(/^department$|^dept/), cT = idx(/^training$/), cS = idx(/^status$/);
+    let cC = idx(/completed_date|completion_date|date_completed|completed date/); if (cC < 0) cC = idx(/complet/);
+    const branchOf = (d) => { const x = String(d || '').toLowerCase(); const m = mgr.find(m => x.includes(m.branch.toLowerCase()) || (m.branch === 'CJSG' && /cj ?s|cjsearch|cj search/.test(x))); return m ? m.branch : 'Other'; };
+    const rows = best.rows.slice(best.hi + 1).filter(r => String(r[cE] || '').includes('@')).map(r => {
+      const raw = cC >= 0 ? r[cC] : '', date = window.WSIXlsx.toDate(raw);
+      const dept = String((cB >= 0 && r[cB]) || (cD >= 0 && r[cD]) || '').trim();
+      const nm = cN >= 0 && r[cN] ? String(r[cN]) : [cF >= 0 ? r[cF] : '', cL >= 0 ? r[cL] : ''].join(' ').trim() || String(r[cE]).split('@')[0];
+      return { name: nm, email: String(r[cE]).trim(), dept, branch: branchOf(dept), done: !!date, date: date || '', note: !date && String(raw).trim() ? String(raw).trim() : !date && cS >= 0 && r[cS] ? String(r[cS]) : '' };
+    });
+    let training = cT >= 0 ? String((best.rows[best.hi + 1] || [])[cT] || '') : '';
+    Object.values(sheets).forEach(rs => rs.forEach(r => { if (!training && /training selected/i.test(String(r[0]))) training = String(r[1] || ''); }));
+    return { id: 'n' + Date.now(), file: fileName, training: training || 'Ninjio training', uploadedAt: Date.now(), month: TODAY.toLocaleString('en-US', { month: 'long', year: 'numeric' }), rows };
+  }
+  schedVals(c) {
+    const s = this.state, { USERS, canAssign } = c;
+    const TPLS = s.schedTemplates || window.WSI_SCHEDULE_TEMPLATES || [], DOCS = s.schedDocs || [];
+    const logo = window.WSI_LOGO || 'wsi-logo.png';
+    const fl = (x) => x ? fmt(x, true) : '—';
+    const locOf = (branch) => { const m = (s.managers || []).find(x => x.branch === branch); return (m && m.location) || BRANCH_LOC[branch] || ''; };
+    const ctxFor = (d) => { const u = USERS.find(x => x.id === d.userId) || {}; const mg = (s.managers || []).find(m => m.branch === u.dept); return { name: u.name || d.personName || '', role: d.role || u.title || '', branch: u.dept && u.dept !== 'Not set' ? u.dept : '', manager: mg ? mg.names : '', start: d.start }; };
+    const nextMon = () => { const d = new Date(TODAY); d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7)); return d.toISOString().slice(0, 10); };
+    const setT = (fn) => this.setState(st => ({ schedTemplates: fn((st.schedTemplates || window.WSI_SCHEDULE_TEMPLATES || []).map(t => t)) }));
+    const setD = (fn) => this.setState(st => ({ schedDocs: fn((st.schedDocs || []).slice()) }));
+    const clone = (x) => JSON.parse(JSON.stringify(x));
+    const statusOf = (d) => d.status === 'assigned' ? { status: 'Assigned', stBg: INK, stColor: '#FFFFFF' } : { status: 'Draft', stBg: '#F5F5F4', stColor: '#3F4040' };
+    const sub = s.schSub || 'docs', E = s.schEdit;
+    const out = { isSchedules: canAssign && s.tab === 'schedules' && !s.editing, schList: !E, schEditing: !!E, schIsDocs: sub === 'docs', schIsTpls: sub === 'tpls',
+      schSubTabs: [['docs', 'Schedules'], ['tpls', 'Templates']].map(([k, l]) => ({ label: l, bg: sub === k ? '#FFFFFF' : 'transparent', color: INK, onClick: () => this.setState({ schSub: k }) })) };
+    // new doc form
+    const N = s.schNew || { userId: '', tplId: '', start: '' };
+    const startFor = (uid, tid) => { const u = USERS.find(x => x.id === uid), t = TPLS.find(x => x.id === tid); if (!u) return ''; const pr = (u.promotions || []).map(p => p.date).filter(Boolean).sort().pop(); return t && t.kind === 'Promotion' && pr ? pr : u.start || pr || nextMon(); };
+    const setN = (k) => (e) => { const v = e.target.value; this.setState(st => { const n = { ...(st.schNew || N), [k]: v }; if (k !== 'start') { if (k === 'userId' && !n.tplId) { const u = USERS.find(x => x.id === v); const t = u && TPLS.find(t => t.role && u.title && t.role.toLowerCase() === u.title.toLowerCase()); if (t) n.tplId = t.id; } n.start = startFor(n.userId, n.tplId) || n.start; } return { schNew: n }; }); };
+    const ntpl = TPLS.find(t => t.id === N.tplId), okN = N.userId && N.tplId && N.start;
+    Object.assign(out, {
+      schNew: N, onSchNewUser: setN('userId'), onSchNewTpl: setN('tplId'), onSchNewStart: setN('start'),
+      schNewDateLabel: ntpl && ntpl.kind === 'Promotion' ? 'Promotion date' : 'Start date',
+      schNewInvalid: !okN, schNewOpacity: okN ? 1 : 0.45,
+      schPeople: USERS.map(u => ({ value: u.id, label: u.name + (u.title ? ' · ' + u.title : '') })),
+      schTplOptions: TPLS.map(t => ({ value: t.id, label: t.name })),
+      createSchDoc: () => { if (!okN) return; const t = TPLS.find(x => x.id === N.tplId), u = USERS.find(x => x.id === N.userId); const id = 'sd' + Date.now(); const d = { id, templateId: t.id, userId: u.id, personName: u.name, title: t.name.replace(/\s*[–-]\s*(New Hire|Promotion)$/i, '') + ' Training Schedule', kind: t.kind, role: t.role || u.title || '', start: N.start, status: 'draft', updatedAt: Date.now(), blocks: clone(t.blocks).map((b, i) => ({ ...b, id: id + '-' + i })) };
+        const bl = locOf(u.dept);
+        if (bl) d.blocks.forEach(b => { if (b.type !== 'day') return; const m = (b.title || '').match(/^(.*?)\s*\(([^)]*)\)\s*$/); if (!m) b.title = (b.title || '') + ' (' + bl + ')'; else if (/home office|office location|^office$|branch/i.test(m[2])) b.title = m[1] + ' (' + bl + ')'; });
+        setD(ds => [d, ...ds]); this.setState({ schNew: null, schEdit: { kind: 'doc', id }, schOpen: {} }); window.scrollTo(0, 0); },
+      schNoDocs: !DOCS.length,
+      schDocRows: DOCS.map(d => { const cx = ctxFor(d); return { name: cx.name, initials: ini(cx.name || '?'), meta: [cx.role, cx.branch].filter(Boolean).join(' · '), title: d.title, start: fl(d.start), updated: fmtTs(d.updatedAt), ...statusOf(d),
+        onView: () => window.WSISchedule && WSISchedule.open(d, cx, { logo }), onEdit: () => { this.setState({ schEdit: { kind: 'doc', id: d.id }, schOpen: {} }); window.scrollTo(0, 0); } }; }),
+      schTplRows: TPLS.map(t => { const promo = t.kind === 'Promotion', wks = Math.max(1, ...t.blocks.map(b => b.week || 1)); return { name: t.name, kind: t.kind, edge: promo ? INK : RED, tagBg: promo ? INK : TINT, tagColor: promo ? '#FFFFFF' : '#9E2216',
+        meta: (t.role ? t.role + ' · ' : '') + wks + ' weeks · ' + t.blocks.length + ' sections · used ' + DOCS.filter(d => d.templateId === t.id).length + '×',
+        onEdit: () => { this.setState({ schEdit: { kind: 'tpl', id: t.id }, schOpen: {} }); window.scrollTo(0, 0); },
+        onView: () => window.WSISchedule && WSISchedule.open(t, { start: nextMon() }, { logo }),
+        onDup: () => { const id = 'st' + Date.now(); setT(ts => [...ts, { ...clone(t), id, name: t.name + ' (copy)', updatedAt: Date.now() }]); },
+        onDelete: () => { if (confirm('Delete the template "' + t.name + '"? Schedules already created from it are kept.')) setT(ts => ts.filter(x => x.id !== t.id)); } }; }),
+      schUpLabel: s.schUploading ? 'Reading…' : 'Upload a template',
+      onSchUpload: async (e) => {
+        const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+        if (!window.WSIScheduleImport) return this.toastMsg('The importer did not load. Refresh and try again.');
+        this.setState({ schUploading: true });
+        try {
+          const r = await WSIScheduleImport.fromFile(f), id = 'st' + Date.now();
+          const role = (r.name.match(/^(AM|SC|BM|FOA)\b/i) || [])[1];
+          const roleName = role ? ({ am: 'Account Manager', sc: 'Staffing Coordinator', bm: 'Branch Manager', foa: 'Front Office Administrator' })[role.toLowerCase()] : '';
+          const nm = (roleName ? r.name.replace(/^(AM|SC|BM|FOA)\b\s*-?\s*/i, roleName + ' – ') : r.name).replace(/Training Schedule\s*$/i, '').replace(/[–-]\s*$/, '').trim() || 'Uploaded template';
+          setT(ts => [...ts, { id, name: nm, kind: /promotion/i.test(f.name) ? 'Promotion' : 'New hire', role: roleName, updatedAt: Date.now(), source: f.name, blocks: r.blocks }]);
+          this.setState(st => ({ schUploading: false, schSub: 'tpls', schEdit: { kind: 'tpl', id }, schOpen: {}, schNew: st.schNew ? { ...st.schNew, tplId: id } : st.schNew }));
+          this.toastMsg('Imported ' + r.blocks.length + ' sections from ' + f.name + '. Check the preview and fix anything that came through oddly.');
+          window.scrollTo(0, 0);
+        } catch (err) { this.setState({ schUploading: false }); this.toastMsg("Couldn't read that file: " + err.message); }
+      },
+      newSchTpl: () => { const id = 'st' + Date.now(); setT(ts => [...ts, { id, name: 'New template', kind: 'New hire', role: '', updatedAt: Date.now(), blocks: [{ id: id + '-0', type: 'day', week: 1, title: 'Monday', rows: [{ time: '9AM', text: '' }] }, { id: id + '-1', type: 'heading', week: 1, text: 'Week One Goals' }, { id: id + '-2', type: 'todo', week: 1, title: 'To-Do List', items: [''] }] }]); this.setState({ schEdit: { kind: 'tpl', id }, schOpen: { [id + '-0']: true } }); },
+    });
+    if (!E) return out;
+    const isDoc = E.kind === 'doc', T0 = isDoc ? DOCS.find(d => d.id === E.id) : TPLS.find(t => t.id === E.id);
+    if (!T0) { out.schEditing = false; out.schList = true; return out; }
+    const upd = (fn) => { const f = (arr) => arr.map(x => { if (x.id !== E.id) return x; const y = clone(x); fn(y); y.updatedAt = Date.now(); return y; }); if (isDoc) setD(f); else setT(f); };
+    const ub = (bid, fn) => upd(x => { const b = x.blocks.find(b => b.id === bid); if (b) fn(b); });
+    const open = s.schOpen || {}, cx = isDoc ? ctxFor(T0) : { start: nextMon() };
+    const TL = { day: 'Day', heading: 'Heading', note: 'Note', text: 'Text', todo: 'To-do list', list: 'Scheduled training', goals: 'Goals table' };
+    let lastW = null;
+    const n = T0.blocks.length;
+    const val = (e) => e.target.value;
+    Object.assign(out, {
+      schEd: { isDoc, title: T0.title || T0.name || '', titleLabel: isDoc ? 'Schedule title' : 'Template name', role: T0.role || '', kind: T0.kind || 'New hire', start: T0.start || '', dateLabel: T0.kind === 'Promotion' ? 'Promotion date' : 'Start date',
+        ...(isDoc ? statusOf(T0) : { status: 'Template', stBg: TINT, stColor: '#9E2216' }), assignLabel: T0.status === 'assigned' ? 'Unassign' : 'Assign to ' + (cx.name || 'person').split(' ')[0],
+        help: isDoc ? 'Changes here only affect ' + (cx.name || 'this person') + "'s schedule." : 'Changes affect new schedules made from this template. Existing schedules stay as they are.' },
+      onSchTitle: (e) => { const v = val(e); upd(x => { if (isDoc) x.title = v; else x.name = v; }); },
+      onSchRole: (e) => { const v = val(e); upd(x => { x.role = v; }); }, onSchKind: (e) => { const v = val(e); upd(x => { x.kind = v; }); }, onSchStart: (e) => { const v = val(e); upd(x => { x.start = v; }); },
+      schBack: () => this.setState({ schEdit: null }),
+      schOpenPrint: () => window.WSISchedule && WSISchedule.open(T0, cx, { logo }),
+      schToggleAssign: () => { const on = T0.status !== 'assigned'; upd(x => { x.status = on ? 'assigned' : 'draft'; x.assignedAt = on ? Date.now() : null; }); this.toastMsg(on ? 'Assigned. ' + (cx.name || '').split(' ')[0] + ' can open it from their dashboard.' : 'Unassigned'); },
+      schDelete: () => { if (!confirm(isDoc ? 'Delete this schedule?' : 'Delete this template? Schedules already created from it are kept.')) return; if (isDoc) setD(ds => ds.filter(d => d.id !== E.id)); else setT(ts => ts.filter(t => t.id !== E.id)); this.setState({ schEdit: null }); },
+      schExpandAll: () => this.setState({ schOpen: Object.fromEntries(T0.blocks.map(b => [b.id, true])) }), schCollapseAll: () => this.setState({ schOpen: {} }),
+      schPreview: window.WSISchedule ? WSISchedule.html(T0, cx, { logo }) : '',
+      schBlocks: T0.blocks.map((b, i) => {
+        const w = b.week || 1, ws = w !== lastW; lastW = w;
+        const isItems = b.type === 'todo' || b.type === 'list';
+        const summ = b.type === 'day' ? b.title + ' · ' + (b.rows || []).length + ' time slots' : b.type === 'goals' ? (b.title || 'Goals') + ' · ' + (b.rows || []).length + ' topics' : isItems ? (b.title || TL[b.type]) + ' · ' + (b.items || []).filter(x => String(x).trim()).length + ' items' : String(b.text || '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1');
+        const move = (d) => upd(x => { const j = i + d; if (j < 0 || j >= x.blocks.length) return; const [it] = x.blocks.splice(i, 1); x.blocks.splice(j, 0, it); });
+        return {
+          week: w, weekStart: ws, typeLabel: TL[b.type] || b.type, summary: summ || '(empty)', open: !!open[b.id],
+          onToggle: () => this.setState(st => ({ schOpen: { ...(st.schOpen || {}), [b.id]: !(st.schOpen || {})[b.id] } })),
+          onWeek: (e) => { const v = Math.max(1, parseInt(val(e), 10) || 1); ub(b.id, x => { x.week = v; }); },
+          onUp: () => move(-1), onDown: () => move(1), onRemove: () => { if (confirm('Delete this ' + (TL[b.type] || 'section').toLowerCase() + '?')) upd(x => { x.blocks.splice(i, 1); }); },
+          hasText: ['heading', 'note', 'text'].includes(b.type), text: b.text || '', onText: (e) => { const v = val(e); ub(b.id, x => { x.text = v; }); },
+          hasTitle: isItems || b.type === 'goals', notDay: b.type !== 'day',
+          ...(() => { if (b.type !== 'day') return {}; const t = b.title || ''; const loc = (t.match(/\(([^)]*)\)\s*$/) || [])[1] || ''; const noLoc = t.replace(/\s*\([^)]*\)\s*$/, ''); const ci = noLoc.indexOf(','); const dd = (ci >= 0 ? noLoc.slice(0, ci) : noLoc).trim(), hrs = ci >= 0 ? noLoc.slice(ci + 1).trim() : '';
+            const compose = (d, h, l) => d + (h ? ', ' + h : '') + (l ? ' (' + l + ')' : '');
+            const dt = window.WSISchedule ? WSISchedule.dayDates(t, w, isDoc ? T0.start : cx.start) : '';
+            const to24 = (x) => { const m = String(x || '').trim().match(/^(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m?\.?$/i); if (!m) return ''; let h = +m[1] % 12; if (/p/i.test(m[3])) h += 12; return String(h).padStart(2, '0') + ':' + (m[2] || '00'); };
+            const to12 = (x) => { if (!x) return ''; const [H, M] = x.split(':').map(Number); return ((H % 12) || 12) + (M ? ':' + String(M).padStart(2, '0') : '') + (H >= 12 ? 'pm' : 'am'); };
+            const hp = hrs.split(/\s*[-–]\s*/), from = to24(hp[0]), toT = to24(hp[1]);
+            const DOPTS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Monday - Friday', 'Tuesday - Friday', 'Wednesday - Friday', 'Thursday - Friday'];
+            const first = (b.rows || []).map(r => String(r.text || '').split('\n')[0]).filter(Boolean);
+            const setH = (f, t2) => (f || t2) ? [to12(f), to12(t2)].filter(Boolean).join(' - ') : '';
+            return { dDay: dd, dHoursRaw: hrs, dLoc: loc, dayOptions: DOPTS.includes(dd) ? DOPTS : [dd, ...DOPTS], dLocPh: (isDoc && locOf((USERS.find(x => x.id === T0.userId) || {}).dept)) || 'e.g. Kalamazoo, MI', dFrom: from, dTo: toT,
+              dDateFull: dt || ('Week ' + w + ' · set the start date to see dates'),
+              onDFrom: (e) => { const v = val(e); ub(b.id, x => { x.title = compose(dd, setH(v, toT) || hrs, loc); }); },
+              onDTo: (e) => { const v = val(e); ub(b.id, x => { x.title = compose(dd, setH(from, v) || hrs, loc); }); }, dDate: dt || dd, dHours: hrs || ((b.rows || [])[0] ? (b.rows[0].time || '') + ((b.rows || []).length > 1 ? ' …' : '') : '—'),
+              dTask: (loc ? loc + ' · ' : '') + (first.slice(0, 2).join(', ') || (b.rows || []).length + ' time slots'),
+              onDDay: (e) => { const v = val(e); ub(b.id, x => { x.title = compose(v, hrs, loc); }); }, onDHours: (e) => { const v = val(e); ub(b.id, x => { x.title = compose(dd, v, loc); }); }, onDLoc: (e) => { const v = val(e); ub(b.id, x => { x.title = compose(dd, hrs, v); }); } };
+          })(), title: b.title || '', onTitle: (e) => { const v = val(e); ub(b.id, x => { x.title = v; }); },
+          isDay: b.type === 'day', rows: (b.rows || []).map((r, ri) => ({ time: r.time || '', text: r.text || '', rowsN: Math.min(6, Math.max(2, String(r.text || '').split('\n').length)),
+            onTime: (e) => { const v = val(e); ub(b.id, x => { x.rows[ri].time = v; }); }, onText: (e) => { const v = val(e); ub(b.id, x => { x.rows[ri].text = v; }); }, onRemove: () => ub(b.id, x => { x.rows.splice(ri, 1); }) })),
+          onAddRow: () => ub(b.id, x => { (x.rows = x.rows || []).push({ time: '', text: '' }); }),
+          itemRows: isItems ? (b.items || []).map((raw, ii) => {
+            const links = []; const plain = String(raw || '').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, (m, l, u) => { links.push({ label: l, url: u }); return l; });
+            const rebuild = (txt, ls) => { let outS = '', rest = txt; ls.forEach(L => { const k = rest.indexOf(L.label); if (k < 0) return; outS += rest.slice(0, k) + '[' + L.label + '](' + L.url + ')'; rest = rest.slice(k + L.label.length); }); return outS + rest; };
+            const setItem = (v) => ub(b.id, x => { x.items[ii] = v; });
+            const LF = s.schLink && s.schLink.bid === b.id && s.schLink.idx === ii ? s.schLink : null;
+            const todo = b.type === 'todo';
+            return { plain, hasLinks: links.length > 0, dot: todo ? '12px' : '6px', dotRadius: todo ? '3px' : '999px', dotBorder: todo ? '1.5px solid #262626' : '0', dotBg: todo ? '#FFFFFF' : RED,
+              links: links.map((L, li) => ({ label: L.label, url: L.url, host: (L.url.match(/^https?:\/\/([^/]+)/) || [])[1] || '', onRemove: () => setItem(rebuild(plain, links.filter((_, j) => j !== li))) })),
+              onText: (e) => { const v = val(e); setItem(rebuild(v, links)); },
+              onKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); ub(b.id, x => { x.items.splice(ii + 1, 0, ''); }); setTimeout(() => { const ins = e.target.closest('[style]') && e.target.parentElement.parentElement.parentElement.querySelectorAll('input[placeholder="Type an item"]'); if (ins && ins[ii + 1]) ins[ii + 1].focus(); }, 60); } },
+              onUp: () => ub(b.id, x => { if (ii > 0) { const [t2] = x.items.splice(ii, 1); x.items.splice(ii - 1, 0, t2); } }),
+              onRemove: () => ub(b.id, x => { x.items.splice(ii, 1); }),
+              onLink: () => this.setState({ schLink: LF ? null : { bid: b.id, idx: ii, label: plain, url: '' } }),
+              linkOpen: !!LF, lLabel: LF ? LF.label : '', lUrl: LF ? LF.url : '',
+              onLLabel: (e) => { const v = val(e); this.setState(st => ({ schLink: { ...st.schLink, label: v } })); }, onLUrl: (e) => { const v = val(e); this.setState(st => ({ schLink: { ...st.schLink, url: v } })); },
+              onLCancel: () => this.setState({ schLink: null }),
+              onLSave: () => {
+                let url = String(LF.url || '').trim(), label = String(LF.label || '').trim();
+                if (!url) return this.toastMsg('Paste a web address first');
+                if (!/^https?:/i.test(url)) url = 'https://' + url;
+                if (!label) label = url;
+                const txt = plain.includes(label) ? plain : (plain ? plain + ' ' : '') + label;
+                const ls = [...links, { label, url }].sort((p, q) => txt.indexOf(p.label) - txt.indexOf(q.label));
+                setItem(rebuild(txt, ls)); this.setState({ schLink: null });
+              } };
+          }) : [],
+          onAddItem: () => ub(b.id, x => { (x.items = x.items || []).push(''); }),
+          isItems, itemsText: (b.items || []).join('\n'), itemsRows: Math.min(14, Math.max(3, (b.items || []).length + 1)), onItems: (e) => { const v = val(e); ub(b.id, x => { x.items = v.split('\n'); }); },
+          isGoals: b.type === 'goals', goals: (b.rows || []).map((r, ri) => ({ topic: r.topic || '', items: (r.items || []).join('\n'), rowsN: Math.min(10, Math.max(2, (r.items || []).length)),
+            onTopic: (e) => { const v = val(e); ub(b.id, x => { x.rows[ri].topic = v; }); }, onItems: (e) => { const v = val(e); ub(b.id, x => { x.rows[ri].items = v.split('\n'); }); }, onRemove: () => ub(b.id, x => { x.rows.splice(ri, 1); }) })),
+          onAddGoal: () => ub(b.id, x => { (x.rows = x.rows || []).push({ topic: '', items: [''] }); }),
+        };
+      }),
+      schAddTypes: [['day', 'Day'], ['heading', 'Week heading'], ['todo', 'To-do list'], ['goals', 'Goals table'], ['list', 'Scheduled training'], ['note', 'Note'], ['text', 'Text']].map(([k, l]) => ({ label: l, onClick: () => {
+        const id = E.id + '-' + Date.now(), w = Math.max(1, ...T0.blocks.map(b => b.week || 1));
+        const nb = { id, type: k, week: w, ...(k === 'day' ? { title: 'Monday', rows: [{ time: '9AM', text: '' }] } : k === 'todo' ? { title: 'To-Do List', items: [''] } : k === 'list' ? { title: 'Scheduled Training', items: [''] } : k === 'goals' ? { title: 'Proficiency Goals', rows: [{ topic: '', items: [''] }] } : k === 'heading' ? { text: 'Week ' + w + ' Goals' } : { text: '' }) };
+        upd(x => { x.blocks.push(nb); }); this.setState(st => ({ schOpen: { ...(st.schOpen || {}), [id]: true } }));
+      } })),
+    });
+    return out;
+  }
+  extraVals(c) {
+    const s = this.state; this._ctx = c;
+    const { USERS, ASG, modById, MODULES, pathById, isNew, canAssign, bmM } = c;
+    const tpl = { ...TPL_DEFAULT, ...(s.templates || {}) }, first = (n) => n.split(' ')[0];
+    const lnk = (mid) => siteBase() + 'WSI%20Training.dc.html' + (mid ? '?module=' + mid : '');
+    const out = {};
+    // Recertification
+    const dueAfter = (exp) => diff(exp) > 0 ? exp : addDays(todayS(), 14);
+    const rec = ASG.filter(a => a.progress >= 100 && modById[a.moduleId] && +modById[a.moduleId].recertMonths > 0 && a.last).map(a => {
+      const m = modById[a.moduleId], exp = addMonths(a.last, +m.recertMonths), dd = diff(exp), u = USERS.find(x => x.id === a.userId);
+      return u && dd <= 60 ? { a, u, m, exp, dd } : null;
+    }).filter(Boolean).sort((x, y) => x.dd - y.dd);
+    const recMail = (list) => this.sendMail(list.map(r => { const v = { first: first(r.u.name), name: r.u.name, training: r.m.title, expires: fmtD(r.exp), due: fmtD(dueAfter(r.exp)), link: lnk(r.m.id) }; return { to: mail(r.u.name), subject: fillT(tpl.recert.subject, v), text: fillT(tpl.recert.body, v) }; }));
+    Object.assign(out, {
+      recertRows: rec.map(r => ({ name: r.u.name, initials: ini(r.u.name), module: r.m.title, every: 'Every ' + r.m.recertMonths + ' months' + (r.m.autoRecert ? ' · auto-reassign' : ''), completed: fmtD(r.a.last), expires: fmtD(r.exp), status: r.dd < 0 ? 'Expired' : 'Expires in ' + r.dd + ' day' + (r.dd === 1 ? '' : 's'), statusColor: r.dd < 0 ? DEEP : INK,
+        onReassign: () => this.resetMany([{ uid: r.a.userId, mid: r.a.moduleId, extra: { due: dueAfter(r.exp) } }], r.m.title + ' reassigned to ' + first(r.u.name)), onEmail: () => recMail([r]) })),
+      noRecert: !rec.length, hasRecert: rec.length > 0,
+      recertSummary: rec.length ? rec.filter(r => r.dd < 0).length + ' expired · ' + rec.filter(r => r.dd >= 0).length + ' expiring in the next 60 days' : '',
+      reassignExpired: () => { const ex = rec.filter(r => r.dd < 0); if (!ex.length) return this.toastMsg('Nothing has expired'); this.resetMany(ex.map(r => ({ uid: r.a.userId, mid: r.a.moduleId, extra: { due: dueAfter(r.exp) } })), ex.length + ' training' + (ex.length === 1 ? '' : 's') + ' reassigned'); },
+      emailRecertAll: () => recMail(rec),
+      recertModules: MODULES.filter(m => +m.recertMonths > 0).map(m => m.title + ' (' + m.recertMonths + ' mo)').join(', ') || 'None yet. Set "Recertify every" in a module’s settings.',
+    });
+    // Recurring schedules
+    const RD = s.recDraft || { moduleId: '', groupId: '', every: '3', start: todayS(), dueDays: '30' };
+    const setRD = (k) => (e) => { const v = e.target.value; this.setState(st => ({ recDraft: { ...(st.recDraft || RD), [k]: v } })); };
+    Object.assign(out, {
+      recurRows: (s.recurring || []).map(r => {
+        const m = modById[r.moduleId], g = s.groups.find(x => x.id === r.groupId), ps = periodStart(r);
+        const n = g ? USERS.filter(u => this.inGroup(g.id, u)).length : 0;
+        return { title: m ? m.title : 'Deleted module', meta: (g ? g.name : 'No group') + ' · ' + n + ' people · every ' + everyLabel(+r.every),
+          cycle: ps ? 'Current cycle started ' + fmtD(ps) + ', due ' + fmtD(addDays(ps, +r.dueDays || 30)) + '. Next cycle ' + fmtD(addMonths(ps, +r.every)) + '.' : 'First cycle starts ' + fmtD(r.start) + '.',
+          onRemove: () => { if (confirm('Stop this recurring schedule? Trainings already assigned stay assigned.')) this.setState(st => ({ recurring: st.recurring.filter(x => x.id !== r.id) })); } };
+      }),
+      noRecur: !(s.recurring || []).length,
+      recDraft: RD, onRecMod: setRD('moduleId'), onRecGroup: setRD('groupId'), onRecEvery: setRD('every'), onRecStart: setRD('start'), onRecDue: setRD('dueDays'),
+      recModOptions: MODULES.map(m => ({ value: m.id, label: m.title })), recGroupOptions: s.groups.map(g => ({ value: g.id, label: g.name })),
+      recInvalid: !RD.moduleId || !RD.groupId || !RD.start, recOpacity: RD.moduleId && RD.groupId && RD.start ? 1 : 0.45,
+      addRecur: () => { if (!RD.moduleId || !RD.groupId) return; this.setState(st => ({ recurring: [...(st.recurring || []), { id: 'r' + Date.now(), ...RD, every: +RD.every, dueDays: +RD.dueDays || 30 }], recDraft: null })); setTimeout(() => { const n = this.runSchedules(); this.toastMsg('Recurring schedule saved' + (n ? ' · ' + n + ' assigned for this cycle' : '')); }, 50); },
+      runSchedulesNow: () => { const n = this.runSchedules(); this.toastMsg(n ? n + ' training' + (n === 1 ? '' : 's') + ' assigned or renewed' : 'Everything is up to date'); },
+    });
+    // Surveys & touchpoints
+    const survPeople = (list, canEdit) => list.filter(u => isNew(u) || ASG.some(a => a.userId === u.id && SURVEY_IDS.includes(a.moduleId))).map(u => ({ name: u.name, initials: ini(u.name), meta: (u.title || '') + ' · started ' + (u.start ? fmtD(u.start) : 'not set'), cells: this.surveyCells(u, ASG, modById, canEdit) }));
+    const sv = survPeople(USERS, canAssign);
+    Object.assign(out, { surveyRows: sv, noSurveyRows: !sv.length, surveyHeads: SURVEY_IDS.filter(id => modById[id]).map(id => ({ label: modById[id].title })) });
+    // Email templates
+    const tSel = s.tplSel || 'overdue', meta = TPL_META.find(x => x[0] === tSel) || TPL_META[0];
+    const cur = tSel === 'overdue' ? (s.emailCfg || EMAIL_DEFAULT) : tpl[tSel];
+    const setTpl = (k) => (e) => { const v = e.target.value; if (tSel === 'overdue') this.setState(st => ({ emailCfg: { ...(st.emailCfg || EMAIL_DEFAULT), [k]: v } })); else this.setState(st => ({ templates: { ...TPL_DEFAULT, ...(st.templates || {}), [tSel]: { ...tpl[tSel], [k]: v } } })); };
+    Object.assign(out, {
+      tplRows: TPL_META.map(([k, label, use]) => ({ label, use, bg: k === tSel ? TINT : '#FFFFFF', border: k === tSel ? RED : LINE, onClick: () => this.setState({ tplSel: k }) })),
+      tplLabel: meta[1], tplUse: meta[2], tplVars: meta[3], tplSubject: cur.subject, tplBody: cur.body, onTplSubject: setTpl('subject'), onTplBody: setTpl('body'),
+      tplPrevSubject: fillT(cur.subject, TPL_SAMPLE), tplPrevBody: fillT(cur.body, TPL_SAMPLE),
+      resetTpl: () => { if (!confirm('Reset this template to the original wording?')) return; if (tSel === 'overdue') this.setState(st => ({ emailCfg: { ...(st.emailCfg || EMAIL_DEFAULT), subject: EMAIL_DEFAULT.subject, body: EMAIL_DEFAULT.body } })); else this.setState(st => ({ templates: { ...(st.templates || {}), [tSel]: TPL_DEFAULT[tSel] } })); },
+    });
+    // Ninjio
+    const reps = s.ninjio || [], rep = reps.find(r => r.id === s.ninjioSel) || reps[0];
+    const mgrs = s.managers || [];
+    const byBranch = (r) => { const out2 = {}; r.rows.forEach(x => { (out2[x.branch] = out2[x.branch] || []).push(x); }); return out2; };
+    const rateOf = (l) => l.length ? Math.round(l.filter(x => x.done).length / l.length * 100) : 0;
+    Object.assign(out, {
+      ninjioHasReport: !!rep, ninjioNoReport: !rep, ninjioBusy: !!s.ninjioBusy,
+      onNinjioFile: async (e) => {
+        const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+        if (!window.WSIXlsx) return this.toastMsg('The spreadsheet reader did not load. Refresh and try again.');
+        this.setState({ ninjioBusy: true });
+        try { const r = this.parseNinjio(await window.WSIXlsx.read(f), f.name); if (!r.rows.length) throw new Error('no people found'); this.setState(st => ({ ninjio: [r, ...(st.ninjio || [])].slice(0, 12), ninjioSel: r.id, ninjioBusy: false })); this.toastMsg(r.rows.length + ' people loaded from ' + f.name); }
+        catch (err) { this.setState({ ninjioBusy: false }); this.toastMsg("Couldn't read that file: " + err.message); }
+      },
+      ninjioReportOptions: reps.map(r => ({ value: r.id, label: r.month + ' · ' + r.training + ' · ' + r.file })), ninjioSelVal: rep ? rep.id : '',
+      onNinjioSel: (e) => this.setState({ ninjioSel: e.target.value }),
+      deleteNinjio: () => { if (rep && confirm('Remove this report from the history?')) this.setState(st => ({ ninjio: st.ninjio.filter(r => r.id !== rep.id), ninjioSel: null })); },
+      managerRows: mgrs.map((m, i) => { const upd = (k, xf) => (e) => { const v = xf ? xf(e.target.value) : e.target.value; this.setState(st => ({ managers: st.managers.map((x, j) => j === i ? { ...x, [k]: v } : x) })); }; return { branch: m.branch, location: m.location || BRANCH_LOC[m.branch] || '', onLocation: upd('location'), names: m.names, emails: m.emails.join(', '), onBranch: upd('branch'), onNames: upd('names'), onEmails: upd('emails', v => v.split(/[,;]\s*/).map(x => x.trim()).filter(Boolean)), onRemove: () => { if (confirm('Remove ' + m.branch + '?')) this.setState(st => ({ managers: st.managers.filter((x, j) => j !== i) })); } }; }),
+      addManager: () => this.setState(st => ({ managers: [...(st.managers || []), { branch: 'New branch', names: '', emails: [] }] })),
+    });
+    if (rep) {
+      const bb = byBranch(rep), all = rep.rows, edits = (s.ninjioEdits || {})[rep.id] || {};
+      const odd = all.filter(x => !x.done && x.note).length;
+      const branches = [...mgrs.map(m => m.branch), ...Object.keys(bb).filter(b => !mgrs.some(m => m.branch === b))];
+      const drafts = mgrs.filter(m => (bb[m.branch] || []).length).map(m => {
+        const l = bb[m.branch], nd = l.filter(x => !x.done), ed = edits[m.branch] || {};
+        const v = { managers: m.names, branch: m.branch, month: rep.month, training: rep.training, completed: l.length - nd.length, total: l.length, rate: rateOf(l) + '%', list: nd.length ? nd.map(x => '• ' + x.name + (x.note ? ' (' + x.note + ')' : '')).join('\n') : 'Everyone has completed it.' };
+        const setE = (k, val) => this.setState(st => ({ ninjioEdits: { ...(st.ninjioEdits || {}), [rep.id]: { ...(((st.ninjioEdits || {})[rep.id]) || {}), [m.branch]: { ...((((st.ninjioEdits || {})[rep.id]) || {})[m.branch] || {}), [k]: val } } } }));
+        return { branch: m.branch, to: m.emails.join(', ') || 'No email set', on: !ed.off, subject: ed.subject ?? fillT(tpl.ninjioManager.subject, v), body: ed.body ?? fillT(tpl.ninjioManager.body, v),
+          onToggle: () => setE('off', !ed.off), onSubject: (e) => setE('subject', e.target.value), onBody: (e) => setE('body', e.target.value), op: ed.off ? 0.5 : 1, emails: m.emails };
+      });
+      const nd = all.filter(x => !x.done);
+      Object.assign(out, {
+        ninjioTitle: rep.training, ninjioMeta: rep.month + ' · ' + rep.file + ' · uploaded ' + fmtTs(rep.uploadedAt),
+        ninjioOverall: rateOf(all) + '%', ninjioOverallSub: (all.length - nd.length) + ' of ' + all.length + ' completed',
+        ninjioOdd: odd > 0, ninjioOddText: odd + ' ' + (odd === 1 ? 'person has' : 'people have') + ' text instead of a completed date (for example "' + (all.find(x => !x.done && x.note) || {}).note + '"). They are counted as not completed.',
+        ninjioBranches: branches.filter(b => (bb[b] || []).length).map(b => { const l = bb[b], m = mgrs.find(x => x.branch === b), n2 = l.filter(x => !x.done); return { branch: b, manager: m ? m.names : 'No manager (goes to Katelyn only)', rate: rateOf(l) + '%', done: (l.length - n2.length) + ' of ' + l.length, barW: rateOf(l) + '%', missing: n2.map(x => x.name + (x.note ? ' (' + x.note + ')' : '')).join(', ') || 'Everyone completed it', missColor: n2.length ? '#3F4040' : '#5C5D5D' }; }),
+        ninjioDrafts: drafts, ninjioDraftCount: drafts.filter(d => d.on).length,
+        sendNinjioManagers: () => { const ds = drafts.filter(d => d.on && d.emails.length); if (!ds.length) return this.toastMsg('No emails selected'); if (!confirm('Send ' + ds.length + ' email' + (ds.length === 1 ? '' : 's') + ' to branch managers? Katelyn is cc’d on each.')) return; this.sendMail(ds.map(d => ({ to: d.emails.join(','), subject: d.subject, text: d.body }))); },
+        ninjioIndCount: nd.length, ninjioHasInd: nd.length > 0,
+        ninjioIndPreview: nd.length ? fillT(tpl.ninjioIndividual.body, { first: first(nd[0].name), name: nd[0].name, training: rep.training }) : '',
+        sendNinjioIndividuals: () => { if (!confirm('Email ' + nd.length + ' people who haven’t finished?')) return; this.sendMail(nd.map(x => { const v = { first: first(x.name), name: x.name, training: rep.training }; return { to: x.email, subject: fillT(tpl.ninjioIndividual.subject, v), text: fillT(tpl.ninjioIndividual.body, v) }; })); },
+      });
+    }
+    Object.assign(out, this.schedVals(c));
+    // Branch manager view
+    out.isBM = !!bmM;
+    if (bmM) {
+      const br = bmM.branch, ppl = USERS.filter(u => u.dept === br), ids = new Set(ppl.map(u => u.id));
+      const typeOf = (a, u) => a.pathId && pathById[a.pathId] ? pathById[a.pathId].kind : isNew(u) ? 'New hire' : 'Other';
+      const as = ASG.filter(a => ids.has(a.userId) && modById[a.moduleId] && !SURVEY_IDS.includes(a.moduleId));
+      const uOf = (a) => ppl.find(u => u.id === a.userId);
+      const inProg = as.filter(a => a.progress < 100).sort((x, y) => String(x.due).localeCompare(String(y.due)));
+      const done = as.filter(a => a.progress >= 100).sort((x, y) => String(y.last).localeCompare(String(x.last)));
+      const nrep = reps[0], nl = nrep ? nrep.rows.filter(x => x.branch === br) : [];
+      const typeStyle = (t) => t === 'New hire' ? { tBg: TINT, tColor: '#9E2216' } : t === 'Promotion' ? { tBg: '#262626', tColor: '#FFFFFF' } : { tBg: SOFT, tColor: '#3F4040' };
+      Object.assign(out, {
+        bmBranch: br, bmEmpty: !ppl.length, bmHas: ppl.length > 0,
+        bmStats: [
+          { value: ppl.length, label: 'People in ' + br },
+          { value: inProg.length, label: 'Trainings in progress' },
+          { value: inProg.filter(a => aStatus(a) === 'Overdue').length, label: 'Overdue' },
+          { value: nl.length ? rateOf(nl) + '%' : '—', label: 'Latest Ninjio completion' },
+        ],
+        bmInProg: inProg.map(a => { const u = uOf(a), t = typeOf(a, u), st = aStatus(a); return { name: u.name, initials: ini(u.name), type: t, ...typeStyle(t), training: modById[a.moduleId].title, pctWidth: a.progress + '%', pct: a.progress + '%', due: fmtD(a.due), status: st, ...stStyle(st) }; }),
+        bmNoInProg: !inProg.length,
+        bmDone: done.map(a => { const u = uOf(a), t = typeOf(a, u); return { name: u.name, initials: ini(u.name), type: t, ...typeStyle(t), training: modById[a.moduleId].title, completed: fmtD(a.last), score: a.score != null ? a.score + '%' : '—' }; }),
+        bmNoDone: !done.length,
+        bmSurveys: survPeople(ppl, false), bmNoSurveys: !survPeople(ppl, false).length,
+        bmNinjioHas: nl.length > 0, bmNinjioNone: !nl.length,
+        bmNinjioTitle: nrep ? nrep.training + ' · ' + nrep.month : '', bmNinjioRate: rateOf(nl) + '%', bmNinjioDone: nl.filter(x => x.done).length + ' of ' + nl.length + ' completed',
+        bmNinjioMissing: nl.filter(x => !x.done).map(x => ({ name: x.name, note: x.note || 'Not started' })), bmNinjioAllDone: nl.length > 0 && nl.every(x => x.done),
+        bmDocs: (s.schedDocs || []).filter(d => ids.has(d.userId) && d.status === 'assigned').map(d => { const u = ppl.find(x => x.id === d.userId); return { name: u.name, initials: ini(u.name), title: d.title, start: fmt(d.start, true), onView: () => window.WSISchedule && WSISchedule.open(d, { name: u.name, role: d.role || u.title, branch: br, manager: bmM.names, start: d.start }, { logo: window.WSI_LOGO || 'wsi-logo.png' }) }; }),
+        bmNoDocs: !(s.schedDocs || []).some(d => ids.has(d.userId) && d.status === 'assigned'),
+      });
+    }
+    return out;
   }
   groupVals(USERS, canAssign) {
     const s = this.state;
@@ -1922,7 +2781,11 @@ class Component extends DCLogic {
       edStatusColor: E.dirty ? '#C62B1C' : '#5C5D5D', edClean: !E.dirty, edSaveOp: E.dirty ? 1 : 0.45,
       edCanReset: !original.custom && !!s.overrides[E.id],
       deleteFromEditor: () => this.setState({ delId: E.id }),
-      ed: { title: b(['title']), cat: b(['cat']), mins: b(['mins'], num), summary: b(['summary']) },
+      ed: { title: b(['title']), cat: b(['cat']), mins: b(['mins'], num), summary: b(['summary']), recert: b(['recertMonths'], num) },
+      edAutoRecert: !!d.autoRecert, toggleAutoRecert: () => this.edit(dd => { dd.autoRecert = !dd.autoRecert; }),
+      eForm: L && L.type === 'form', eLink: L && L.type === 'link',
+      lx: L ? { url: b(lp('url')), nameEntry: b(lp('nameEntry')), desc: b(lp('desc')), proof: b(lp('proof'), { out: (x) => x || 'confirm', in: (x) => x }) } : {},
+      formQCount: L && L.type === 'form' ? (L.questions || []).length : 0,
       edDraftFlag: !!d.draft, toggleDraftFlag: () => this.edit(dd => { dd.draft = !dd.draft; }),
       closeEditor: () => { if (E.dirty && !confirm('Discard unsaved changes?')) return; this.setState({ editing: null }); },
       saveEdits: () => { persist(); this.toastMsg('Saved. Learners see the changes next time they open the module.'); },
@@ -1948,7 +2811,7 @@ class Component extends DCLogic {
       newLessonType: s.newLessonType, onNewLessonType: (e) => this.setState({ newLessonType: e.target.value }),
       addLesson: () => this.setState(st => { const dd = clone(st.editing.draft); dd.lessons.push(NEW_LESSON[st.newLessonType]()); return { editing: { ...st.editing, draft: dd, li: dd.lessons.length - 1, dirty: true } }; }),
       noLesson: !L, hasLesson: !!L, onImgDragOver: (e) => e.preventDefault(),
-      addLessonButtons: [['text', 'Add reading'], ['steps', 'Add step-by-step'], ['flashcards', 'Add flashcards'], ['scenario', 'Add scenario'], ['quiz', 'Add knowledge check'], ['resources', 'Add resources']].map(([t, label]) => ({ label,
+      addLessonButtons: [['text', 'Add reading'], ['steps', 'Add step-by-step'], ['flashcards', 'Add flashcards'], ['scenario', 'Add scenario'], ['quiz', 'Add knowledge check'], ['resources', 'Add resources'], ['link', 'Add outside training link'], ['form', 'Add survey form']].map(([t, label]) => ({ label,
         onClick: () => this.setState(st => { const dd = clone(st.editing.draft); const at = dd.lessons.length ? Math.min(Math.max(0, st.editing.li), dd.lessons.length - 1) + 1 : 0; dd.lessons.splice(at, 0, NEW_LESSON[t]()); return { editing: { ...st.editing, draft: dd, li: at, dirty: true } }; }) })),
       edHistory: (s.audit || []).filter(x => x.moduleId === E.id).slice(0, 8).map(x => ({ when: fmtTs(x.at), by: x.by, action: x.action, detail: x.detail || '' })),
       edNoHistory: !(s.audit || []).some(x => x.moduleId === E.id),
@@ -2027,6 +2890,10 @@ class Component extends DCLogic {
       quizRows: L.questions.map((q, i) => ({
         num: i + 1, q: b(lp('questions', i, 'q')), e: b(lp('questions', i, 'e')), onRemove: del(lp('questions'), i),
         kind: b(lp('questions', i, 'kind'), { out: (x) => x || 'choice', in: (x) => x }), isUpload: q.kind === 'upload', isChoice: q.kind !== 'upload',
+        expect: b(lp('questions', i, 'expect')), hasExample: !!q.example, exUrl: q.example ? vidUrl(q.example, fu) || '' : '',
+        exLabel: q.example ? 'Replace example screenshot' : 'Upload an example screenshot',
+        onExample: async (e) => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return; const key = 'ex' + Date.now(); try { await vidPut(key, f); this.edit(dd => { getAt(dd, lp('questions', i)).example = key; }); } catch (err) { this.toastMsg("Couldn't upload: " + err.message); } },
+        onClearExample: () => this.edit(dd => { delete getAt(dd, lp('questions', i)).example; }),
         onAddOpt: push(lp('questions', i, 'o'), ''),
         opts: (q.o || []).map((_, j) => ({ checked: q.a === j, a: b(lp('questions', i, 'o', j)),
           onPick: () => this.edit(dd => { dd.lessons[li].questions[i].a = j; }),
@@ -2050,7 +2917,8 @@ class Component extends DCLogic {
     const USERS = USERS_ALL.filter(u => !ARCU.has(u.id));
     const win = this.props.newHireWindowDays ?? 60;
     const canAssign = s.role === 'manager' || s.role === 'admin';
-    const meBase = s.role ? ACCOUNTS[s.role] : null;
+    const bmM = String(s.role || '').startsWith('bm:') ? (s.managers || []).find(m => 'bm:' + m.branch === s.role) : null;
+    const meBase = bmM ? { name: bmM.names, email: bmM.emails[0], roleLabel: 'Branch manager · ' + bmM.branch, branch: bmM.branch } : s.role ? ACCOUNTS[s.role] : null;
     const me = meBase ? { ...meBase, initials: ini(meBase.name), first: meBase.name.split(' ')[0] } : {};
     const modById = Object.fromEntries(MODULES.map(m => [m.id, m]));
     const PASS = this.props.passScore ?? 80;
@@ -2072,7 +2940,7 @@ class Component extends DCLogic {
       });
       });
     } catch (e) {}
-    const ASG0 = s.assignments.map(a => { const l = live[a.userId + '|' + a.moduleId]; if (!l) return a; const o = { ...a, _src: a, live: true }; Object.entries(l).forEach(([k, v]) => { if (v != null) o[k] = v; }); return o; });
+    const ASG0 = s.assignments.map(a => { const l = live[a.userId + '|' + a.moduleId]; if (!l || (a.cycleStart && !(toD(l.last).getTime() >= a.cycleStart - 864e5))) return a; const o = { ...a, _src: a, live: true }; Object.entries(l).forEach(([k, v]) => { if (v != null) o[k] = v; }); return o; });
     const ACTIVEU = new Set(USERS.map(u => u.id)), ASG = ASG0.filter(a => ACTIVEU.has(a.userId));
     const avgOf = (arr) => arr.length ? Math.round(arr.reduce((t, x) => t + x, 0) / arr.length) : null;
     const scored = ASG.filter(a => a.score != null && modById[a.moduleId]);
@@ -2145,7 +3013,7 @@ class Component extends DCLogic {
       { value: counts.newhires, label: `New hires, last ${win} days`, edge: INK, color: INK, onClick: setFilter('newhires') },
       { value: counts.overdue, label: 'People with overdue training', edge: RED, color: DEEP, onClick: () => this.setState({ tab: 'assignments', asgFilter: 'overdue' }) },
       { value: nhRate + '%', label: 'New hire assignments complete', edge: '#7D7E7D', color: INK, onClick: setFilter('newhires') },
-      { value: scored.length ? avgOf(scored.map(a => a.score)) + '%' : '—', label: 'Average quiz score', edge: RED, color: INK, onClick: () => this.setState({ tab: 'progress' }) },
+      { value: scored.length ? avgOf(scored.map(a => a.score)) + '%' : '—', label: 'Average quiz score', edge: RED, color: INK, onClick: () => this.setState({ tab: 'reports' }) },
     ];
     const filters = [['newhires', 'New hires'], ['overdue', 'Overdue'], ['unassigned', 'Unassigned'], ['all', 'All staff'], ...(archAll.length || isArchView ? [['archived', 'Archived']] : [])].map(([k, l]) => ({
       label: l, count: counts[k], bg: s.filter === k ? INK : '#FFFFFF', color: s.filter === k ? '#FFFFFF' : INK, border: s.filter === k ? INK : '#C9CAC8', onClick: setFilter(k),
@@ -2157,6 +3025,7 @@ class Component extends DCLogic {
       const st = aStatus(a);
       return {
         title: modById[a.moduleId].title, status: st, ...stStyle(st), pct: a.progress, pctWidth: a.progress + '%',
+        dueValue: a.due || '', canEditDue: canAssign && a.progress < 100, onDueChange: (e) => this.setDue(a.userId, a.moduleId, e.target.value),
         weekLabel: a.week ? 'Week ' + a.week : '', hasWeek: !!a.week,
         dueLabel: dueText(a), dueColor: st === 'Overdue' ? DEEP : INK,
         score: a.score != null ? `${a.score}%${a.attempts > 1 ? ` (${a.attempts} attempts)` : ''}` : '—', last: fmt(a.last),
@@ -2215,7 +3084,7 @@ class Component extends DCLogic {
     const empPath = s.paths.find(p => p.id === empPathId);
     const dPaths = du ? Array.from(new Set(detailAs.filter(a => a.pathId).map(a => a.pathId))).map(id => pathById[id]).filter(Boolean) : [];
     const dStart = dPaths.length ? this.pathStart(dPaths[0], du) : null;
-    this._schedule = JSON.stringify({ manager: ACCOUNTS.manager, email: s.emailCfg, people: USERS.map(u => ({ name: u.name, email: mail(u.name), items: asFor(u.id).map(a => ({ moduleId: a.moduleId, title: modById[a.moduleId].title, week: a.week || null, opens: a.opens || null, due: a.due, progress: a.progress })) })).filter(p => p.items.length) });
+    this._schedule = JSON.stringify({ manager: ACCOUNTS.manager, email: s.emailCfg, people: USERS.map(u => ({ name: u.name, email: mail(u.name), docs: (s.schedDocs || []).filter(d => d.userId === u.id && d.status === 'assigned').map(d => { const mg = (s.managers || []).find(m => m.branch === u.dept); return { id: d.id, title: d.title, kind: d.kind, role: d.role, start: d.start, blocks: d.blocks, ctx: { name: u.name, role: d.role || u.title, branch: u.dept !== 'Not set' ? u.dept : '', manager: mg ? mg.names : '', start: d.start } }; }), journey: (() => { const pa = asFor(u.id).filter(x => x.pathId && pathById[x.pathId]); if (!pa.length) return null; const pr = pa.find(x => pathById[x.pathId].kind === 'Promotion' && x.progress < 100) || pa.find(x => pathById[x.pathId].kind === 'Promotion'); const pick = pr || pa[0], p = pathById[pick.pathId], lp = (u.promotions || []).slice().sort((x, y) => String(x.date).localeCompare(String(y.date))).pop(); return { type: p.kind === 'Promotion' ? 'Promotion' : 'New hire', path: p.name, weeks: p.weeks, start: this.pathStart(p, u), hire: u.start || '', from: lp && p.kind === 'Promotion' ? lp.from : '', to: lp && p.kind === 'Promotion' ? lp.to : '' }; })(), items: asFor(u.id).map(a => ({ moduleId: a.moduleId, title: modById[a.moduleId].title, week: a.week || null, opens: a.opens || null, due: a.due, progress: a.progress, cycleStart: a.cycleStart || null })) })).filter(p => p.items.length || p.docs.length) });
 
     const autoCount = MODULES.filter(m => s.auto[m.id]).length;
     const csv = () => {
@@ -2229,11 +3098,13 @@ class Component extends DCLogic {
       logo, isSignin: !s.role, signedIn: !!s.role, me,
       toLearner: (e) => { if (window.__wsiDemo) { e.preventDefault(); window.__wsiDemo('learner'); } },
       isStaffView: s.role === 'manager' || s.role === 'admin',
+      ...this.extraVals({ USERS, ASG, ASG0, MODULES, modById, pathById, isNew, me, canAssign, bmM }),
       ...(this._sortVals || {}),
-      isLearner: s.role === 'learner', isPeople: s.role && s.role !== 'learner' && s.tab === 'people' && !s.editing, isModules: s.role && s.role !== 'learner' && s.tab === 'modules' && !s.editing,
-      isScores: s.role && s.role !== 'learner' && s.tab === 'progress' && !s.editing,
-      isInsights: s.role && s.role !== 'learner' && s.tab === 'insights' && !s.editing,
-      isAssignments: s.role && s.role !== 'learner' && s.tab === 'assignments' && !s.editing,
+      isLearner: s.role === 'learner', isPeople: canAssign && s.tab === 'people' && !s.editing, isModules: canAssign && s.tab === 'modules' && !s.editing,
+      isScores: canAssign && s.tab === 'reports' && !s.editing,
+      isInsights: canAssign && s.tab === 'reports' && !s.editing,
+      isAssignments: canAssign && s.tab === 'assignments' && !s.editing,
+      isNinjio: canAssign && s.tab === 'ninjio' && !s.editing, isEmails: canAssign && s.tab === 'emails' && !s.editing,
       ...this.dashVals({ ASG: ASGd, USERS: USERSd, MODULES, modById, PASS, avgOf, scored: scoredD, isNew, me, canAssign }),
       scopeVal: sv, scopeOn: !!sv, scopeBg: sv ? '#FDECE9' : '#FFFFFF', scopeBorder: sv ? '#EE3826' : '#E3E3E1',
       onScope: (e) => this.setState({ scope: e.target.value }), clearScope: () => this.setState({ scope: '' }),
@@ -2241,9 +3112,9 @@ class Component extends DCLogic {
       scopeGroups: s.groups.map(g => ({ value: 'g:' + g.id, label: g.name })),
       scopeDepts: Array.from(new Set(s.roles.map(r => r.dept).filter(Boolean))).map(d => ({ value: 'd:' + d, label: d })),
       scopeBranches: Array.from(new Set([...BRANCHES, ...USERS.map(u => u.dept)])).filter(b => b && b !== 'Not set').map(b => ({ value: 'b:' + b, label: b })),
-      isGroups: s.role && s.role !== 'learner' && s.tab === 'groups' && !s.editing,
-      isPaths: s.role && s.role !== 'learner' && s.tab === 'paths' && !s.editing,
-      isArchive: s.role && s.role !== 'learner' && s.tab === 'archive' && !s.editing,
+      isGroups: canAssign && s.tab === 'groups' && !s.editing,
+      isPaths: canAssign && s.tab === 'paths' && !s.editing,
+      isArchive: canAssign && s.tab === 'archive' && !s.editing,
       ...this.groupVals(USERS, canAssign),
       ...this.pathVals(MODULES, USERS, modById, me, canAssign, isNew),
       ...this.pathDlgVals(USERS, MODULES, modById, me),
@@ -2272,8 +3143,9 @@ class Component extends DCLogic {
       openAuditModule: () => s.editing && this.setState({ auditFor: s.editing.id }),
       uploadRows: uploadsAll.sort((a, b) => (b.at || 0) - (a.at || 0)).map(f => {
         const m = modById[f.mid], qz = m && m.lessons.find(l => l.type === 'quiz'), qq = qz && qz.questions[f.qi];
-        const src = vidUrl(f.key, () => this.forceUpdate()), rv = !!(s.reviewed || {})[f.key];
-        return { who: f.who, initials: ini(f.who), module: m ? m.title : f.mid, question: qq ? qq.q : 'Question ' + (f.qi + 1), file: f.name, date: f.at ? fmtTs(f.at) : '', href: src || '', hasHref: !!src, reviewed: rv, notReviewed: !rv,
+        const src = vidUrl(f.key, () => this.forceUpdate()), aiOk = !!(f.ai && f.ai.verdict === 'match'), rv = !!(s.reviewed || {})[f.key] || aiOk;
+        const aiLabel = !f.ai ? '' : f.ai.verdict === 'match' ? 'Auto-check: matches the example' : f.ai.verdict === 'checking' ? 'Auto-check running' : 'Needs review' + (f.ai.reason ? ': ' + f.ai.reason : '');
+        return { aiLabel, hasAi: !!aiLabel, aiColor: aiOk ? INK : DEEP, who: f.who, initials: ini(f.who), module: m ? m.title : f.mid, question: qq ? qq.q : 'Question ' + (f.qi + 1), file: f.name, date: f.at ? fmtTs(f.at) : '', href: src || '', hasHref: !!src, reviewed: rv, notReviewed: !rv,
           onReview: () => this.setState(st => ({ reviewed: { ...(st.reviewed || {}), [f.key]: true } })) };
       }),
       noUploads: !uploadsAll.length,
@@ -2324,10 +3196,11 @@ class Component extends DCLogic {
         };
       })(),
       canEdit: s.role === 'manager' || s.role === 'admin', ...this.editorVals(RAW),
-      demoAccounts: Object.entries(ACCOUNTS).map(([k, a]) => ({ ...a, initials: ini(a.name), onClick: () => this.setState({ role: k, tab: 'insights' }) })),
-      googleSignIn: () => this.setState({ role: 'manager', tab: 'insights' }),
+      demoAccounts: [...Object.entries(ACCOUNTS).map(([k, a]) => ({ ...a, initials: ini(a.name), onClick: () => this.setState({ role: k, tab: 'reports' }) })),
+        ...(s.managers || []).map(m => ({ name: m.names, email: m.emails[0] || '', roleLabel: 'Branch manager · ' + m.branch, initials: ini(m.names), onClick: () => this.setState({ role: 'bm:' + m.branch }) }))],
+      googleSignIn: () => this.setState({ role: 'manager', tab: 'reports' }),
       signOut: () => this.setState({ role: null, detailId: null, assignTarget: null, selected: {} }),
-      tabs: [['insights', 'Insights'], ['progress', 'Progress & scores'], ['assignments', 'Assignments'], ['people', 'People'], ['groups', 'Groups'], ['paths', 'Learning paths'], ['modules', 'Modules'], ['archive', 'Archive']].map(([k, l]) => ({ label: l, line: s.tab === k ? RED : 'transparent', color: s.tab === k ? INK : '#5C5D5D', onClick: () => { if (s.editing && s.editing.dirty && !confirm('Discard unsaved changes?')) return; this.setState({ tab: k, editing: null }); } })),
+      tabs: [['reports', 'Reports'], ['assignments', 'Assignments'], ['people', 'People'], ['groups', 'Groups'], ['paths', 'Learning paths'], ['modules', 'Modules'], ['schedules', 'Training Schedules'], ['ninjio', 'Ninjio'], ['emails', 'Emails'], ['archive', 'Archive']].map(([k, l]) => ({ label: l, line: s.tab === k ? RED : 'transparent', color: s.tab === k ? INK : '#5C5D5D', onClick: () => { if (s.editing && s.editing.dirty && !confirm('Discard unsaved changes?')) return; this.setState({ tab: k, editing: null }); } })),
       learnerSummary: (openCount ? `You have ${openCount} training${openCount === 1 ? '' : 's'} to finish.` : "You're all caught up.") + (laterCount ? ` ${laterCount} more unlock${laterCount === 1 ? 's' : ''} in the coming weeks.` : ''),
       learnerItems,
       stats, filters, rows, noRows: !rows.length, canAssign,
@@ -2411,6 +3284,36 @@ class Component extends DCLogic {
       detail: du ? { ...du, initials: ini(du.name), email: mail(du.name), startLabel: du.start ? fmt(du.start, true) : 'Not set' } : {},
       detailStart: du ? du.start || '' : '', detailBranch: du ? du.dept : '', detailReadOnly: !canAssign,
       onDetailStart: (e) => { const v = e.target.value; this.setState(st => ({ userEdits: { ...(st.userEdits || {}), [du.id]: { ...((st.userEdits || {})[du.id] || {}), start: v } } })); },
+      ...(() => {
+        if (!du) return { detailPromos: [], detailNoPromos: true, detailCanPromo: false, promoDraft: {}, titleOptions: [] };
+        const promos = (du.promotions || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+        const setUE = (fn) => this.setState(st => { const ue = { ...((st.userEdits || {})[du.id] || {}) }; fn(ue); return { userEdits: { ...(st.userEdits || {}), [du.id]: ue } }; });
+        const PD = (s.promoDraft && s.promoDraft.uid === du.id) ? s.promoDraft : { uid: du.id, date: todayS(), from: du.title || '', to: '', assign: true };
+        const setPD = (k) => (e) => { const v = e.target.type === 'checkbox' ? e.target.checked : e.target.value; this.setState(st => ({ promoDraft: { ...((st.promoDraft && st.promoDraft.uid === du.id) ? st.promoDraft : PD), [k]: v } })); };
+        const yrs = du.start ? Math.max(0, -diff(du.start)) : null;
+        const tenure = du.start ? 'With WSI since ' + fmt(du.start, true) + (yrs >= 365 ? ' · ' + Math.floor(yrs / 365) + ' yr' + (yrs >= 730 ? 's' : '') : yrs >= 30 ? ' · ' + Math.floor(yrs / 30) + ' mo' : '') : 'Original start date not set';
+        const ok = PD.date && String(PD.to).trim();
+        return {
+          detailTenure: tenure, detailNoPromos: !promos.length, detailCanPromo: canAssign,
+          detailPromos: promos.map(p => ({ date: fmt(p.date, true), from: p.from || '—', to: p.to, canEdit: canAssign, onRemove: () => { if (confirm('Remove this promotion record? Their current title stays the same.')) setUE(ue => { ue.promotions = (ue.promotions || du.promotions || []).filter(x => x.id !== p.id); }); } })),
+          promoDraft: PD, onPromoDate: setPD('date'), onPromoFrom: setPD('from'), onPromoTo: setPD('to'), onPromoAssign: setPD('assign'),
+          promoInvalid: !ok, promoOpacity: ok ? 1 : 0.45,
+          titleOptions: Array.from(new Set([...(s.roles || []).map(r => r.title), ...USERS.map(u => u.title), 'Front Office Administrator'].filter(Boolean))).sort(),
+          addPromo: () => {
+            if (!ok) return;
+            const rec = { id: 'pr' + Date.now(), date: PD.date, from: String(PD.from).trim(), to: String(PD.to).trim() };
+            setUE(ue => { ue.promotions = [...(ue.promotions || du.promotions || []), rec]; ue.title = rec.to; });
+            this.setState({ promoDraft: null });
+            this.toastMsg(du.name.split(' ')[0] + ' promoted to ' + rec.to);
+            if (PD.assign) setTimeout(() => {
+              const u2 = { ...du, title: rec.to, promotions: [...(du.promotions || []), rec] };
+              const p = s.paths.find(x => x.kind === 'Promotion' && (x.name.toLowerCase().includes(rec.to.toLowerCase()) || this.inGroup(x.groupId, u2))) || s.paths.find(x => x.kind === 'Promotion');
+              if (!p) return this.toastMsg('Create a Promotion learning path first');
+              this.setState({ pathDlg: { userId: du.id, pathId: p.id, start: rec.date, items: this.pathItemsFor(p, u2) } });
+            }, 60);
+          },
+        };
+      })(),
       onDetailBranch: (e) => { const v = e.target.value; this.setState(st => ({ userEdits: { ...(st.userEdits || {}), [du.id]: { ...((st.userEdits || {})[du.id] || {}), dept: v } } })); },
       detailItems, detailEmpty: du ? !detailAs.length : false,
       closeDetail: () => this.setState({ detailId: null }),
@@ -2428,7 +3331,12 @@ class Component extends DCLogic {
         const add = [];
         targetIds.forEach(uid => mids.forEach(mid => { if (!s.assignments.some(a => a.userId === uid && a.moduleId === mid)) add.push({ userId: uid, moduleId: mid, due: s.draft.due, progress: 0, score: null, last: null, by: me.name }); }));
         this.setState(st => ({ assignments: [...st.assignments, ...add], assignTarget: null, selected: {} }));
-        this.toastMsg(`${add.length} assignment${add.length === 1 ? '' : 's'} created${s.draft.notify ? ' · emails sent' : ''}`);
+        this.toastMsg(`${add.length} assignment${add.length === 1 ? '' : 's'} created`);
+        if (s.draft.notify && add.length) {
+          const t = { ...TPL_DEFAULT, ...(s.templates || {}) }.assigned;
+          const msgs = Array.from(new Set(add.map(a => a.userId))).map(uid => { const u = USERS.find(x => x.id === uid), its = add.filter(a => a.userId === uid); const v = { first: u.name.split(' ')[0], name: u.name, trainings: its.map(a => modById[a.moduleId].title).join(', '), list: its.map(a => '• ' + modById[a.moduleId].title + ' (due ' + fmtD(a.due) + ')').join('\n'), link: siteBase() + 'WSI%20Training.dc.html' }; return { to: mail(u.name), subject: fillT(t.subject, v), text: fillT(t.body, v) }; });
+          this.sendMail(msgs, 'assignment');
+        }
       },
       hasToast: !!s.toast, toast: s.toast,
       ...(() => {
