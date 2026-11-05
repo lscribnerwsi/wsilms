@@ -61,7 +61,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
           <img src="wsi-logo.png" data-wsi-logo="1" alt="WSI" style="height: 40px;">
           <span style="width: 1px; height: 28px; background: #E3E3E1;"></span>
           <span style="font-size: 17px; font-weight: 700; color: #5C5D5D;">Learning</span>
-          <span title="Admin file version" style="font-size: 11px; font-weight: 600; color: #7D7E7D;">v2026.10.16-r7</span>
+          <span title="Admin file version" style="font-size: 11px; font-weight: 600; color: #7D7E7D;">v2026.11.05-r8</span>
         </div>
         <sc-if value="{{ isStaffView }}" hint-placeholder-val="{{ false }}">
           <nav style="display: flex; gap: 2px; flex-wrap: wrap;">
@@ -924,6 +924,7 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
             </div>
             <sc-for list="{{ ninjioDrafts }}" as="d" hint-placeholder-count="3">
               <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 10px; border: 1.5px solid #E3E3E1; opacity: {{ d.op }};">
+                <sc-if value="{{ d.hasNh }}" hint-placeholder-val="{{ false }}"><span style="align-self: flex-start; padding: 3px 10px; border-radius: 999px; background: #FDECE9; color: #7E1B11; font-size: 12px; font-weight: 700;">{{ d.nhLabel }}</span></sc-if>
                 <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; cursor: pointer;"><input type="checkbox" checked="{{ d.on }}" onChange="{{ d.onToggle }}" style="width: 17px; height: 17px; accent-color: #EE3826;">{{ d.branch }}<span style="font-size: 12px; font-weight: 600; color: #5C5D5D; overflow-wrap: anywhere;">To {{ d.to }}</span></label>
                 <input value="{{ d.subject }}" onChange="{{ d.onSubject }}" aria-label="Subject" style="min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; color: #262626; font-weight: 700;">
                 <textarea value="{{ d.body }}" onChange="{{ d.onBody }}" rows="8" aria-label="Message" style="padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; resize: vertical;"></textarea>
@@ -1225,8 +1226,11 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button onClick="{{ deleteFromEditor }}" style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 8px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #C62B1C; cursor: pointer;" style-hover="background: #FDECE9;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>Delete module</button>
             <sc-if value="{{ edCanReset }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resetModule }}" style="padding: 10px 14px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Reset to original</button></sc-if>
-            <button onClick="{{ previewModule }}" style="padding: 10px 18px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #262626; cursor: pointer;">Save &amp; preview</button>
-            <button onClick="{{ saveEdits }}" disabled="{{ edClean }}" style="padding: 10px 22px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; opacity: {{ edSaveOp }};" style-hover="background: #B42617;">Save changes</button>
+            <sc-if value="{{ edHasDraft }}" hint-placeholder-val="{{ false }}"><button onClick="{{ discardDraft }}" style="padding: 10px 14px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Discard draft</button></sc-if>
+            <button onClick="{{ openVersions }}" style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #262626; cursor: pointer;" style-hover="border-color: #262626;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>Version history</button>
+            <button onClick="{{ previewModule }}" style="padding: 10px 18px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #262626; cursor: pointer;">Preview</button>
+            <button onClick="{{ saveEdits }}" disabled="{{ edClean }}" style="padding: 10px 18px; border-radius: 8px; border: 1.5px solid #262626; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #262626; cursor: pointer; opacity: {{ edSaveOp }};">Save draft</button>
+            <button onClick="{{ publishEdits }}" disabled="{{ edCantPublish }}" style="padding: 10px 22px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; opacity: {{ edPubOp }};" style-hover="background: #B42617;">Publish</button>
           </div>
         </div>
 
@@ -1772,6 +1776,57 @@ td { padding: 12px 14px; border-bottom: 1px solid #EBEBEA; font-size: 14px; vert
     </div>
   </sc-if>
 
+  <sc-if value="{{ hasVer }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; background: rgba(38,38,38,0.4); z-index: 66; display: flex; align-items: center; justify-content: center; padding: 16px;">
+      <div style="width: min(600px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; padding: 26px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 20px 60px rgba(38,38,38,0.25); border-top: 6px solid #EE3826;">
+        <div style="flex: none; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><h2 style="font-weight: 800; font-size: 22px; margin: 0;">Version history</h2><span style="font-size: 14px; color: #3F4040;">Every publish saves the version it replaced. Restoring loads it into the editor; nothing changes for learners until you publish.</span></div>
+          <button onClick="{{ closeVersions }}" aria-label="Close" style="flex: none; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #F5F5F4; cursor: pointer; font-size: 18px; color: #262626;">×</button>
+        </div>
+        <div style="flex: none; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; background: #262626; color: #FFFFFF;"><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;">Live now</span><span style="font-size: 14px; font-weight: 700;">{{ verCurrent }}</span></div>
+        <sc-if value="{{ verNone }}" hint-placeholder-val="{{ false }}"><span style="font-size: 14px; color: #5C5D5D;">No earlier versions yet. They appear here after the next publish.</span></sc-if>
+        <sc-for list="{{ verRows }}" as="v" hint-placeholder-count="2">
+          <div style="flex: none; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 10px; border: 1px solid #E3E3E1;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 800; font-size: 14px;">{{ v.when }}</span><span style="font-size: 13px; color: #3F4040;">{{ v.title }} · {{ v.meta }}</span><span style="font-size: 12px; color: #5C5D5D;">{{ v.label }}</span></span>
+              <button onClick="{{ v.onView }}" style="padding: 6px 12px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Lessons</button>
+              <button onClick="{{ v.onRestore }}" style="padding: 7px 14px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;">Restore</button>
+            </div>
+            <sc-if value="{{ v.open }}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 3px; padding: 8px 12px; border-radius: 8px; background: #F5F5F4; font-size: 13px;"><sc-for list="{{ v.lessons }}" as="l" hint-placeholder-count="3"><span>{{ l.t }}</span></sc-for></div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasOutbox }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; background: rgba(38,38,38,0.4); z-index: 70; display: flex; align-items: center; justify-content: center; padding: 16px;">
+      <div style="width: min(720px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; padding: 26px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 20px 60px rgba(38,38,38,0.25); border-top: 6px solid #EE3826;">
+        <div style="flex: none; display: flex; flex-direction: column; gap: 4px;"><h2 style="font-weight: 800; font-size: 22px; margin: 0;">{{ obTitle }}</h2><span style="font-size: 14px; color: #3F4040;">{{ obSub }}</span></div>
+        <sc-if value="{{ obMany }}" hint-placeholder-val="{{ false }}">
+          <div style="flex: none; flex: none; display: flex; gap: 6px; flex-wrap: wrap; max-height: 120px; overflow-y: auto;">
+            <sc-for list="{{ obChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onClick }}" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.color }}; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;"><span>{{ c.label }}</span><sc-if value="{{ c.edited }}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 800; opacity: 0.8;">· edited</span></sc-if></button></sc-for>
+          </div>
+        </sc-if>
+        <div style="flex: none; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 6px 10px; font-size: 13px; line-height: 1.45; padding: 12px 14px; border-radius: 10px; background: #F5F5F4;">
+          <span style="font-weight: 700; color: #5C5D5D;">From</span><span>{{ obFrom }}</span>
+          <span style="font-weight: 700; color: #5C5D5D;">To</span><span style="overflow-wrap: anywhere;">{{ obTo }}</span>
+          <span style="font-weight: 700; color: #5C5D5D;">Cc</span><span>{{ obFrom }}</span>
+        </div>
+        <label style="flex: none; display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 13px; font-weight: 700;">Subject</span><input value="{{ obSubject }}" onChange="{{ onObSubject }}" style="min-height: 42px; padding: 0 12px; font: inherit; font-size: 14px; font-weight: 700; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%;"></label>
+        <label style="flex: none; display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 13px; font-weight: 700;">Message</span><textarea value="{{ obBody }}" onChange="{{ onObBody }}" rows="12" style="padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.55; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; box-sizing: border-box; width: 100%; resize: vertical;"></textarea></label>
+        <div style="flex: none; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #5C5D5D;"><span style="flex: 1 1 260px;">{{ obHint }}</span><sc-if value="{{ obEdited }}" hint-placeholder-val="{{ false }}"><button onClick="{{ obRevert }}" style="padding: 0; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 700; color: #3F4040; cursor: pointer; text-decoration: underline;">Undo my edits to this email</button></sc-if></div>
+        <div style="flex: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 4px;">
+          <sc-if value="{{ obMany }}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 6px;"><button onClick="{{ obPrev }}" style="padding: 8px 12px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">← Previous</button><button onClick="{{ obNext }}" style="padding: 8px 12px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Next →</button></div></sc-if>
+          <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button onClick="{{ obCancel }}" style="padding: 10px 16px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: #3F4040;">Cancel</button>
+            <button onClick="{{ obSend }}" style="padding: 10px 22px; border-radius: 8px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: #B42617;">{{ obSendLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; left: 24px; bottom: 24px; z-index: 80; padding: 12px 20px; border-radius: 10px; background: #262626; color: #FFFFFF; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(38,38,38,0.25); border-left: 4px solid #EE3826;">{{ toast }}</div>
   </sc-if>
@@ -1841,7 +1896,7 @@ const TPL_DEFAULT = {
   assigned: { subject: 'New training assigned: {trainings}', body: 'Hi {first},\n\nYou have new training to complete:\n\n{list}\n\nStart here:\n{link}\n\nThanks,\nKatelyn' },
   recert: { subject: 'Time to renew: {training}', body: 'Hi {first},\n\nYour {training} training expires on {expires}. Please complete it again by {due}:\n{link}\n\nThanks,\nKatelyn' },
   survey: { subject: 'Please complete: {training}', body: 'Hi {first},\n\nPlease take a few minutes to complete the {training} by {due}:\n{link}\n\nThanks,\nKatelyn' },
-  ninjioManager: { subject: 'Ninjio completion for {branch}: {rate}', body: 'Hi {managers},\n\nHere is the {month} Ninjio completion for {branch} ({training}):\n\nCompleted: {completed} of {total} ({rate})\n\nStill need to complete:\n{list}\n\nPlease remind your team to finish by the end of the month.\n\nThanks,\nKatelyn' },
+  ninjioManager: { subject: 'Ninjio completion for {branch}: {rate}', body: 'Hi {managers},\n\nHere is the {month} Ninjio completion for {branch} ({training}):\n\nCompleted: {completed} of {total} ({rate})\n\nStill need to complete:\n{list}\n\nNew hires since the last report:\n{newhires}\n\nPlease remind your team to finish by the end of the month.\n\nThanks,\nKatelyn' },
   ninjioIndividual: { subject: 'Reminder: finish your Ninjio training', body: "Hi {first},\n\nOur records show you haven't finished this month's Ninjio training, {training}. Please complete it as soon as you can.\n\nThanks,\nKatelyn" },
   uploadReview: { subject: 'Upload needs review: {training}', body: 'Hi Katelyn,\n\n{name} uploaded a file for "{question}" in {training}. The automatic check could not confirm it matches the example.\n\nReason: {reason}\n\nReview it under Reports → Uploaded answers.' },
 };
@@ -1850,11 +1905,11 @@ const TPL_META = [
   ['assigned', 'Training assigned', 'When you assign training with "Email them" ticked', '{first} {list} {trainings} {link}'],
   ['recert', 'Recertification due', 'Reports → Recertification', '{first} {training} {expires} {due} {link}'],
   ['survey', 'Survey / touchpoint reminder', 'Reports → Surveys & touchpoints', '{first} {training} {due} {link}'],
-  ['ninjioManager', 'Monthly Ninjio report to managers', 'Ninjio tab, one email per branch', '{managers} {branch} {month} {training} {completed} {total} {rate} {list}'],
+  ['ninjioManager', 'Monthly Ninjio report to managers', 'Ninjio tab, one email per branch', '{managers} {branch} {month} {training} {completed} {total} {rate} {list} {newhires}'],
   ['ninjioIndividual', 'Ninjio reminder to individuals', 'Ninjio tab, people who haven’t finished', '{first} {training}'],
   ['uploadReview', 'Upload needs review', 'Sent to Katelyn when an upload doesn’t match the example', '{name} {training} {question} {reason}'],
 ];
-const TPL_SAMPLE = { first: 'Jordan', name: 'Jordan Ellis', list: '• Posting Jobs in Avionte (due Oct 30, 2026)', trainings: 'Posting Jobs in Avionte', training: 'E-Verify Training', link: 'https://your-site.netlify.app/WSI%20Training.dc.html', expires: 'Nov 15, 2026', due: 'Nov 30, 2026', managers: 'Dani', branch: 'Kalamazoo', month: 'October 2026', completed: '14', total: '16', rate: '88%', question: 'Upload your E-Verify confirmation', reason: 'The screenshot shows a different page.' };
+const TPL_SAMPLE = { first: 'Jordan', name: 'Jordan Ellis', list: '• Posting Jobs in Avionte (due Oct 30, 2026)', trainings: 'Posting Jobs in Avionte', training: 'E-Verify Training', link: 'https://your-site.netlify.app/WSI%20Training.dc.html', expires: 'Nov 15, 2026', due: 'Nov 30, 2026', managers: 'Dani', branch: 'Kalamazoo', month: 'October 2026', completed: '14', total: '16', rate: '88%', newhires: '• Austin McKendrick, Account Manager, started Oct 5, 2026 (not in this Ninjio report yet)', question: 'Upload your E-Verify confirmation', reason: 'The screenshot shows a different page.' };
 const SURVEY_IDS = ['new-hire-survey', 'touchpoint-45'];
 const toD = (x) => x == null || x === '' ? new Date(NaN) : typeof x === 'number' ? new Date(x) : new Date(String(x).length === 10 ? x + 'T12:00:00' : x);
 const fmtD = (x) => { const d = toD(x); return isNaN(d) ? '—' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); };
@@ -1968,8 +2023,8 @@ class Component extends DCLogic {
   syncMedia() { document.querySelectorAll('[data-src]').forEach(el => { const v = el.getAttribute('data-src'); if (v && v.indexOf('{{') === -1 && el.getAttribute('src') !== v) el.setAttribute('src', v); }); }
   componentDidUpdate() {
     this.swapLogo(); this.syncMedia();
-    const { role, tab, filter, assignments, auto, extraUsers, customModules, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, customTpls, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits } = this.state;
-    try { localStorage.setItem(KEY, JSON.stringify({ role, tab, filter, assignments, auto, extraUsers, roles, groups, paths, audit, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, customTpls, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits })); localStorage.setItem('wsi-custom-modules', JSON.stringify(customModules)); localStorage.setItem(OVR, JSON.stringify(this.state.overrides)); localStorage.setItem('wsi-hidden-modules', JSON.stringify(this.state.hidden)); if (this._schedule && this._schedule !== this._lastSched) { this._lastSched = this._schedule; localStorage.setItem('wsi-schedule', this._schedule); } } catch (e) {}
+    const { role, tab, filter, assignments, auto, extraUsers, customModules, roles, groups, paths, audit, moduleVersions, moduleDrafts, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, customTpls, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits } = this.state;
+    try { localStorage.setItem(KEY, JSON.stringify({ role, tab, filter, assignments, auto, extraUsers, roles, groups, paths, audit, moduleVersions, moduleDrafts, archive, emailCfg, reviewed, userEdits, archivedUsers, deletedUsers, rolesV, seedV, promoV, sampleFix, branchV, foaV, customTpls, schedTemplates, schedDocs, templates, managers, ninjio, recurring, ninjioEdits })); localStorage.setItem('wsi-custom-modules', JSON.stringify(customModules)); localStorage.setItem(OVR, JSON.stringify(this.state.overrides)); localStorage.setItem('wsi-hidden-modules', JSON.stringify(this.state.hidden)); if (this._schedule && this._schedule !== this._lastSched) { this._lastSched = this._schedule; localStorage.setItem('wsi-schedule', this._schedule); } } catch (e) {}
   }
   edit(fn) {
     this.setState(s => { const d = clone(s.editing.draft); fn(d, s.editing.li); return { editing: { ...s.editing, draft: d, dirty: true } }; });
@@ -2146,9 +2201,34 @@ class Component extends DCLogic {
     }
     throw new Error("it isn't available here. It works on the Netlify site once the AI key is added.");
   }
-  async sendMail(msgs, what) {
-    msgs = msgs.filter(m => m.to);
+  sendMail(msgs, what) {
+    msgs = (msgs || []).filter(m => m.to);
     if (!msgs.length) return this.toastMsg('No one to email');
+    this.setState({ outbox: { msgs: msgs.map(m => ({ ...m, orig: { subject: m.subject, text: m.text } })), sel: 0, what: what || '' } });
+  }
+  outboxVals() {
+    const s = this.state, O = s.outbox;
+    if (!O) return { hasOutbox: false };
+    const n = O.msgs.length, i = Math.min(O.sel, n - 1), m = O.msgs[i];
+    const setM = (k) => (e) => { const v = e.target.value; this.setState(st => ({ outbox: { ...st.outbox, msgs: st.outbox.msgs.map((x, j) => j === i ? { ...x, [k]: v } : x) } })); };
+    const edited = (x) => x.subject !== x.orig.subject || x.text !== x.orig.text;
+    const who = (x) => { const t = String(x.to).split(/[,;]/)[0].trim(); const u = this._ctx && this._ctx.USERS.find(u => mail(u.name).toLowerCase() === t.toLowerCase()); return u ? u.name : t; };
+    return {
+      hasOutbox: true, obMany: n > 1,
+      obTitle: n > 1 ? 'Review ' + n + ' emails before sending' : 'Review email before sending',
+      obSub: n > 1 ? 'Each person gets their own email. Click a name to check or change theirs; changes only affect that email.' : 'Change anything for this send. The saved template stays the same.',
+      obChips: O.msgs.map((x, j) => ({ label: who(x), edited: edited(x), bg: j === i ? '#262626' : '#FFFFFF', color: j === i ? '#FFFFFF' : '#262626', border: j === i ? '#262626' : '#C9CAC8', onClick: () => this.setState(st => ({ outbox: { ...st.outbox, sel: j } })) })),
+      obFrom: (ACCOUNTS.manager || {}).name + ' <' + ((ACCOUNTS.manager || {}).email || '') + '>', obTo: m.to,
+      obSubject: m.subject, obBody: m.text, onObSubject: setM('subject'), onObBody: setM('text'),
+      obEdited: edited(m), obRevert: () => this.setState(st => ({ outbox: { ...st.outbox, msgs: st.outbox.msgs.map((x, j) => j === i ? { ...x, subject: x.orig.subject, text: x.orig.text } : x) } })),
+      obHint: (n > 1 ? 'Email ' + (i + 1) + ' of ' + n + '. ' : '') + (edited(m) ? 'Edited for this send only.' : 'Wording comes from the template on the Emails tab.'),
+      obPrev: () => this.setState(st => ({ outbox: { ...st.outbox, sel: (i - 1 + n) % n } })), obNext: () => this.setState(st => ({ outbox: { ...st.outbox, sel: (i + 1) % n } })),
+      obCancel: () => this.setState({ outbox: null }),
+      obSendLabel: s.obSending ? 'Sending…' : n > 1 ? 'Send ' + n + ' emails' : 'Send email',
+      obSend: async () => { if (this.state.obSending) return; const msgs = O.msgs.map(({ orig, ...x }) => x); this.setState({ obSending: true }); await this.deliverMail(msgs); this.setState({ obSending: false, outbox: null }); },
+    };
+  }
+  async deliverMail(msgs) {
     const n = msgs.length + ' email' + (msgs.length === 1 ? '' : 's');
     if (!(window.WSIStore && WSIStore.server)) return this.toastMsg('Demo only: on the Netlify site this sends ' + n + ' from Katelyn');
     try {
@@ -2555,11 +2635,17 @@ class Component extends DCLogic {
       const bb = byBranch(rep), all = rep.rows, edits = (s.ninjioEdits || {})[rep.id] || {};
       const odd = all.filter(x => !x.done && x.note).length;
       const branches = [...mgrs.map(m => m.branch), ...Object.keys(bb).filter(b => !mgrs.some(m => m.branch === b))];
-      const drafts = mgrs.filter(m => (bb[m.branch] || []).length).map(m => {
-        const l = bb[m.branch], nd = l.filter(x => !x.done), ed = edits[m.branch] || {};
-        const fn = String(m.names || '').split(/\s*,\s*|\s+and\s+|\s*&\s*/).map(p => p.trim().split(/\s+/)[0]).filter(Boolean); const v = { managers: fn.length > 1 ? fn.slice(0, -1).join(', ') + ' and ' + fn[fn.length - 1] : (fn[0] || m.names), branch: m.branch, month: rep.month, training: rep.training, completed: l.length - nd.length, total: l.length, rate: rateOf(l) + '%', list: nd.length ? nd.map(x => '• ' + x.name + (x.note ? ' (' + x.note + ')' : '')).join('\n') : 'Everyone has completed it.' };
+      const ri = reps.indexOf(rep), prevRep = reps[ri + 1], since = prevRep ? prevRep.uploadedAt : rep.uploadedAt - 31 * 864e5;
+      const inRep = (u) => all.some(x => String(x.email).toLowerCase() === mail(u.name).toLowerCase() || String(x.name).toLowerCase() === u.name.toLowerCase());
+      const newHiresFor = (br) => USERS.filter(u => u.dept === br && u.start && toD(u.start).getTime() > since && toD(u.start).getTime() <= rep.uploadedAt + 864e5);
+      const nhText = (list) => list.length ? list.map(u => '• ' + u.name + (u.title ? ', ' + u.title : '') + ', started ' + fmtD(u.start) + (inRep(u) ? '' : ' (not in this Ninjio report yet)')).join('\n') : 'No new hires since the last report.';
+      const sinceLabel = prevRep ? 'since the ' + prevRep.month + ' report' : 'in the 31 days before this report';
+      const drafts = mgrs.filter(m => (bb[m.branch] || []).length || newHiresFor(m.branch).length).map(m => {
+        const l = bb[m.branch] || [], nd = l.filter(x => !x.done), ed = edits[m.branch] || {}, nh = newHiresFor(m.branch);
+        const fn = String(m.names || '').split(/\s*,\s*|\s+and\s+|\s*&\s*/).map(p => p.trim().split(/\s+/)[0]).filter(Boolean); const v = { managers: fn.length > 1 ? fn.slice(0, -1).join(', ') + ' and ' + fn[fn.length - 1] : (fn[0] || m.names), branch: m.branch, month: rep.month, training: rep.training, completed: l.length - nd.length, total: l.length, rate: rateOf(l) + '%', list: nd.length ? nd.map(x => '• ' + x.name + (x.note ? ' (' + x.note + ')' : '')).join('\n') : 'Everyone has completed it.', newhires: nhText(nh) };
+        const bodyT = /\{newhires\}/.test(tpl.ninjioManager.body) ? tpl.ninjioManager.body : (() => { const b0 = tpl.ninjioManager.body, k = b0.search(/\n\s*(Thanks|Thank you)/i); const sec = '\n\nNew hires since the last report:\n{newhires}'; return k >= 0 ? b0.slice(0, k) + sec + b0.slice(k) : b0 + sec; })();
         const setE = (k, val) => this.setState(st => ({ ninjioEdits: { ...(st.ninjioEdits || {}), [rep.id]: { ...(((st.ninjioEdits || {})[rep.id]) || {}), [m.branch]: { ...((((st.ninjioEdits || {})[rep.id]) || {})[m.branch] || {}), [k]: val } } } }));
-        return { branch: m.branch, to: m.emails.join(', ') || 'No email set', on: !ed.off, subject: ed.subject ?? fillT(tpl.ninjioManager.subject, v), body: ed.body ?? fillT(tpl.ninjioManager.body, v),
+        return { branch: m.branch, to: m.emails.join(', ') || 'No email set', on: !ed.off, subject: ed.subject ?? fillT(tpl.ninjioManager.subject, v), body: ed.body ?? fillT(bodyT, v), nhCount: nh.length, nhLabel: nh.length ? nh.length + ' new hire' + (nh.length === 1 ? '' : 's') + ' ' + sinceLabel + (nh.some(u => !inRep(u)) ? ' · ' + nh.filter(u => !inRep(u)).length + ' not in Ninjio yet' : '') : '', hasNh: nh.length > 0,
           onToggle: () => setE('off', !ed.off), onSubject: (e) => setE('subject', e.target.value), onBody: (e) => setE('body', e.target.value), op: ed.off ? 0.5 : 1, emails: m.emails };
       });
       const nd = all.filter(x => !x.done);
@@ -2569,10 +2655,10 @@ class Component extends DCLogic {
         ninjioOdd: odd > 0, ninjioOddText: odd + ' ' + (odd === 1 ? 'person has' : 'people have') + ' text instead of a completed date (for example "' + (all.find(x => !x.done && x.note) || {}).note + '"). They are counted as not completed.',
         ninjioBranches: branches.filter(b => (bb[b] || []).length).map(b => { const l = bb[b], m = mgrs.find(x => x.branch === b), n2 = l.filter(x => !x.done); return { branch: b, manager: m ? m.names : 'No manager (goes to Katelyn only)', rate: rateOf(l) + '%', done: (l.length - n2.length) + ' of ' + l.length, barW: rateOf(l) + '%', missing: n2.map(x => x.name + (x.note ? ' (' + x.note + ')' : '')).join(', ') || 'Everyone completed it', missColor: n2.length ? '#3F4040' : '#5C5D5D' }; }),
         ninjioDrafts: drafts, ninjioDraftCount: drafts.filter(d => d.on).length,
-        sendNinjioManagers: () => { const ds = drafts.filter(d => d.on && d.emails.length); if (!ds.length) return this.toastMsg('No emails selected'); if (!confirm('Send ' + ds.length + ' email' + (ds.length === 1 ? '' : 's') + ' to branch managers? Katelyn is cc’d on each.')) return; this.sendMail(ds.map(d => ({ to: d.emails.join(','), subject: d.subject, text: d.body }))); },
+        sendNinjioManagers: () => { const ds = drafts.filter(d => d.on && d.emails.length); if (!ds.length) return this.toastMsg('No emails selected'); this.sendMail(ds.map(d => ({ to: d.emails.join(','), subject: d.subject, text: d.body }))); },
         ninjioIndCount: nd.length, ninjioHasInd: nd.length > 0,
         ninjioIndPreview: nd.length ? fillT(tpl.ninjioIndividual.body, { first: first(nd[0].name), name: nd[0].name, training: rep.training }) : '',
-        sendNinjioIndividuals: () => { if (!confirm('Email ' + nd.length + ' people who haven’t finished?')) return; this.sendMail(nd.map(x => { const v = { first: first(x.name), name: x.name, training: rep.training }; return { to: x.email, subject: fillT(tpl.ninjioIndividual.subject, v), text: fillT(tpl.ninjioIndividual.body, v) }; })); },
+        sendNinjioIndividuals: () => { this.sendMail(nd.map(x => { const v = { first: first(x.name), name: x.name, training: rep.training }; return { to: x.email, subject: fillT(tpl.ninjioIndividual.subject, v), text: fillT(tpl.ninjioIndividual.body, v) }; })); },
       });
     }
     Object.assign(out, this.schedVals(c), this.dashExtra(c, out));
@@ -2803,6 +2889,7 @@ class Component extends DCLogic {
       if (this.state.mailSending) return;
       const msgs = people.map(u => ({ to: mail(u.name), cc: ACCOUNTS.manager.email, subject: fill(cfg.subject, u), text: fill(cfg.body, u) }));
       const n = msgs.length + ' email' + (msgs.length === 1 ? '' : 's');
+      if (true) { this.setState({ mail: null }); this.sendMail(msgs, 'overdue'); return; }
       if (window.WSIStore && WSIStore.server) {
         this.setState({ mailSending: true });
         try {
@@ -2822,7 +2909,7 @@ class Component extends DCLogic {
       mailSubject: cfg.subject, mailBody: cfg.body, onMailSubject: setCfg('subject'), onMailBody: setCfg('body'),
       previewSubject: fill(cfg.subject, first), previewBody: fill(cfg.body, first),
       mailCanSend: people.length > 0, mailTemplateOnly: !people.length,
-      mailSendLabel: s.mailSending ? 'Sending…' : people.length > 1 ? 'Send ' + people.length + ' emails' : 'Send email',
+      mailSendLabel: people.length > 1 ? 'Review ' + people.length + ' emails' : 'Review and send',
       sendMail: send, closeMail: () => this.setState({ mail: null }),
     };
   }
@@ -2904,11 +2991,35 @@ class Component extends DCLogic {
     const num = { out: (v) => String(v), in: (v) => Number(v.replace(/[^0-9]/g, '')) || 0 };
     const move = (i, dir) => () => this.setState(st => { const dd = clone(st.editing.draft); const [x] = dd.lessons.splice(i, 1); dd.lessons.splice(i + dir, 0, x); return { editing: { ...st.editing, draft: dd, li: i + dir, dirty: true } }; });
     const original = RAW.find(m => m.id === E.id);
-    const persist = () => { if (E.dirty) this.logAudit(E.id, d.title, 'Edited', changesOf(d, s.overrides[E.id] || original)); this.setState(st => ({ overrides: { ...st.overrides, [E.id]: clone(st.editing.draft) }, editing: { ...st.editing, dirty: false } })); };
+    const pub = s.overrides[E.id] || original, hasDraft = !!(s.moduleDrafts || {})[E.id];
+    const me0 = (ACCOUNTS[s.role] || {}).name || 'Unknown';
+    const saveDraft = () => { this.setState(st => ({ moduleDrafts: { ...(st.moduleDrafts || {}), [E.id]: clone(st.editing.draft) }, editing: { ...st.editing, dirty: false } })); };
+    const persist = () => {
+      this.logAudit(E.id, d.title, 'Published', changesOf(d, pub));
+      this.setState(st => {
+        const vs = ((st.moduleVersions || {})[E.id] || []).slice();
+        vs.unshift({ at: Date.now(), by: me0, data: clone(st.overrides[E.id] || original), replaced: true });
+        const md = { ...(st.moduleDrafts || {}) }; delete md[E.id];
+        return { overrides: { ...st.overrides, [E.id]: clone(st.editing.draft) }, moduleVersions: { ...(st.moduleVersions || {}), [E.id]: vs.slice(0, 12) }, moduleDrafts: md, editing: { ...st.editing, dirty: false } };
+      });
+    };
+    const vers = ((s.moduleVersions || {})[E.id] || []);
     const v = {
       isEditor: true, edHeading: d.title || 'Untitled module',
-      edStatus: E.dirty ? 'Unsaved changes' : (s.overrides[E.id] ? 'All changes saved' : 'No changes yet'),
-      edStatusColor: E.dirty ? '#C62B1C' : '#5C5D5D', edClean: !E.dirty, edSaveOp: E.dirty ? 1 : 0.45,
+      edStatus: E.dirty ? 'Unsaved changes' : hasDraft ? 'Draft saved · learners still see the published version' : (s.overrides[E.id] ? 'Published' : 'No changes yet'),
+      edStatusColor: E.dirty || hasDraft ? '#C62B1C' : '#5C5D5D', edClean: !E.dirty, edSaveOp: E.dirty ? 1 : 0.45,
+      edHasDraft: hasDraft && !E.dirty, edCanPublish: E.dirty || hasDraft, edPubOp: E.dirty || hasDraft ? 1 : 0.45, edCantPublish: !(E.dirty || hasDraft),
+      saveDraftEdits: () => { saveDraft(); this.toastMsg('Draft saved. Publish when it’s ready for learners.'); },
+      publishEdits: () => { if (!confirm('Publish these changes? Learners see them the next time they open the module.')) return; persist(); this.toastMsg('Published. The previous version is saved in Version history.'); },
+      discardDraft: () => { if (!confirm('Discard the draft and go back to the published version?')) return; this.setState(st => { const md = { ...(st.moduleDrafts || {}) }; delete md[E.id]; return { moduleDrafts: md, editing: { ...st.editing, draft: clone(pub), li: 0, dirty: false } }; }); this.toastMsg('Draft discarded'); },
+      openVersions: () => this.setState({ verOpen: true }),
+      hasVer: !!s.verOpen, closeVersions: () => this.setState({ verOpen: false }),
+      verCurrent: 'Published' + (s.overrides[E.id] ? '' : ' (original)') + ' · ' + (pub.title || ''),
+      verRows: [...vers.map((v, i) => ({ when: fmtTs(v.at), label: 'Replaced by ' + v.by, title: v.data.title || '', meta: (v.data.lessons || []).length + ' lessons', data: v.data })),
+        ...(!original.custom && s.overrides[E.id] && !vers.some(v => JSON.stringify(v.data) === JSON.stringify(original)) ? [{ when: 'Original', label: 'The version that came with the site', title: original.title, meta: (original.lessons || []).length + ' lessons', data: original }] : [])]
+        .map(v => ({ ...v, onRestore: () => { if (E.dirty && !confirm('Replace your unsaved changes with this version?')) return; this.setState(st => ({ editing: { ...st.editing, draft: clone(v.data), li: 0, dirty: true }, verOpen: false })); this.logAudit(E.id, v.title, 'Restored version', v.when); this.toastMsg('Version loaded into the editor. Save a draft or publish to keep it.'); },
+          onView: () => { this.setState(st => ({ verPeek: st.verPeek === v.when ? null : v.when })); }, open: s.verPeek === v.when, lessons: (v.data.lessons || []).map((l, j) => ({ t: (j + 1) + '. ' + (l.title || 'Untitled') + ' · ' + (TYPE_LABEL[l.type] || l.type) })) })),
+      verNone: !vers.length && !(!original.custom && s.overrides[E.id]),
       edCanReset: !original.custom && !!s.overrides[E.id],
       deleteFromEditor: () => this.setState({ delId: E.id }),
       ed: { title: b(['title']), cat: b(['cat']), mins: b(['mins'], num), summary: b(['summary']), recert: b(['recertMonths'], num) },
@@ -2917,15 +3028,16 @@ class Component extends DCLogic {
       lx: L ? { url: b(lp('url')), nameEntry: b(lp('nameEntry')), desc: b(lp('desc')), proof: b(lp('proof'), { out: (x) => x || 'confirm', in: (x) => x }) } : {},
       formQCount: L && L.type === 'form' ? (L.questions || []).length : 0,
       edDraftFlag: !!d.draft, toggleDraftFlag: () => this.edit(dd => { dd.draft = !dd.draft; }),
-      closeEditor: () => { if (E.dirty && !confirm('Discard unsaved changes?')) return; this.setState({ editing: null }); },
-      saveEdits: () => { persist(); this.toastMsg('Saved. Learners see the changes next time they open the module.'); },
-      resetModule: () => { if (!confirm('Undo all edits and go back to the original module?')) return; this.setState(st => { const o = { ...st.overrides }; delete o[E.id]; return { overrides: o, editing: { ...st.editing, draft: clone(original), li: 0, dirty: false } }; }); this.logAudit(E.id, d.title, 'Reset to original', ''); this.toastMsg('Module reset to the original'); },
+      closeEditor: () => { if (E.dirty && !confirm('Leave without saving? Your unsaved changes will be lost.')) return; this.setState({ editing: null, verOpen: false }); },
+      saveEdits: () => { saveDraft(); this.toastMsg('Draft saved'); },
+      resetModule: () => { if (!confirm('Undo all edits and go back to the original module?')) return; this.setState(st => { const o = { ...st.overrides }; delete o[E.id]; const vs = ((st.moduleVersions || {})[E.id] || []).slice(); if (st.overrides[E.id]) vs.unshift({ at: Date.now(), by: me0, data: clone(st.overrides[E.id]) }); const md = { ...(st.moduleDrafts || {}) }; delete md[E.id]; return { moduleDrafts: md, moduleVersions: { ...(st.moduleVersions || {}), [E.id]: vs.slice(0, 12) }, overrides: o, editing: { ...st.editing, draft: clone(original), li: 0, dirty: false } }; }); this.logAudit(E.id, d.title, 'Reset to original', ''); this.toastMsg('Module reset to the original'); },
       previewModule: () => {
-        persist();
+        if (E.dirty) saveDraft();
+        try { localStorage.setItem('wsi-module-preview', JSON.stringify({ id: E.id, at: Date.now(), mod: clone(d) })); } catch (e) {}
         if (window.__wsiDemo) {
-          try { const k = 'wsi-training-v2', t = JSON.parse(localStorage.getItem(k) || '{}'); if (!t.name) t.name = (ACCOUNTS[s.role] || {}).name || 'Preview'; t.pendingModule = E.id; localStorage.setItem(k, JSON.stringify(t)); } catch (e) {}
+          try { const k = 'wsi-training-v2', t = JSON.parse(localStorage.getItem(k) || '{}'); if (!t.name) t.name = (ACCOUNTS[s.role] || {}).name || 'Preview'; t.pendingModule = E.id; t.previewDraft = true; localStorage.setItem(k, JSON.stringify(t)); } catch (e) {}
           setTimeout(() => window.__wsiDemo('learner'), 50);
-        } else window.open('WSI Training.dc.html?module=' + E.id, '_blank');
+        } else window.open('WSI Training.dc.html?module=' + E.id + '&preview=1', '_blank');
       },
       lessonRows: d.lessons.map((l, i) => ({
         num: i + 1, title: l.title || 'Untitled', typeLabel: TYPE_LABEL[l.type],
@@ -3185,7 +3297,7 @@ class Component extends DCLogic {
       const on = !!s.auto[m.id];
       const lastEd = (s.audit || []).find(e => e.moduleId === m.id);
       const picked = !!(s.modSel || {})[m.id];
-      return { onHistory: () => this.setState({ auditFor: m.id }), picked, rowBg: picked ? TINT : 'transparent', onPick: () => this.setState(st => ({ modSel: { ...(st.modSel || {}), [m.id]: !(st.modSel || {})[m.id] } })), title: m.title, cat: m.cat, mins: m.mins, isCustom: !!m.custom, hasUpdated: !!lastEd, updated: lastEd ? 'Updated ' + fmtTs(lastEd.at) + ' by ' + lastEd.by : '', avgScore: mAvg == null ? '—' : mAvg + '%', avgColor: mAvg == null ? '#A9AAA8' : mAvg < PASS ? DEEP : INK, isEdited: !m.custom && !!s.overrides[m.id], onDelete: () => this.setState({ delId: m.id }), onEdit: () => this.setState({ editing: { id: m.id, draft: clone(m), li: 0, dirty: false } }), assigned: as.length, pct, pctWidth: pct + '%', overdue: od,
+      return { onHistory: () => this.setState({ auditFor: m.id }), picked, rowBg: picked ? TINT : 'transparent', onPick: () => this.setState(st => ({ modSel: { ...(st.modSel || {}), [m.id]: !(st.modSel || {})[m.id] } })), title: m.title, cat: m.cat, mins: m.mins, isCustom: !!m.custom, hasUpdated: !!lastEd, updated: lastEd ? 'Updated ' + fmtTs(lastEd.at) + ' by ' + lastEd.by : '', avgScore: mAvg == null ? '—' : mAvg + '%', avgColor: mAvg == null ? '#A9AAA8' : mAvg < PASS ? DEEP : INK, isEdited: !m.custom && !!s.overrides[m.id], onDelete: () => this.setState({ delId: m.id }), onEdit: () => this.setState({ editing: { id: m.id, draft: clone((s.moduleDrafts || {})[m.id] || m), li: 0, dirty: false } }), assigned: as.length, pct, pctWidth: pct + '%', overdue: od,
         overdueColor: od ? DEEP : '#A9AAA8', autoLabel: on ? 'On' : 'Off',
         switchBg: on ? RED : '#C9CAC8', switchJustify: on ? 'flex-end' : 'flex-start',
         autoDisabled: !canAssign, autoOpacity: canAssign ? 1 : 0.5,
@@ -3229,6 +3341,7 @@ class Component extends DCLogic {
       logo, isSignin: !s.role, signedIn: !!s.role, me,
       toLearner: (e) => { if (window.__wsiDemo) { e.preventDefault(); window.__wsiDemo('learner'); } },
       isStaffView: s.role === 'manager' || s.role === 'admin',
+      ...this.outboxVals(),
       ...this.extraVals({ USERS, ASG, ASG0, MODULES, modById, pathById, isNew, me, canAssign, bmM }),
       ...(this._sortVals || {}),
       isLearner: s.role === 'learner', isPeople: canAssign && s.tab === 'people' && !s.editing, isModules: canAssign && s.tab === 'modules' && !s.editing,
