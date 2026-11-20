@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WSI SOP Library</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap">
+<script src="wsi-store.js"></script>
+<script src="wsi-assets.js"></script>
+<script src="wsi-kb-seed.js"></script>
+<script src="wsi-kb-text.js"></script>
+<style>
+body { margin: 0; background: #F5F5F4; color: #262626; font-family: 'Open Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: #C62B1C; } a:hover { color: #9E2216; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #EE3826; outline-offset: 2px; }
+button:disabled { cursor: not-allowed; opacity: 0.6; }
+.pup-stage svg { overflow: visible; }
+.pup-tail { transform-box: view-box; transform-origin: 134px 116px; animation: pupWag 0.5s ease-in-out infinite alternate; }
+.pup-eyes { transform-box: view-box; transform-origin: 100px 54px; animation: pupBlink 4.5s infinite; }
+.pup-head { transform-box: view-box; transform-origin: 100px 100px; animation: pupTilt 6s ease-in-out infinite; }
+.pup-paper { opacity: 0; transition: opacity 0.2s; }
+.pup-tongue { transition: opacity 0.2s; }
+.is-found .pup-paper { opacity: 1; }
+.is-found .pup-tongue { opacity: 0; }
+.is-found .pup-run { animation: pupHop 0.5s ease-out; }
+.is-fetching .pup-run { animation: pupDash 0.85s ease-in-out; }
+.is-fetching .pup-tail { animation-duration: 0.16s; }
+.is-none .pup-head { animation: none; transform: rotate(9deg); }
+.is-none .pup-tail { animation-duration: 1.4s; }
+@keyframes pupWag { from { transform: rotate(-14deg); } to { transform: rotate(16deg); } }
+@keyframes pupBlink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+@keyframes pupTilt { 0%, 70%, 100% { transform: rotate(0); } 78%, 88% { transform: rotate(-7deg); } }
+@keyframes pupDash { 0% { transform: translateX(0); } 42% { transform: translateX(260px); } 43% { transform: translateX(-260px); } 100% { transform: translateX(0); } }
+@keyframes pupHop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-14px); } }
+@media (prefers-reduced-motion: reduce) { .pup-stage * { animation: none !important; } }
+</style>
+</helmet>
+
+<div style="min-height: {{ minH }}; display: flex; flex-direction: column;">
+  <sc-if value="{{ standalone }}" hint-placeholder-val="{{ true }}">
+  <header style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px clamp(16px, 4vw, 48px); background: #FFFFFF; border-bottom: 1px solid #E3E3E1;">
+    <button onClick="{{ goHome }}" style="display: flex; align-items: center; gap: 14px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;">
+      <img src="{{ logo }}" alt="WSI Recruitment and Staffing" style="height: 42px;">
+      <span style="width: 1px; height: 28px; background: #E3E3E1;"></span>
+      <span style="font-size: 17px; font-weight: 700; color: #5C5D5D;">SOP Library</span>
+    </button>
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <span style="font-size: 13px; color: #5C5D5D;">{{ countLabel }}</span>
+      <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ toggleManage }}" aria-pressed="{{ manage }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; border: 1.5px solid #262626; background: {{ manageBg }}; color: {{ manageColor }}; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>{{ manageLabel }}</button></sc-if>
+    </div>
+  </header>
+  </sc-if>
+
+  <main style="flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; box-sizing: border-box; padding: {{ mainPad }}; display: flex; flex-direction: column; gap: 28px;">
+
+    <sc-if value="{{ embedded }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="font-size: 14px; color: #5C5D5D;">{{ countLabel }}</span>
+        <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ toggleManage }}" aria-pressed="{{ manage }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; border: 1.5px solid #262626; background: {{ manageBg }}; color: {{ manageColor }}; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>{{ manageLabel }}</button></sc-if>
+      </div>
+    </sc-if>
+
+    <!-- HERO: Scout + search -->
+    <section aria-label="Search SOPs" style="display: flex; flex-wrap: wrap; align-items: center; gap: clamp(16px, 3vw, 40px); padding: clamp(20px, 3vw, 32px); border-radius: 20px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+      <div style="flex: 0 1 230px; display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 180px; margin: 0 auto;">
+        <div aria-live="polite" style="position: relative; max-width: 230px; padding: 10px 14px; border-radius: 14px; background: #262626; color: #FFFFFF; font-size: 13px; font-weight: 600; line-height: 1.4; text-align: center;">{{ bubble }}<span style="position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; margin-left: -7px; background: #262626; transform: rotate(45deg);"></span></div>
+        <div class="pup-stage {{ pupClass }}" style="width: 190px; height: 160px; overflow: hidden;">
+          <svg viewBox="0 0 200 170" width="190" height="160" role="img" aria-label="Scout, the WSI puppy">
+            <ellipse cx="100" cy="160" rx="58" ry="7" fill="#262626" opacity="0.08"></ellipse>
+            <g class="pup-run">
+              <g class="pup-tail"><path d="M134 116 Q170 108 166 74" stroke="#1F1D1C" stroke-width="15" fill="none" stroke-linecap="round"></path><path d="M167 86 Q168 78 166 74" stroke="#B9733A" stroke-width="11" fill="none" stroke-linecap="round"></path></g>
+              <ellipse cx="100" cy="124" rx="43" ry="32" fill="#1F1D1C"></ellipse>
+              <ellipse cx="68" cy="134" rx="13" ry="17" fill="#8C5A32"></ellipse>
+              <ellipse cx="132" cy="134" rx="13" ry="17" fill="#8C5A32"></ellipse>
+              <path d="M90 108 Q100 104 110 108 Q114 132 100 150 Q86 132 90 108 Z" fill="#FAF7F2"></path>
+              <ellipse cx="79" cy="154" rx="13" ry="8" fill="#B9733A"></ellipse>
+              <ellipse cx="121" cy="154" rx="13" ry="8" fill="#B9733A"></ellipse>
+              <path d="M74 152v5M80 151v6M86 152v5M114 152v5M120 151v6M126 152v5" stroke="#6E4425" stroke-width="1.5" stroke-linecap="round"></path>
+              <path d="M68 97 Q100 114 132 97" stroke="#EE3826" stroke-width="8" fill="none" stroke-linecap="round"></path>
+              <circle cx="100" cy="109" r="3.5" fill="none" stroke="#9A9B99" stroke-width="2"></circle>
+              <rect x="94.5" y="111" width="11" height="18" rx="5" fill="#B5B6B4" stroke="#7D7E7D" stroke-width="1.5"></rect>
+              <g class="pup-head">
+                <path d="M64 50 L54 4 Q80 14 92 34 Z" fill="#1F1D1C"></path>
+                <path d="M66 42 L60 15 Q76 22 84 34 Z" fill="#C98A6A"></path>
+                <g transform="translate(122 50) scale(0.8) translate(-122 -50)"><path d="M110 42 L127 12 L151 15 L135 58 Z" fill="#1F1D1C" stroke="#1F1D1C" stroke-width="3" stroke-linejoin="round"></path><path d="M120 42 L130 17 L146 19 L136 52 Z" fill="#C98A6A"></path><path d="M127 12 L151 15 L164 38 Z" fill="#2E2A28" stroke="#2E2A28" stroke-width="3" stroke-linejoin="round"></path><path d="M128 13 L150 16" stroke="#4A4542" stroke-width="2" stroke-linecap="round"></path></g>
+                <circle cx="100" cy="62" r="39" fill="#1F1D1C"></circle>
+                <ellipse cx="76" cy="75" rx="14" ry="11" fill="#B9733A"></ellipse>
+                <ellipse cx="124" cy="75" rx="14" ry="11" fill="#B9733A"></ellipse>
+                <ellipse cx="84" cy="41" rx="6.5" ry="4.2" fill="#C7864A" transform="rotate(-12 84 41)"></ellipse>
+                <ellipse cx="116" cy="41" rx="6.5" ry="4.2" fill="#C7864A" transform="rotate(12 116 41)"></ellipse>
+                <ellipse cx="100" cy="80" rx="20" ry="15" fill="#B7B0A7"></ellipse>
+                <path d="M93 46 Q100 44 107 46 L106 70 Q100 73 94 70 Z" fill="#1F1D1C"></path>
+                <ellipse cx="100" cy="93" rx="10" ry="6" fill="#FAF7F2"></ellipse>
+                <g class="pup-eyes">
+                  <circle cx="84" cy="54" r="6" fill="#4A2C17"></circle>
+                  <circle cx="116" cy="54" r="6" fill="#4A2C17"></circle>
+                  <circle cx="84" cy="54" r="3.4" fill="#120C08"></circle>
+                  <circle cx="116" cy="54" r="3.4" fill="#120C08"></circle>
+                  <circle cx="86" cy="52" r="1.8" fill="#FFFFFF"></circle>
+                  <circle cx="118" cy="52" r="1.8" fill="#FFFFFF"></circle>
+                </g>
+                <ellipse cx="100" cy="70" rx="9" ry="6.5" fill="#121110"></ellipse>
+                <ellipse cx="97" cy="68" rx="2.5" ry="1.4" fill="#5C5D5D"></ellipse>
+                <path d="M86 80 Q100 97 114 80 Q100 86 86 80 Z" fill="#3A1E1E"></path>
+                <path class="pup-tongue" d="M94 86 Q100 103 106 86 Z" fill="#F08C8C"></path>
+                <g class="pup-paper" transform="rotate(-12 100 90)">
+                  <rect x="74" y="80" width="52" height="32" rx="3" fill="#FFFFFF" stroke="#262626" stroke-width="2"></rect>
+                  <path d="M82 89h28M82 96h36M82 103h22" stroke="#EE3826" stroke-width="2.5" stroke-linecap="round"></path>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
+        <h1 style="margin: 0; font-weight: 800; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; letter-spacing: -0.02em; text-wrap: pretty;">Need an SOP? Scout will fetch it.</h1>
+        <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3F4040; max-width: 560px;">Search every procedure by title, topic, or words inside the document.</p>
+        <form onSubmit="{{ onSearch }}" role="search" style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <label style="flex: 1 1 280px; display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 0 16px; border: 2px solid #262626; border-radius: 12px; background: #FFFFFF; box-sizing: border-box;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5C5D5D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Search SOPs</span>
+            <input value="{{ q }}" onChange="{{ onQ }}" placeholder="Try “payroll hours” or “post a job”" style="flex: 1; min-width: 0; border: 0; outline: none; font: inherit; font-size: 17px; background: transparent; color: #262626;">
+            <sc-if value="{{ hasQ }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ clearQ }}" aria-label="Clear search" style="display: flex; padding: 4px; border: 0; background: none; cursor: pointer; color: #5C5D5D;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></sc-if>
+          </label>
+          <button type="submit" style="min-height: 54px; padding: 0 28px; border: 0; border-radius: 12px; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer;" style-hover="background: #B42617;">Fetch!</button>
+        </form>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+          <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5D5D;">Popular</span>
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+            <button type="button" onClick="{{ c.pick }}" style="padding: 6px 12px; border-radius: 999px; border: 1.5px solid #C9CAC8; background: #FFFFFF; color: #262626; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;" style-hover="border-color: #EE3826; background: #FDECE9;">{{ c.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ hasNotice }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 16px; border-radius: 10px; background: #262626; color: #FFFFFF; font-size: 14px;"><span>{{ notice }}</span><button onClick="{{ clearNotice }}" aria-label="Dismiss" style="display: flex; padding: 4px; border: 0; background: none; color: #FFFFFF; cursor: pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>
+    </sc-if>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start;">
+      <!-- SECTIONS -->
+      <nav aria-label="SOP sections" style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 4px;">
+        <span style="padding: 0 12px 6px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #5C5D5D;">Sections</span>
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+          <button onClick="{{ n.pick }}" aria-current="{{ n.current }}" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 0; background: {{ n.bg }}; color: #262626; font: inherit; font-size: 14px; font-weight: {{ n.weight }}; text-align: left; cursor: pointer;" style-hover="background: #EBEBEA;">
+            <span style="flex: none; width: 10px; height: 10px; border-radius: 3px; background: {{ n.color }};"></span>
+            <span style="flex: 1; min-width: 0;">{{ n.name }}</span>
+            <span style="font-size: 12px; font-weight: 700; color: #5C5D5D;">{{ n.count }}</span>
+          </button>
+        </sc-for>
+        <sc-if value="{{ manage }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ newSop }}" style="margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 14px; border-radius: 10px; border: 0; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: #B42617;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Add or upload SOPs</button>
+        </sc-if>
+      </nav>
+
+      <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px;">
+
+        <!-- ADD / EDIT SOP -->
+        <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+          <form onSubmit="{{ saveSop }}" style="display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 16px; background: #FFFFFF; border: 1.5px solid #262626;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <h2 style="margin: 0; font-size: 22px; font-weight: 800;">{{ formHeading }}</h2>
+              <button type="button" onClick="{{ cancelForm }}" style="padding: 7px 14px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #262626;">Cancel</button>
+            </div>
+            <label style="display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px; border: 2px dashed #C9CAC8; background: #FAFAF9; cursor: pointer;">
+              <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C62B1C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>{{ fileLabel }}</span>
+              <span style="font-size: 13px; color: #5C5D5D;">PDF, Word (.docx) or text. Pick several to add them all at once. Scout reads the text so it's searchable.</span>
+              <input type="file" multiple accept=".pdf,.docx,.txt,.md" onChange="{{ onFiles }}" style="font: inherit; font-size: 13px;">
+              <sc-if value="{{ hasPicked }}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; font-weight: 600; color: #262626;">{{ pickedLabel }}</span></sc-if>
+            </label>
+            <sc-if value="{{ showTitle }}" hint-placeholder-val="{{ true }}">
+              <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 13px; font-weight: 700;">Title</span><input value="{{ form.title }}" onChange="{{ onTitle }}" placeholder="e.g. Submitting Payroll Hours" style="min-height: 44px; padding: 0 14px; font: inherit; font-size: 15px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"></label>
+            </sc-if>
+            <sc-if value="{{ multiPicked }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 13px; color: #3F4040; padding: 10px 12px; border-radius: 8px; background: #F5F5F4;">Each file becomes its own SOP, titled from its file name. You can edit any of them afterwards.</span>
+            </sc-if>
+            <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+              <label style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 13px; font-weight: 700;">Section</span><select value="{{ form.sectionId }}" onChange="{{ onSection }}" style="min-height: 44px; padding: 0 10px; font: inherit; font-size: 15px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"><sc-for list="{{ sectionOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.id }}">{{ o.name }}</option></sc-for></select></label>
+              <label style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 13px; font-weight: 700;">Search words <span style="font-weight: 500; color: #5C5D5D;">(comma separated)</span></span><input value="{{ form.tags }}" onChange="{{ onTags }}" placeholder="payroll, hours, timecards" style="min-height: 44px; padding: 0 14px; font: inherit; font-size: 15px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"></label>
+            </div>
+            <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 13px; font-weight: 700;">One-line summary</span><input value="{{ form.summary }}" onChange="{{ onSummary }}" placeholder="What this SOP helps someone do" style="min-height: 44px; padding: 0 14px; font: inherit; font-size: 15px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"></label>
+            <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 13px; font-weight: 700;">Steps or notes <span style="font-weight: 500; color: #5C5D5D;">(optional, or write the whole SOP here)</span></span><textarea value="{{ form.body }}" onChange="{{ onBody }}" rows="7" placeholder="1. Open Avionte…" style="padding: 10px 14px; font: inherit; font-size: 15px; line-height: 1.5; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF; resize: vertical;"></textarea></label>
+            <sc-if value="{{ hasFormErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size: 14px; font-weight: 600; color: #9E2216;">{{ formErr }}</span></sc-if>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+              <button type="submit" disabled="{{ formBusy }}" style="min-height: 46px; padding: 0 26px; border: 0; border-radius: 10px; background: #D42E1D; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer;" style-hover="background: #B42617;">{{ saveLabel }}</button>
+            </div>
+          </form>
+        </sc-if>
+
+        <!-- SOP DETAIL -->
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+          <article style="display: flex; flex-direction: column; gap: 18px; padding: clamp(20px, 3vw, 32px); border-radius: 16px; background: #FFFFFF; border: 1px solid #E3E3E1;">
+            <button onClick="{{ closeDetail }}" style="align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #C62B1C; cursor: pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>{{ backLabel }}</button>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #3F4040;"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{ d.color }};"></span>{{ d.sectionName }}</span>
+              <h2 style="margin: 0; font-size: clamp(24px, 3vw, 32px); font-weight: 800; line-height: 1.15; letter-spacing: -0.01em;">{{ d.title }}</h2>
+              <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3F4040;">{{ d.summary }}</p>
+              <span style="font-size: 12px; color: #5C5D5D;">{{ d.updated }}</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              <sc-if value="{{ d.hasFile }}" hint-placeholder-val="{{ true }}">
+                <a href="{{ d.viewUrl }}" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; background: #D42E1D; color: #FFFFFF; font-size: 14px; font-weight: 700; text-decoration: none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>Open document</a>
+                <a href="{{ d.viewUrl }}" download="{{ d.fileName }}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: 1.5px solid #262626; color: #262626; font-size: 14px; font-weight: 700; text-decoration: none;">Download</a>
+              </sc-if>
+              <sc-if value="{{ manage }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ d.edit }}" style="padding: 10px 18px; border-radius: 10px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: #262626;">Edit</button>
+                <button onClick="{{ d.del }}" style="padding: 10px 18px; border-radius: 10px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: #9E2216;">{{ d.delLabel }}</button>
+              </sc-if>
+            </div>
+            <sc-if value="{{ d.hasBody }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 16px 18px; border-radius: 12px; background: #F5F5F4; font-size: 15px; line-height: 1.6; white-space: pre-line;">{{ d.body }}</div>
+            </sc-if>
+            <sc-if value="{{ d.isPdf }}" hint-placeholder-val="{{ true }}">
+              <iframe src="{{ d.viewUrl }}" title="{{ d.title }}" style="width: 100%; height: 72vh; min-height: 420px; border: 1px solid #E3E3E1; border-radius: 12px; background: #F5F5F4;"></iframe>
+            </sc-if>
+            <sc-if value="{{ d.hasText }}" hint-placeholder-val="{{ false }}">
+              <details style="border-top: 1px solid #E3E3E1; padding-top: 14px;">
+                <summary style="cursor: pointer; font-size: 14px; font-weight: 700; color: #3F4040;">Show the document's text</summary>
+                <div style="margin-top: 12px; max-height: 480px; overflow: auto; font-size: 14px; line-height: 1.6; color: #3F4040; white-space: pre-line;">{{ d.text }}</div>
+              </details>
+            </sc-if>
+          </article>
+        </sc-if>
+
+        <!-- SEARCH RESULTS -->
+        <sc-if value="{{ isResults }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+              <h2 style="margin: 0; font-size: 20px; font-weight: 800;">{{ resultsHeading }}</h2>
+              <button onClick="{{ clearQ }}" style="padding: 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #C62B1C; cursor: pointer;">Clear search</button>
+            </div>
+            <sc-if value="{{ isFetching }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 36px; border-radius: 14px; background: #FFFFFF; border: 1px dashed #C9CAC8; text-align: center; font-size: 15px; color: #5C5D5D;">Scout is sniffing through the library…</div>
+            </sc-if>
+            <sc-for list="{{ results }}" as="r" hint-placeholder-count="3">
+              <button onClick="{{ r.open }}" style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; border-radius: 14px; border: 1px solid #E3E3E1; background: #FFFFFF; font: inherit; color: #262626; text-align: left; cursor: pointer;" style-hover="border-color: #EE3826; box-shadow: 0 6px 18px rgba(38,38,38,0.08);">
+                <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #3F4040;"><span style="width: 9px; height: 9px; border-radius: 3px; background: {{ r.color }};"></span>{{ r.sectionName }}<span style="color: #7D7E7D;">·</span><span style="font-weight: 600; color: #5C5D5D;">{{ r.why }}</span></span>
+                <span style="font-size: 17px; font-weight: 800; line-height: 1.3;">{{ r.title }}</span>
+                <span style="font-size: 14px; line-height: 1.55; color: #3F4040;"><sc-for list="{{ r.parts }}" as="p" hint-placeholder-count="3"><span style="background: {{ p.bg }}; font-weight: {{ p.fw }}; border-radius: 3px;">{{ p.t }}</span></sc-for></span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 28px; border-radius: 14px; background: #FFFFFF; border: 1px dashed #C9CAC8;">
+                <strong style="font-size: 16px;">No SOPs matched “{{ activeQ }}”.</strong>
+                <span style="font-size: 14px; color: #3F4040; line-height: 1.5;">Try a shorter word (like “payroll” instead of “payroll submission process”), or browse a section on the left. If the SOP doesn't exist yet, ask a manager to add it.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- MANAGE SECTIONS -->
+        <sc-if value="{{ showSecMgr }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 16px; background: #FFFFFF; border: 1.5px solid #262626;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <h2 style="margin: 0; font-size: 18px; font-weight: 800;">Manage sections</h2>
+              <span style="font-size: 13px; color: #5C5D5D;">Rename, reorder or remove sections. Deleting a section moves its SOPs to the section above it.</span>
+            </div>
+            <sc-for list="{{ secRows }}" as="s" hint-placeholder-count="4">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid #EBEBEA;">
+                <span style="flex: none; width: 12px; height: 12px; border-radius: 3px; background: {{ s.color }};"></span>
+                <label style="flex: 1 1 180px; display: flex;"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Section name</span><input value="{{ s.name }}" onChange="{{ s.onName }}" style="flex: 1; min-width: 0; min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; font-weight: 700; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"></label>
+                <label style="flex: 2 1 220px; display: flex;"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Section description</span><input value="{{ s.desc }}" onChange="{{ s.onDesc }}" placeholder="Short description" style="flex: 1; min-width: 0; min-height: 38px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"></label>
+                <span style="font-size: 12px; color: #5C5D5D; min-width: 52px;">{{ s.countLabel }}</span>
+                <button onClick="{{ s.up }}" aria-label="Move section up" style="display: flex; padding: 8px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; cursor: pointer; color: #262626;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"></path></svg></button>
+                <button onClick="{{ s.down }}" aria-label="Move section down" style="display: flex; padding: 8px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; cursor: pointer; color: #262626;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+                <button onClick="{{ s.del }}" style="padding: 8px 12px; border-radius: 8px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; color: #9E2216;">{{ s.delLabel }}</button>
+              </div>
+            </sc-for>
+            <form onSubmit="{{ addSection }}" style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; border-top: 1px solid #EBEBEA;">
+              <label style="flex: 1 1 180px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; font-weight: 700;">New section</span><input value="{{ secName }}" onChange="{{ onSecName }}" placeholder="e.g. Safety & Workers' Comp" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"></label>
+              <label style="flex: 2 1 220px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; font-weight: 700;">Description</span><input value="{{ secDesc }}" onChange="{{ onSecDesc }}" placeholder="What belongs here" style="min-height: 40px; padding: 0 10px; font: inherit; font-size: 14px; border: 1.5px solid #C9CAC8; border-radius: 8px; background: #FFFFFF;"></label>
+              <button type="submit" disabled="{{ secEmpty }}" style="align-self: flex-end; min-height: 40px; padding: 0 18px; border: 0; border-radius: 8px; background: #262626; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">Add section</button>
+            </form>
+          </div>
+        </sc-if>
+
+        <!-- BROWSE -->
+        <sc-if value="{{ isBrowse }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <h2 style="margin: 0; font-size: 22px; font-weight: 800;">{{ browseTitle }}</h2>
+              <span style="font-size: 14px; color: #5C5D5D;">{{ browseDesc }}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px;">
+              <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+                <div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E3E3E1; border-top: 4px solid {{ c.color }};">
+                  <span style="font-size: 12px; font-weight: 700; color: #3F4040;">{{ c.sectionName }}</span>
+                  <button onClick="{{ c.open }}" style="padding: 0; border: 0; background: none; font: inherit; font-size: 16px; font-weight: 800; line-height: 1.3; color: #262626; text-align: left; cursor: pointer;" style-hover="color: #C62B1C;">{{ c.title }}</button>
+                  <span style="flex: 1; font-size: 13px; line-height: 1.5; color: #3F4040;">{{ c.summary }}</span>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 12px; color: #5C5D5D;">{{ c.meta }}</span>
+                    <sc-if value="{{ c.manage }}" hint-placeholder-val="{{ false }}">
+                      <span style="display: flex; gap: 6px;"><button onClick="{{ c.edit }}" style="padding: 5px 10px; border-radius: 6px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #262626;">Edit</button><button onClick="{{ c.del }}" style="padding: 5px 10px; border-radius: 6px; border: 1.5px solid #C9CAC8; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: #9E2216;">{{ c.delLabel }}</button></span>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ emptySection }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 28px; border-radius: 14px; background: #FFFFFF; border: 1px dashed #C9CAC8; font-size: 14px; color: #3F4040;">{{ emptyText }}</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"embedded":{"editor":"boolean","default":false},"canEdit":{"editor":"boolean","default":true}}'>
+const KB_KEY = 'wsi-kb';
+const KB_COLORS = ['#EE3826', '#3B6FB6', '#B4681E', '#5B7F3A', '#7A4FA0', '#0F7C7C', '#5C5D5D'];
+const KB_STOP = new Set(['the', 'a', 'an', 'to', 'how', 'do', 'does', 'i', 'for', 'of', 'in', 'on', 'my', 'what', 'is', 'and', 'with', 'where', 'can', 'we', 'you', 'it', 'or', 'at', 'when', 'who', 'sop', 'sops', 'about', 'find', 'need']);
+const KB_SYN = { pay: ['payroll', 'wage'], payroll: ['pay', 'hours', 'timecard'], hour: ['timecard', 'time'], timecard: ['hours', 'kronos'], time: ['hours'], post: ['posting', 'indeed', 'talroo'], job: ['job order'], hire: ['direct hire'], client: ['company', 'account'], customer: ['client'], onboard: ['onboarding', 'new client'], medical: ['privacy', 'hipaa'], privacy: ['private', 'medical'], break: ['lunch', 'nursing'], pump: ['nursing'], accommodat: ['accommodation', 'ada'], audit: ['report', 'missing hours'], terminat: ['termination', 'end assignment'], visit: ['onsite', 'tour'], ad: ['posting', 'indeed'] };
+const kbStem = (w) => (w.length > 5 ? w.replace(/(ings|ing|ed|es|s)$/, '') : w.length > 3 ? w.replace(/s$/, '') : w);
+const kbEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const kbFmtDate = (t) => { try { return new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch (e) { return ''; } };
+
+class Component extends DCLogic {
+  state = { kb: null, q: '', activeQ: '', pup: 'idle', section: 'all', openId: null, viewUrl: '', manage: false, form: null, picked: [], formErr: '', formBusy: false, secName: '', secDesc: '', confirm: '', notice: '' };
+
+  componentDidMount() {
+    let kb = null;
+    try { kb = JSON.parse(localStorage.getItem(KB_KEY) || 'null'); } catch (e) {}
+    if (!kb || !Array.isArray(kb.sections) || !Array.isArray(kb.sops)) {
+      kb = JSON.parse(JSON.stringify(window.WSI_KB_SEED || { v: 1, sections: [{ id: 'general', name: 'General', desc: '', color: KB_COLORS[0] }], sops: [] }));
+      this.persist(kb);
+    }
+    this.setState({ kb });
+    if (window.__wsiScoutHide) window.__wsiScoutHide(true);
+  }
+  componentWillUnmount() { if (window.__wsiScoutHide) window.__wsiScoutHide(false); clearTimeout(this._deb); clearTimeout(this._ft); clearTimeout(this._cf); if (this._blob) URL.revokeObjectURL(this._blob); }
+
+  persist(kb) {
+    try { localStorage.setItem(KB_KEY, JSON.stringify(kb)); }
+    catch (e) { this.setState({ notice: "This browser's storage is full, so that change wasn't saved. Remove a large file or connect WSI storage." }); }
+  }
+  update(fn) { const kb = fn(JSON.parse(JSON.stringify(this.state.kb))); this.persist(kb); this.setState({ kb }); return kb; }
+  who() { try { return JSON.parse(localStorage.getItem('wsi-training-v2') || '{}').name || 'a manager'; } catch (e) { return 'a manager'; } }
+  sec(id) { return (this.state.kb.sections || []).find((s) => s.id === id) || { name: 'Unsorted', color: '#7D7E7D', desc: '' }; }
+
+  // ---------- search ----------
+  terms(q) {
+    const words = String(q || '').toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 1 && !KB_STOP.has(w));
+    return words.map((w) => { const s = kbStem(w); return { word: w, stem: s, syn: (KB_SYN[s] || KB_SYN[w] || []) }; });
+  }
+  search(q) {
+    const kb = this.state.kb; if (!kb) return [];
+    const T = this.terms(q); if (!T.length) return [];
+    const phrase = String(q).toLowerCase().trim();
+    const out = [];
+    kb.sops.forEach((s) => {
+      const f = { title: (s.title || '').toLowerCase(), tags: (s.tags || []).join(' ').toLowerCase(), sec: this.sec(s.sectionId).name.toLowerCase(), summary: (s.summary || '').toLowerCase(), body: ((s.body || '') + '\n' + (s.text || '')).toLowerCase(), file: (s.fileName || '').toLowerCase() };
+      let score = 0, matched = 0, where = '';
+      T.forEach((t) => {
+        let ts = 0;
+        const hit = (term, w) => {
+          if (f.title.includes(term)) { ts += 10 * w; where = where || 'title'; }
+          if (f.tags.includes(term)) { ts += 6 * w; where = where || 'tags'; }
+          if (f.summary.includes(term)) { ts += 4 * w; where = where || 'summary'; }
+          if (f.sec.includes(term)) ts += 3 * w;
+          if (f.file.includes(term)) ts += 2 * w;
+          const n = Math.min(6, f.body.split(term).length - 1);
+          if (n) { ts += n * w; where = where || 'document'; }
+        };
+        hit(t.stem, 1);
+        t.syn.forEach((x) => hit(x, 0.4));
+        if (ts > 0) matched++;
+        score += ts;
+      });
+      if (!matched) return;
+      score *= matched / T.length;
+      if (phrase.length > 4 && (f.title.includes(phrase) || f.body.includes(phrase))) score += 12;
+      out.push({ s, score, where });
+    });
+    return out.sort((a, b) => b.score - a.score).slice(0, 25);
+  }
+  snippet(s, q) {
+    const T = this.terms(q);
+    const keys = T.map((t) => t.stem).concat(...T.map((t) => t.syn)).filter(Boolean);
+    const src = ((s.body || '') + ' ' + (s.text || '')).replace(/\s+/g, ' ').trim();
+    const low = src.toLowerCase();
+    let idx = -1;
+    keys.some((k) => { idx = low.indexOf(k); return idx >= 0; });
+    let snip;
+    if (idx < 0) snip = s.summary || src.slice(0, 200);
+    else {
+      let a = Math.max(0, idx - 80), b = Math.min(src.length, idx + 180);
+      while (a > 0 && src[a - 1] !== ' ' && idx - a < 100) a--;
+      while (b < src.length && src[b] !== ' ' && b - idx < 220) b++;
+      snip = (a > 0 ? '…' : '') + src.slice(a, b).trim() + (b < src.length ? '…' : '');
+    }
+    if (!keys.length) return [{ t: snip, bg: 'transparent', fw: 'inherit' }];
+    const re = new RegExp('(' + keys.slice().sort((x, y) => y.length - x.length).map((k) => kbEsc(k) + '[a-z]*').join('|') + ')', 'ig');
+    return snip.split(re).filter((x) => x !== '').map((t, i) => (re.test(t) && (re.lastIndex = 0, true)) ? { t, bg: '#FDE2C8', fw: '700' } : { t, bg: 'transparent', fw: 'inherit' });
+  }
+  fetchNow(q) {
+    clearTimeout(this._deb); clearTimeout(this._ft);
+    if (!String(q).trim()) return this.setState({ activeQ: '', pup: 'idle' });
+    this.setState({ pup: 'fetching', activeQ: q, openId: null, form: null });
+    this._ft = setTimeout(() => { this.setState({ pup: this.search(q).length ? 'found' : 'none' }); }, 850);
+  }
+
+  // ---------- open / delete ----------
+  openSop(id) {
+    const s = this.state.kb.sops.find((x) => x.id === id); if (!s) return;
+    if (this._blob) { URL.revokeObjectURL(this._blob); this._blob = null; }
+    let viewUrl = s.fileUrl || '';
+    if (viewUrl.startsWith('data:')) {
+      try {
+        const [head, b64] = viewUrl.split(','); const mime = (head.match(/data:([^;]+)/) || [])[1] || 'application/octet-stream';
+        const bin = atob(b64), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        this._blob = viewUrl = URL.createObjectURL(new Blob([arr], { type: mime }));
+      } catch (e) {}
+    }
+    this.setState({ openId: id, viewUrl, form: null });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  askConfirm(key, then) {
+    if (this.state.confirm === key) { clearTimeout(this._cf); this.setState({ confirm: '' }); return then(); }
+    clearTimeout(this._cf); this.setState({ confirm: key }); this._cf = setTimeout(() => this.setState({ confirm: '' }), 4000);
+  }
+  deleteSop(id) {
+    this.askConfirm('sop:' + id, () => {
+      const s = this.state.kb.sops.find((x) => x.id === id);
+      if (s && s.fileKey && window.WSIStore && WSIStore.server) WSIStore.delFile(s.fileKey);
+      this.update((kb) => { kb.sops = kb.sops.filter((x) => x.id !== id); return kb; });
+      this.setState({ openId: this.state.openId === id ? null : this.state.openId, notice: 'Deleted “' + (s ? s.title : 'SOP') + '”.' });
+    });
+  }
+
+  // ---------- add / edit ----------
+  startForm(s) {
+    this._files = [];
+    const first = this.state.section !== 'all' ? this.state.section : ((this.state.kb.sections[0] || {}).id || '');
+    this.setState({ form: s ? { id: s.id, title: s.title || '', sectionId: s.sectionId, summary: s.summary || '', tags: (s.tags || []).join(', '), body: s.body || '' } : { id: null, title: '', sectionId: first, summary: '', tags: '', body: '' }, picked: [], formErr: '', openId: null });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  async storeFile(file) {
+    if (window.WSIStore && WSIStore.server) {
+      const key = 'kb-' + Date.now().toString(36) + '-' + (file.name || 'file').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '').slice(-80);
+      await WSIStore.putFile(key, file);
+      return { fileUrl: WSIStore.fileUrl(key), fileKey: key };
+    }
+    if (file.size > 1.5e6) return { fileUrl: '', fileKey: '', note: file.name + ' is too large to keep in this browser, so only its text was saved. On the live site the file itself is stored.' };
+    const url = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+    return { fileUrl: url, fileKey: '' };
+  }
+  async saveSop(e) {
+    e.preventDefault();
+    const f = this.state.form, files = this._files || [];
+    if (!f.sectionId) return this.setState({ formErr: 'Pick a section first (or add one under Manage sections).' });
+    if (files.length <= 1 && !f.title.trim() && !files.length) return this.setState({ formErr: 'Give the SOP a title, or upload a file.' });
+    this.setState({ formBusy: true, formErr: '' });
+    const tags = f.tags.split(',').map((t) => t.trim()).filter(Boolean);
+    const now = Date.now(), by = this.who(), notes = [];
+    const made = [];
+    try {
+      const jobs = files.length ? files : [null];
+      for (let i = 0; i < jobs.length; i++) {
+        const file = jobs[i];
+        const rec = { sectionId: f.sectionId, summary: f.summary.trim(), tags, body: f.body, updatedAt: now, updatedBy: by };
+        if (file) {
+          let text = '';
+          try { text = window.WSIKbText ? await WSIKbText.fromFile(file) : ''; } catch (err) { notes.push("Couldn't read the text in " + file.name + ' (it can still be found by title and search words).'); }
+          let st;
+          try { st = await this.storeFile(file); } catch (err) { st = { fileUrl: '', fileKey: '', note: "Couldn't upload " + file.name + ' (' + err.message + '). Its text was saved.' }; }
+          if (st.note) notes.push(st.note);
+          Object.assign(rec, { text, fileUrl: st.fileUrl, fileKey: st.fileKey, fileName: file.name, fileType: file.type || '' });
+          rec.title = files.length > 1 || !f.title.trim() ? file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim() : f.title.trim();
+          if (!rec.summary && text) rec.summary = text.replace(/\s+/g, ' ').slice(0, 140).replace(/\s\S*$/, '') + '…';
+        } else rec.title = f.title.trim();
+        made.push(rec);
+      }
+      let openId = null;
+      this.update((kb) => {
+        made.forEach((rec, i) => {
+          const old = f.id && i === 0 ? kb.sops.find((x) => x.id === f.id) : null;
+          if (old) {
+            if (rec.fileName && old.fileKey && old.fileKey !== rec.fileKey && window.WSIStore && WSIStore.server) WSIStore.delFile(old.fileKey);
+            Object.assign(old, rec); openId = old.id;
+          } else { const id = 'sop-' + now.toString(36) + '-' + i; kb.sops.unshift({ id, body: '', text: '', fileUrl: '', fileName: '', fileType: '', ...rec }); openId = openId || id; }
+        });
+        return kb;
+      });
+      this._files = [];
+      const msg = (made.length > 1 ? 'Added ' + made.length + ' SOPs.' : f.id ? 'Saved changes.' : 'Added “' + made[0].title + '”.') + (notes.length ? ' ' + notes.join(' ') : '');
+      this.setState({ form: null, picked: [], formBusy: false, notice: msg, section: f.sectionId, activeQ: '', q: '', pup: 'idle' });
+      if (made.length === 1 && openId) this.openSop(openId);
+    } catch (err) { this.setState({ formBusy: false, formErr: 'Something went wrong: ' + err.message }); }
+  }
+
+  // ---------- sections ----------
+  moveSec(id, dir) { this.update((kb) => { const i = kb.sections.findIndex((s) => s.id === id), j = i + dir; if (i < 0 || j < 0 || j >= kb.sections.length) return kb; const t = kb.sections[i]; kb.sections[i] = kb.sections[j]; kb.sections[j] = t; return kb; }); }
+  delSec(id) {
+    const kb0 = this.state.kb;
+    if (kb0.sections.length <= 1) return this.setState({ notice: 'Keep at least one section. Rename this one instead.' });
+    this.askConfirm('sec:' + id, () => {
+      this.update((kb) => {
+        const i = kb.sections.findIndex((s) => s.id === id), to = kb.sections[i > 0 ? i - 1 : 1];
+        kb.sops.forEach((s) => { if (s.sectionId === id) s.sectionId = to.id; });
+        kb.sections.splice(i, 1); return kb;
+      });
+      if (this.state.section === id) this.setState({ section: 'all' });
+    });
+  }
+
+  renderVals() {
+    const st = this.state, kb = st.kb || { sections: [], sops: [] };
+    const embedded = !!this.props.embedded, canEdit = this.props.canEdit ?? !embedded;
+    const manage = canEdit && !!st.manage, conf = st.confirm;
+    const count = (id) => kb.sops.filter((s) => s.sectionId === id).length;
+    const isForm = manage && !!st.form, openSop = st.openId && kb.sops.find((s) => s.id === st.openId);
+    const isDetail = !isForm && !!openSop;
+    const isResults = !isForm && !isDetail && !!String(st.activeQ).trim();
+    const fetching = st.pup === 'fetching';
+    const hits = isResults && !fetching ? this.search(st.activeQ) : [];
+    const sectionObj = st.section === 'all' ? null : kb.sections.find((s) => s.id === st.section);
+    const browseList = (sectionObj ? kb.sops.filter((s) => s.sectionId === sectionObj.id) : kb.sops.slice()).sort((a, b) => sectionObj ? a.title.localeCompare(b.title) : (b.updatedAt || 0) - (a.updatedAt || 0));
+    const fileKind = (s) => (s.fileName ? (/\.pdf$/i.test(s.fileName) ? 'PDF' : /\.docx$/i.test(s.fileName) ? 'Word' : 'File') : 'Written');
+    const n = kb.sops.length;
+    const bubble = st.pup === 'fetching' ? 'Sniffing through ' + n + ' SOPs…'
+      : st.pup === 'found' ? 'Fetched ' + hits.length + (hits.length === 1 ? ' SOP' : ' SOPs') + ' for “' + st.activeQ.trim() + '”!'
+      : st.pup === 'none' ? 'Hmm, I couldn’t sniff out “' + st.activeQ.trim() + '”. Try another word?'
+      : "Hi, I'm Scout! Tell me what you need and I'll fetch the SOP.";
+    const picked = st.picked || [];
+    const f = st.form || {};
+    return {
+      logo: window.WSI_LOGO || 'assets/wsi-logo.png', embedded, standalone: !embedded, canEdit, minH: embedded ? '0' : '100vh', mainPad: embedded ? '0' : 'clamp(16px, 4vw, 40px)',
+      countLabel: n + (n === 1 ? ' SOP' : ' SOPs') + ' in ' + kb.sections.length + ' sections',
+      manage, manageLabel: manage ? 'Done managing' : 'Manage library', manageBg: manage ? '#262626' : '#FFFFFF', manageColor: manage ? '#FFFFFF' : '#262626',
+      toggleManage: () => this.setState({ manage: !manage, form: null }),
+      goHome: () => { clearTimeout(this._ft); this.setState({ q: '', activeQ: '', pup: 'idle', openId: null, form: null, section: 'all' }); },
+      bubble, pupClass: 'is-' + st.pup,
+      q: st.q, hasQ: !!st.q,
+      onQ: (e) => { const q = e.target.value; this.setState({ q }); clearTimeout(this._deb); if (!q.trim()) { clearTimeout(this._ft); return this.setState({ activeQ: '', pup: 'idle' }); } this._deb = setTimeout(() => this.fetchNow(q), 500); },
+      onSearch: (e) => { e.preventDefault(); this.fetchNow(this.state.q); },
+      clearQ: () => { clearTimeout(this._deb); clearTimeout(this._ft); this.setState({ q: '', activeQ: '', pup: 'idle' }); },
+      chips: ['payroll hours', 'post a job on Indeed', 'medical documents', 'new client', 'nursing mothers', 'missing hours'].map((label) => ({ label, pick: () => { this.setState({ q: label }); this.fetchNow(label); } })),
+      hasNotice: !!st.notice, notice: st.notice, clearNotice: () => this.setState({ notice: '' }),
+      navItems: [{ id: 'all', name: 'All SOPs', color: '#262626', count: n }].concat(kb.sections.map((s) => ({ id: s.id, name: s.name, color: s.color || '#7D7E7D', count: count(s.id) }))).map((x) => {
+        const on = !isResults && st.section === x.id;
+        return { ...x, bg: on ? '#FFFFFF' : 'transparent', weight: on ? 800 : 600, current: on ? 'page' : 'false', pick: () => { clearTimeout(this._ft); this.setState({ section: x.id, openId: null, form: null, activeQ: '', q: '', pup: 'idle' }); } };
+      }),
+      newSop: () => this.startForm(null),
+      // form
+      isForm, form: f, formHeading: f.id ? 'Edit SOP' : 'Add SOPs',
+      fileLabel: f.id ? 'Replace the document (optional)' : 'Upload SOP documents',
+      hasPicked: picked.length > 0, pickedLabel: picked.length === 1 ? 'Selected: ' + picked[0] : picked.length + ' files selected: ' + picked.join(', '),
+      multiPicked: picked.length > 1, showTitle: picked.length <= 1,
+      onFiles: (e) => { this._files = Array.from(e.target.files || []); this.setState({ picked: this._files.map((x) => x.name), formErr: '' }); },
+      onTitle: (e) => this.setState({ form: { ...this.state.form, title: e.target.value } }),
+      onSection: (e) => this.setState({ form: { ...this.state.form, sectionId: e.target.value } }),
+      onTags: (e) => this.setState({ form: { ...this.state.form, tags: e.target.value } }),
+      onSummary: (e) => this.setState({ form: { ...this.state.form, summary: e.target.value } }),
+      onBody: (e) => this.setState({ form: { ...this.state.form, body: e.target.value } }),
+      sectionOptions: kb.sections.map((s) => ({ id: s.id, name: s.name })),
+      hasFormErr: !!st.formErr, formErr: st.formErr, formBusy: !!st.formBusy,
+      saveLabel: st.formBusy ? 'Scout is reading the files…' : f.id ? 'Save changes' : picked.length > 1 ? 'Add ' + picked.length + ' SOPs' : 'Add SOP',
+      saveSop: (e) => this.saveSop(e), cancelForm: () => { this._files = []; this.setState({ form: null, picked: [], formErr: '' }); },
+      // detail
+      isDetail, backLabel: isResults || st.activeQ ? 'Back to results' : 'Back to the library',
+      closeDetail: () => { if (this._blob) { URL.revokeObjectURL(this._blob); this._blob = null; } this.setState({ openId: null, viewUrl: '' }); },
+      d: openSop ? {
+        title: openSop.title, summary: openSop.summary || '', sectionName: this.sec(openSop.sectionId).name, color: this.sec(openSop.sectionId).color,
+        updated: 'Updated ' + kbFmtDate(openSop.updatedAt) + (openSop.updatedBy ? ' by ' + openSop.updatedBy : ''),
+        hasFile: !!st.viewUrl, viewUrl: st.viewUrl, fileName: openSop.fileName || 'sop', isPdf: !!st.viewUrl && /\.pdf$/i.test(openSop.fileName || ''),
+        hasBody: !!(openSop.body || '').trim(), body: openSop.body || '', hasText: !!(openSop.text || '').trim(), text: openSop.text || '',
+        edit: () => this.startForm(openSop), del: () => this.deleteSop(openSop.id), delLabel: conf === 'sop:' + openSop.id ? 'Click again to delete' : 'Delete',
+      } : { title: '', summary: '', sectionName: '', color: '#7D7E7D', updated: '', hasFile: false, viewUrl: '', fileName: '', isPdf: false, hasBody: false, body: '', hasText: false, text: '' },
+      // results
+      isResults, isFetching: fetching, activeQ: String(st.activeQ).trim(),
+      resultsHeading: fetching ? 'Fetching “' + String(st.activeQ).trim() + '”…' : hits.length + (hits.length === 1 ? ' SOP' : ' SOPs') + ' for “' + String(st.activeQ).trim() + '”',
+      noResults: isResults && !fetching && !hits.length,
+      results: hits.map((h) => ({ title: h.s.title, sectionName: this.sec(h.s.sectionId).name, color: this.sec(h.s.sectionId).color, why: h.where === 'document' ? 'Found inside the document' : h.where === 'title' ? 'Matches the title' : h.where === 'tags' ? 'Matches a search word' : 'Matches the summary', parts: this.snippet(h.s, st.activeQ), open: () => this.openSop(h.s.id) })),
+      // sections manager
+      showSecMgr: manage && !isForm && !isDetail && !isResults,
+      secRows: kb.sections.map((s) => ({ name: s.name, desc: s.desc || '', color: s.color || '#7D7E7D', countLabel: count(s.id) + (count(s.id) === 1 ? ' SOP' : ' SOPs'),
+        onName: (e) => { const v = e.target.value; this.update((k) => { k.sections.find((x) => x.id === s.id).name = v; return k; }); },
+        onDesc: (e) => { const v = e.target.value; this.update((k) => { k.sections.find((x) => x.id === s.id).desc = v; return k; }); },
+        up: () => this.moveSec(s.id, -1), down: () => this.moveSec(s.id, 1), del: () => this.delSec(s.id), delLabel: conf === 'sec:' + s.id ? 'Click again' : 'Delete' })),
+      secName: st.secName, secDesc: st.secDesc, secEmpty: !st.secName.trim(),
+      onSecName: (e) => this.setState({ secName: e.target.value }), onSecDesc: (e) => this.setState({ secDesc: e.target.value }),
+      addSection: (e) => { e.preventDefault(); const name = this.state.secName.trim(); if (!name) return; const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) + '-' + Date.now().toString(36).slice(-4); this.update((k) => { k.sections.push({ id, name, desc: this.state.secDesc.trim(), color: KB_COLORS[k.sections.length % KB_COLORS.length] }); return k; }); this.setState({ secName: '', secDesc: '', notice: 'Added the “' + name + '” section.' }); },
+      // browse
+      isBrowse: !isForm && !isDetail && !isResults,
+      browseTitle: sectionObj ? sectionObj.name : 'All SOPs',
+      browseDesc: sectionObj ? (sectionObj.desc || count(sectionObj.id) + ' SOPs') : 'Newest first. Pick a section on the left to narrow it down.',
+      cards: browseList.map((s) => ({ title: s.title, summary: s.summary || '', sectionName: this.sec(s.sectionId).name, color: this.sec(s.sectionId).color || '#7D7E7D', meta: fileKind(s) + ' · ' + kbFmtDate(s.updatedAt), manage, open: () => this.openSop(s.id), edit: () => this.startForm(s), del: () => this.deleteSop(s.id), delLabel: conf === 'sop:' + s.id ? 'Sure?' : 'Delete' })),
+      emptySection: !browseList.length, emptyText: manage ? 'No SOPs here yet. Use “Add or upload SOPs” to add the first one.' : 'No SOPs in this section yet.',
+    };
+  }
+}
+</script>
+</body>
+</html>

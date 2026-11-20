@@ -6,7 +6,7 @@
   // Set to false before real use to start with no sample people or assignments.
   var SAMPLE_DATA = true;
 
-  var SYNC = { 'wsi-admin-v5': 'admin-v5', 'wsi-schedule': 'schedule', 'wsi-custom-modules': 'custom-modules', 'wsi-module-overrides': 'module-overrides', 'wsi-hidden-modules': 'hidden-modules' };
+  var SYNC = { 'wsi-admin-v5': 'admin-v5', 'wsi-schedule': 'schedule', 'wsi-custom-modules': 'custom-modules', 'wsi-module-overrides': 'module-overrides', 'wsi-hidden-modules': 'hidden-modules', 'wsi-kb': 'kb' };
   var LOCAL_ONLY_ADMIN = ['role', 'tab', 'filter', 'asgFilter'];
   var LEARNER = 'wsi-training-v2';
   var ls = window.localStorage;
