@@ -9,6 +9,7 @@ This folder is the deployable site. Training data (modules, edits, roles, people
 - `netlify/functions/files.mjs` – saves and serves uploaded images and files
 - `netlify/functions/email.mjs` – sends overdue emails when someone clicks Remind
 - `netlify/functions/overdue-reminders.mjs` – sends overdue emails automatically, weekdays at 9am Eastern
+- `netlify/functions/new-week-emails.mjs` – emails learners when a new week of their learning path opens, weekdays at 9am Eastern
 - `netlify/functions/ai-draft.mjs` – drafts module lessons from an SOP with AI
 - `netlify.toml` – tells Netlify where everything is
 - `package.json` – the libraries the functions need
@@ -49,7 +50,7 @@ If IT would rather not use an app password, the same functions can send through 
 ## Before real use
 
 - **Sample data:** open `wsi-store.js` and change `var SAMPLE_DATA = true;` to `false` to start without the sample people and assignments.
-- **Completion form:** submissions appear under **Site → Forms → training-completion**. Turn on email notifications there if you want them.
+- **Completions:** learners no longer press "Send to WSI". Completions show on the Dashboard as soon as the last lesson is finished.
 - **No sign-in yet:** anyone with the link can open the manager view and change data. Keep the URL internal until Google sign-in is added. As a stopgap, Netlify's site password (Site configuration → Access & security, on paid plans) puts one shared password on the whole site.
 
 ## Limits to know
@@ -60,6 +61,16 @@ If IT would rather not use an app password, the same functions can send through 
 - Learner progress is matched to people in the People list by full name. Associates without a WSI account are saved by the name they type.
 
 ## New in this version
+
+- **Navigation:** top tabs are Dashboard · People · Modules · SOP Library · Ninjio · Admin, each with a side menu. Assignments sits under Dashboard; Surveys, Emails, Archive and Training Schedules sit under Admin.
+- **SOP Library** with Scout the search pup: everyone can search and read SOPs; training managers and admins add, upload and organize them.
+- **Learning path folders** (Staffing → Front Office Administrators, Staffing Coordinators, Account Managers) with add / rename / delete.
+- **Shared first weeks:** set a path to "Start after" another (e.g. Staffing Week 1); its own weeks follow.
+- **Drag and drop** trainings within a week or between weeks.
+- **New-week emails:** learners get the "New week unlocked" template the morning a week opens (weeks 2+, follows the automatic-email switch).
+- Removed: auto-assign, the "needs review" banner, "Send completion to WSI" and the Avg score column under People.
+
+## Earlier
 
 - **Reports** tab combines Insights and Progress & scores, plus Recertification and Surveys & touchpoints.
 - **Ninjio** tab: upload the monthly Advanced Training Report (.xlsx). It reads the "User Performance" sheet, groups people by branch from the department column, and lets you review and send one email per branch manager.
